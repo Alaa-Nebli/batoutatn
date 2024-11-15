@@ -1,0 +1,477 @@
+/* about home page */ 
+.aboutSection {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 60px 80px;
+  text-align: left;
+  margin: 0 auto;
+  transition: all 0.3s ease-in-out;
+  width: 100%;
+  position: relative;
+}
+
+.japaneseShape {
+  position: absolute;
+  top: 20px;  /* Adjust this value to control the vertical position */
+  left: 0; /* Make sure it's always aligned to the far left of the viewport */
+  z-index: -1; /* Ensure it's behind the content */
+  transform: translateX(-50%); /* Push half of its width outside the viewport for visual effect */
+}
+
+.textContainer {
+  flex: 1;
+  margin-right: 50px;
+  color: #333;
+  line-height: 1.8;
+}
+
+.imageContainer {
+  flex: 1;
+  max-width: 50%;
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 12px 10px -10px rgba(236, 186, 124, 0.4); /* Subtle shadow */
+  transform: perspective(1000px) rotateY(0deg);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  will-change: transform, box-shadow;
+}
+
+.imageContainer:hover {
+  transform: perspective(1000px) rotateY(10deg) scale(1.05);
+  box-shadow: 0 25px 15px -10px rgba(236, 186, 124, 0.4); /* Subtle shadow */
+}
+
+.imageContainer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 216, 132, 0.2));
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.imageContainer:hover::before {
+  opacity: 1;
+}
+
+.imageContainer img {
+  width: 100%; /* Ensure the image fills the container */
+  height: auto;
+  transition: transform 0.8s ease;
+}
+
+.imageContainer:hover img {
+  transform: scale(1.1);
+}
+
+.heading {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  color: #2a3d5b;
+  letter-spacing: -0.02em;
+}
+
+.text {
+  font-size: 1.2rem;
+  color: #666;
+  line-height: 1.8;
+}
+
+.highlight {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .aboutSection {
+    padding: 40px 60px;
+  }
+
+  .heading {
+    font-size: 3rem;
+  }
+
+  .text {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .aboutSection {
+    flex-direction: column;
+    padding: 30px;
+  }
+
+  .textContainer {
+    margin-right: 0;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .imageContainer {
+    max-width: 100%;
+    margin-top: 20px;
+  }
+
+  .heading {
+    font-size: 2.7rem;
+  }
+
+  .text {
+    font-size: 1rem;
+  }
+}
+
+/* What Makes Us Different Section */
+
+.differentSection {
+  padding: 60px 20px;
+  background-color: #f9f9f9;
+  text-align: center;
+}
+
+.differentSection .heading {
+  font-size: 2.5rem;
+  color: #2a3d5b;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 50px;
+  line-height: 1.5;
+}
+
+.cardsWrapper {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.card {
+  margin: 10px;
+  background-color: #fff;
+  padding: 30px;
+  width: 30%;
+  min-height: 400px;
+  border-radius: 10px;
+  box-shadow: 0 12px 10px -10px rgba(236, 186, 124, 0.4); /* Subtle shadow */
+  transform: perspective(1000px) rotateY(0deg);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  will-change: transform, box-shadow;
+  text-align: center;
+  position: relative; /* Needed for absolute positioning of the image */
+  overflow: hidden; /* Ensures the image doesn't overflow out of the card */
+  justify-items: center ; 
+}
+
+.card img {
+  width: 50%; /* Ensure the image fills the card */
+  height: 50%;
+  transition: transform 0.5s ease; /* Smooth scaling effect */
+}
+
+/* When hovering on the card, the image inside scales */
+.card:hover img {
+  transform: scale(1.1); /* Scale the image by 10% */
+}
+
+.card:hover {
+  transform: translateY(-10px); /* The existing hover effect for the card */
+  box-shadow: 0 25px 15px -10px rgba(236, 186, 124, 0.4); /* Subtle shadow */
+
+}
+
+.cardTitle {
+  font-size: 1.5rem;
+  color: #e74c3c;
+  margin-top: 20px;
+  font-weight: bold;
+}
+
+.cardText {
+  font-size: 1rem;
+  color: #666;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .cardsWrapper {
+    flex-direction: column;
+  }
+
+  .card {
+    width: 80%;
+    margin: 20px auto;
+  }
+}
+
+/* Additional small screen optimizations */
+@media (max-width: 480px) {
+  .aboutSection {
+    padding: 20px;
+  }
+
+  .heading {
+    font-size: 2.4rem;
+  }
+
+  .text {
+    font-size: 0.9rem;
+  }
+}
+
+/* General Section Styling */
+.aboutSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 60px 80px;
+  text-align: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  background-color: #fff;
+}
+
+.timeline {
+  padding: 60px 80px;
+  text-align: left;
+}
+
+/* Titles Styling */
+.sectionTitle {
+  font-size: 3.5rem;
+  font-weight: 800;
+  color: #2a3d5b;
+  margin-bottom: 25px;
+  letter-spacing: -0.02em;
+  position: relative;
+}
+
+/* Moving Line Under Title */
+.sectionTitle::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -10px;
+  width: 50px; /* The width of the line */
+  height: 4px; /* The height of the line */
+  background-color: #e74c3c;
+  transition: width 0.4s ease-in-out;
+}
+
+/* Animate the line when hovering on the title */
+.sectionTitle:hover::after {
+  width: 100%;
+}
+
+/* Timeline items */
+.timelineItem {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 40px;
+}
+
+.date {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e74c3c;
+  margin-right: 20px;
+}
+
+.content h3 {
+  font-size: 1.8rem;
+  color: #2a3d5b;
+}
+
+.content p {
+  font-size: 1.1rem;
+  color: #666;
+  line-height: 1.8;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .sectionTitle {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .sectionTitle {
+    font-size: 2.7rem;
+  }
+}
+
+/* Our Values Section */
+.valuesSection {
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.cardsWrapper {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  width: 30%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card img {
+  margin-bottom: 15px;
+}
+
+.cardTitle {
+  font-size: 1.5rem;
+  color: #e74c3c;
+}
+
+.cardText {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+/* History Section */
+.historySection {
+  padding: 60px 20px;
+  position: relative;
+}
+
+.timeline {
+  position: relative;
+  margin: 0 auto;
+  width: 80%;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: #e74c3c;
+  transform: translateX(-50%);
+  height: 0; /* Start with zero height */
+  transition: height 1s ease-in-out;
+}
+
+.timelineItem {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease-in-out;
+  position: relative;
+  margin: 20px 0;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.timelineItem.left {
+  justify-content: flex-end;
+}
+
+.timelineItem.right {
+  justify-content: flex-start;
+}
+
+/* When visible */
+.timelineItem.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Timeline Cards */
+.timelineCard {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 300px;
+  z-index: 2;
+  position: relative;
+}
+
+.timelineCard h3 {
+  font-size: 1.5rem;
+  color: #e74c3c;
+  margin-bottom: 10px;
+}
+
+.timelineCard p {
+  color: #666;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Horizontal lines */
+.timelineItem::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 50px;
+  height: 4px;
+  background: #e74c3c;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.timelineItem.left::before {
+  right: 0;
+}
+
+.timelineItem.right::before {
+  left: 0;
+}
+
+/* Show vertical line on scroll */
+.timeline.show::before {
+  height: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .timeline::before {
+    left: 10px;
+  }
+
+  .timelineItem {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 20px;
+  }
+
+  .timelineItem.left,
+  .timelineItem.right {
+    justify-content: flex-start;
+  }
+
+  .timelineCard {
+    max-width: 100%;
+    margin-left: 20px;
+  }
+}

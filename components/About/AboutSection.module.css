@@ -1,0 +1,410 @@
+.aboutSection {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-items: center;
+  justify-content: space-between;
+  padding: 60px 80px;
+  text-align: left;
+  margin: 0 auto;
+  transition: all 0.3s ease-in-out;
+  width: 100%;
+  min-height: 500px;
+  position: relative;
+  background-color: #ffffff;
+}
+
+.japaneseShape {
+  position: absolute;
+  top: 20px;  /* Adjust this value to control the vertical position */
+  left: 0; /* Make sure it's always aligned to the far left of the viewport */
+  z-index: -1; /* Ensure it's behind the content */
+  transform: translateX(-50%); /* Push half of its width outside the viewport for visual effect */
+}
+
+.textContainer {
+  flex: 1;
+  margin-right: 50px;
+  color: #333;
+  line-height: 1.8;
+}
+
+.imageContainer {
+  flex: 1;
+  max-width: 30%;
+  position: relative;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 12px 10px -10px rgba(236, 186, 124, 0.4); /* Subtle shadow */
+  transform: perspective(1000px) rotateY(0deg);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  will-change: transform, box-shadow;
+}
+
+.imageContainer:hover {
+  transform: perspective(1000px) rotateY(10deg) scale(1.05);
+  box-shadow: 0 25px 15px -10px rgba(236, 186, 124, 0.4); /* Subtle shadow */
+}
+
+.imageContainer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5), rgba(255, 216, 132, 0.2));
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.imageContainer:hover::before {
+  opacity: 1;
+}
+
+.imageContainer img {
+  width: 100%; /* Ensure the image fills the container */
+  height: auto;
+  transition: transform 0.8s ease;
+}
+
+.imageContainer:hover img {
+  transform: scale(1.1);
+}
+
+.heading {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 25px;
+  color: #2a3d5b;
+  letter-spacing: -0.02em;
+}
+
+.text {
+  font-size: 1.2rem;
+  color: #666;
+  line-height: 1.8;
+}
+
+.highlight {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .aboutSection {
+    padding: 40px 60px;
+  }
+
+  .heading {
+    font-size: 3rem;
+  }
+
+  .text {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .aboutSection {
+    flex-direction: column;
+    padding: 30px;
+  }
+
+  .textContainer {
+    margin-right: 0;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .imageContainer {
+    max-width: 100%;
+    margin-top: 20px;
+  }
+
+  .heading {
+    font-size: 2.7rem;
+  }
+
+  .text {
+    font-size: 1rem;
+  }
+}
+
+/* What Makes Us Different Section */
+
+.differentSection {
+  padding: 60px 20px;
+  text-align: center;
+  min-height: 700px;
+  padding-bottom: 100px ;
+  background-image: linear-gradient(to right, #f4f4f4, #fffbf2);
+
+}
+
+.differentSection .heading {
+  font-size: 2.5rem;
+  color: #2a3d5b;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 50px;
+  line-height: 1.5;
+}
+
+.cardsWrapper {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+/* Card Styles */
+.card {
+  position: relative;
+  background-color: #fff;
+  padding: 30px;
+  width: 25%;
+  top: 50px;
+  min-height: 300px;
+  border-radius: 20px;
+  box-shadow: 0 12px 20px -10px rgba(11, 11, 11, 0.4);
+  transform: perspective(1000px) rotateY(0deg);
+  transition: transform 0.5s ease, box-shadow 0.5s ease;
+  text-align: center;
+  overflow: visible;
+  margin: 10px;
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 10px 25px 15px rgba(236, 186, 124, 0.4);
+  border: 1px solid rgba(236, 186, 124, 0.4);
+}
+
+/* Image inside the circle scales when the card is hovered */
+.card:hover .circleImage img {
+  transform: scale(1.1); /* Scale the image inside the circle */
+  transition: transform 0.3s ease; /* Add smooth transition for scaling */
+}
+
+/* Circular Image Styles */
+.circleImage {
+  position: absolute;
+  top: -40px;  /* Adjust to position half of the circle out of the card */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;  /* Circle size */
+  height: 100px;
+  background-color: #ffffff;  /* Red background (instead of blue) */
+  border: 1px solid #e74c3c ;
+
+  border-radius: 50%;  /* Make it a circle */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;  /* Ensure it's above the card content */
+  overflow: hidden;
+}
+
+.circleImage img {
+  width: 50%; /* Ensure the image fits nicely inside the circle */
+  height: 50%;
+  transition: transform 0.3s ease; /* Smooth scaling on hover */
+}
+
+/* Title and Text Styles */
+.cardTitle {
+  font-size: 1.5rem;
+  color: #000000;
+  margin-top: 80px;  /* Adjust margin to account for the circle */
+  font-weight: bold;
+}
+
+.cardText {
+  font-size: 1rem;
+  color: #666;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+/* Cards Wrapper */
+.cardsWrapper {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 1024px) {
+  .cardsWrapper {
+    flex-direction: column;
+  }
+
+  .card {
+    width: 80%;
+    margin: 20px auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .circleImage {
+    width: 80px;
+    height: 80px;
+  }
+
+  .cardTitle {
+    margin-top: 70px;
+  }
+}
+
+/* Additional small screen optimizations */
+@media (max-width: 480px) {
+  .aboutSection {
+    padding: 20px;
+  }
+
+  .heading {
+    font-size: 2.4rem;
+  }
+
+  .text {
+    font-size: 0.9rem;
+  }
+}
+
+
+/* Stats Section */
+.statsSection {
+  padding: 60px 20px;
+  background-color: rgba(236, 186, 124, 0.4);
+  text-align: center;
+  margin: 50px auto;
+}
+
+.statsWrapper {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.statItem {
+  flex: 1;
+  min-width: 200px;
+  margin: 10px;
+}
+
+.statItem h3 {
+  font-size: 3rem;
+  color: #2a3d5b;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.statItem p {
+  font-size: 1.2rem;
+  color: #666;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .statsWrapper {
+    flex-direction: column;
+  }
+}
+
+/* Services Section */
+.servicesSection {
+  padding: 100px ;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  align-content: center;
+  background-image: linear-gradient(to right, #f4f4f4, #fffbf2);
+
+}
+
+.servicesSection .subtitle {
+  text-align: center;
+  align-items: center;
+  width: 600px;
+}
+.serviceRow { 
+  display: flex;
+  align-items: center;
+  margin-top: 50px;
+}
+
+
+
+.serviceRow > .imageContainer{
+  flex: 1;
+}
+
+
+.serviceRow > .textContainer{
+  width: 200px;
+}
+
+@media (max-width: 768px) {
+  
+.serviceRow { 
+  flex-direction: column;
+  margin-bottom: 50px;
+}
+.imageContainer{
+  width: 200px;
+  height: 500px;
+  
+}
+
+}
+
+
+.puzzleSection {
+  background-color: rgba(236, 186, 124, 0.4); /* Same as stats section for consistency */
+  position: relative;
+  margin-top: 50px;
+  width: 100%;
+  max-height: 400px;
+}
+
+.puzzleWrapper {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* Create a 3x2 grid */
+  grid-template-rows: repeat(5, 200px); /* Each row has a height of 200px */
+  gap: 1px; /* Space between puzzle pieces */
+  width: 100%; /* Full width for responsiveness */
+}
+
+.puzzlePiece {
+  position: relative;
+  overflow: hidden; /* Ensure scaling images stay within bounds */
+  border-radius: 5px; /* Optional: Add rounded corners to the puzzle pieces */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.puzzlePiece:hover {
+  transform: scale(1.05); /* Scale up slightly on hover */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Add shadow for hover effect */
+}
+
+.puzzleImage {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease; /* Smooth hover scaling */
+}
+
+.puzzlePiece:hover .puzzleImage {
+  transform: scale(1.1); /* Scale the image inside the piece */
+}
+
+@media (max-width: 768px) {
+  .puzzleWrapper {
+    grid-template-columns: repeat(2, 1fr); /* Adjust to 2x3 grid for smaller screens */
+    grid-template-rows: repeat(3, 150px); /* Adjust row height */
+  }
+}
