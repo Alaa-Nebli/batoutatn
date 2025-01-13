@@ -1,6 +1,6 @@
 /**
 =========================================================
-** Banners Exports - Styles can be edit on @stylesheet - styles/core/components/banner
+** Banners Exports - Styles can be edit on styles/heet - styles/core/components/banner
 =========================================================
 **/
 

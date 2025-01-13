@@ -1,18 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { SectionContainer } from "@components/Section";
-import { Nav } from "@components/Nav";
+import { SectionContainer } from "components//Section";
+import { Nav } from "components//Nav";
 import { useTranslation } from 'next-i18next';
 
 export const Header = () => {
     const router = useRouter();
-    const { t } = useTranslation('common');
-
-    const languages = [
-        { code: 'en', name: 'English' },
-        { code: 'ja', name: '日本語' },
-    ];
+   
 
     return (
         <header
@@ -36,19 +31,6 @@ export const Header = () => {
                 </div>
                 <SectionContainer className="flex items-center">
                     <Nav />
-                    <div className="language-switcher ml-4">
-                        <select
-                            onChange={(e) => router.push(router.pathname, router.asPath, { locale: e.target.value })}
-                            value={router.locale}
-                            className="bg-transparent border border-gray-300 rounded-md px-2 py-1"
-                        >
-                            {languages.map((lang) => (
-                                <option key={lang.code} value={lang.code}>
-                                    {lang.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
                 </SectionContainer>
             </SectionContainer>
         </header>

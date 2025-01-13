@@ -1,9 +1,9 @@
 /**
 
 =========================================================
-** Nav Exports - Styles can be edit on @stylesheet - styles/core/components/nav
+** Nav Exports - Styles can be edit on styles/heet - styles/core/components/nav
 =========================================================
 
 **/
 
-export * from "@components/Nav/Nav";
+export * from "components//Nav/Nav";

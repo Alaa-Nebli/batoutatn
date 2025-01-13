@@ -1,9 +1,9 @@
 /**
 
 =========================================================
-** Header Exports - Styles can be edit on @stylesheet - styles/core/components/header
+** Header Exports - Styles can be edit on styles/heet - styles/core/components/header
 =========================================================
 
 **/
 
-export * from "@components/Header/Header";
+export * from "components//Header/Header";

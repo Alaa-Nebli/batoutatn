@@ -1,9 +1,9 @@
 /**
 
 =========================================================
-** Layout Exports - Styles can be edit on @stylesheet - styles/core/components/general
+** Layout Exports - Styles can be edit on styles/heet - styles/core/components/general
 =========================================================
 
 **/
 
-export * from "@components/Layout/Layout";
+export * from "components//Layout/Layout";

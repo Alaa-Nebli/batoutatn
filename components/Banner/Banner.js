@@ -4,7 +4,7 @@ import { Icon } from '@iconify/react';
 import Typewriter from 'typewriter-effect';
 import { useTranslation } from 'next-i18next';
 
-const Banner = ({Title,  subtitle,button_text}) => {
+const Banner = () => {
     const { t } = useTranslation('common');
     const { scrollY } = useScroll();
     const y = useTransform(scrollY, [0, 500], [0, 150]);
@@ -80,7 +80,11 @@ const Banner = ({Title,  subtitle,button_text}) => {
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
               <Typewriter
                 options={{
-                  strings: Title,
+                  strings: [
+                    t('Services.Banner.title_1'),
+                    t('Services.Banner.title_2'),
+                    t('Services.Banner.title_3'),
+                  ],
                   autoStart: true,
                   loop: true,
                   delay: 50,
@@ -95,7 +99,7 @@ const Banner = ({Title,  subtitle,button_text}) => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 }}
             >
-              {subtitle}
+              {t('Services.Banner.subtitle')}
             </motion.p>
   
             <motion.div
@@ -109,7 +113,7 @@ const Banner = ({Title,  subtitle,button_text}) => {
                 whileTap={{ scale: 0.95 }}
                 className="px-8 py-4 bg-orange-500 text-white rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-orange-500/50"
               >
-                {button_text}
+              {t('Services.Banner.button_text')}
               </motion.button>
             
             </motion.div>

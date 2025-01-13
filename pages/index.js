@@ -1,15 +1,15 @@
-import { Layout } from "@components/Layout";
-import SEO from "@components/SEO/SEO";
+import { Layout } from "components//Layout";
+import SEO from "components//SEO/SEO";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { motion} from 'framer-motion';
-import aboutImage from '@public/batouta_team.png'; // Use your uploaded image here
-import styles from '@components/About/AboutSection.module.css'; // Ensure you have the CSS file
+import aboutImage from 'public//batouta_team.png'; // Use your uploaded image here
+import styles from 'components//About/AboutSection.module.css'; // Ensure you have the CSS file
 import { useState, useEffect, useRef } from 'react';
 import Link from "next/link";
 import { Icon } from "@iconify/react";
-import { ContactUs } from "@components/Contact";
+import { ContactUs } from "components//Contact";
 
 export async function getStaticProps({ locale }) {
     return {
@@ -21,150 +21,150 @@ export async function getStaticProps({ locale }) {
 
 
 const Banner = () => {
-    const { t } = useTranslation('common');
-    const [currentIndex, setCurrentIndex] = useState(0);
-  
-    // Define banners using translation keys with fallback text
-    const banners = [
-      {
-        id: 1,
-        imageUrl: '/tunisia/Discover_Tunisia_Banner.webp',
-        title: t('Home.banner.slide1.title'),
-        description: t('Home.banner.slide1.description'),
-        alt: t('Home.banner.slide1.alt')
-      },
-      {
-        id: 2,
-        imageUrl: '/tunisia/nefta-Star_wars.webp',
-        title: t('Home.banner.slide2.title'),
-        description: t('Home.banner.slide2.description'),
-        alt: t('Home.banner.slide2.alt')
-      },
-      {
-        id: 3,
-        imageUrl: '/Tunisia/carthage-tunis-tunisia.jpg',
-        title: t('Home.banner.slide3.title'),
-        description: t('Home.banner.slide3.description'),
-        alt: t('Home.banner.slide3.alt')
-      },
-      {
-        id: 4,
-        imageUrl: '/tunisia/Chott-Jerid-Tunisia.jpg',
-        title: t('Home.banner.slide2.title'),
-        description: t('Home.banner.slide2.description'),
-        alt: t('Home.banner.slide2.alt')
-      },
-      {
-        id: 5,
-        imageUrl: '/Tunisia/Dougga.jpg',
-        title: t('Home.banner.slide3.title'),
-        description: t('Home.banner.slide3.description'),
-        alt: t('Home.banner.slide3.alt')
-      },
-      {
-        id: 5,
-        imageUrl: '/tunisia/Sidi_bou_saiid.jpg',
-        title: t('Home.banner.slide2.title'),
-        description: t('Home.banner.slide2.description'),
-        alt: t('Home.banner.slide2.alt')
-      },
-      {
-        id: 5,
-        imageUrl: '/Tunisia/tamerza.jpg',
-        title: t('Home.banner.slide3.title'),
-        description: t('Home.banner.slide3.description'),
-        alt: t('Home.banner.slide3.alt')
-      }
-    ];
-  
-    const handlePrev = () => {
-      setCurrentIndex((prevIndex) => (prevIndex - 1 + banners.length) % banners.length);
-    };
-  
-    const handleNext = () => {
-      setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
-    };
-  
-    // Automatic carousel
-    useEffect(() => {
-      const interval = setInterval(() => {
-        handleNext();
-      }, 3000);
-  
-      return () => clearInterval(interval);
-    }, [handleNext]);
-  
-    return (
-      <section className="relative h-screen overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-gray-800 opacity-20"></div>
-  
-        <div className="relative z-10 flex flex-col items-center justify-center h-full max-w-6xl mx-auto px-4 md:px-6 text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
-              {banners[currentIndex].title}
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300 mb-8 md:mb-12 max-w-2xl mx-auto">
-              {banners[currentIndex].description}
-            </p>
-            
-          </motion.div>
-        </div>
-  
-  
-        {/* Carousel slides */}
-        <div className="absolute inset-0 flex">
-          {banners.map((banner, index) => (
-            <div
-              key={banner.id}
-              className={`w-full h-full flex-shrink-0 ${
-                index === currentIndex ? 'block' : 'hidden'
-              }`}
-            >
-              <Image
-                src={banner.imageUrl}
-                alt={banner.alt}
-                layout="fill"
-                objectFit="cover"
-                priority
-                className="w-full h-full object-cover"
-              />
-            </div>
-          ))}
-        </div>
-          {/* Carousel controls */}
-        <div className="absolute top-1/2 transform -translate-y-1/2 w-full flex justify-between px-4 md:px-6">
-          <button
-            className="p-2 bg-white rounded-full shadow-md hover:bg-gray-200 transition-colors"
-            onClick={handlePrev}
-          >
-            <Icon icon="lucide:chevron-left" className="w-6 h-6 text-gray-800" />
-          </button>
-          <button
-            className="p-2 bg-white rounded-full shadow-md hover:bg-gray-200 transition-colors"
-            onClick={handleNext}
-          >
-            <Icon icon="lucide:chevron-right" className="w-6 h-6 text-gray-800" />
-          </button>
-        </div>
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        >
-          <div className="opacity-50 flex flex-col items-center">
-            <Icon icon="mdi:arrow-down-circle" className="w-8 h-8 md:w-12 md:h-12 text-orange" />
-          </div>
-        </motion.div>
-      </section>
-    );
+  const { t } = useTranslation('common');
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const banners = [
+    {
+      id: 1,
+      imageUrl: '/tunisia/japan.webp',
+      title: "Discover Japan",
+      description: t('Home.banner.slide1.description'),
+      alt: "Japan"
+    },
+    {
+      id: 2,
+      imageUrl: '/tunisia/nepal_places.jpg',
+      title: t('Home.banner.slide2.title'),
+      description: t('Home.banner.slide2.description'),
+      alt: t('Home.banner.slide2.alt')
+    },
+    {
+      id: 3,
+      imageUrl: '/tunisia/thailand-chaing-mai.jpg',
+      title: t('Home.banner.slide3.title'),
+      description: t('Home.banner.slide3.description'),
+      alt: t('Home.banner.slide3.alt')
+    },
+    {
+      id: 4,
+      imageUrl: '/tunisia/suisse.jpg',
+      title: t('Home.banner.slide4.title'),
+      description: t('Home.banner.slide4.description'),
+      alt: t('Home.banner.slide4.alt')
+    },
+    {
+      id: 5,
+      imageUrl: '/tunisia/thailand_1.jpg',
+      title: t('Home.banner.slide5.title'),
+      description: t('Home.banner.slide5.description'),
+      alt: t('Home.banner.slide5.alt')
+    },
+    {
+      id: 6,
+      imageUrl: '/tunisia/africa_south.webp',
+      title: t('Home.banner.slide6.title'),
+      description: t('Home.banner.slide6.description'),
+      alt: t('Home.banner.slide6.alt')
+    },
+    {
+      id: 7,
+      imageUrl: '/tunisia/safari.png',
+      title: t('Home.banner.slide7.title'),
+      description: t('Home.banner.slide7.description'),
+      alt: t('Home.banner.slide7.alt')
+    }
+  ];
+
+  const handlePrev = () => {
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + banners.length) % banners.length);
   };
 
-  const UniqueFeatureCard = ({ icon, title, description, delay }) => {
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      handleNext();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <section className="relative h-screen overflow-hidden">
+      {/* Subtle global overlay */}
+      <div className="absolute inset-0 bg-black/30"></div>
+
+      {/* Text content with improved container
+      <div className="absolute bottom-5 left-8 md:left-5 z-10 max-w-xl">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="backdrop-blur-sm bg-black/40 p-6 md:p-8 rounded-lg shadow-xl max-w-3xl"
+        >
+          <h3 className="text-4xl md:text-4xl font-bold text-white mb-6 text-shadow">
+            {banners[currentIndex].title}
+          </h3>
+         
+        </motion.div>
+      </div> */}
+
+      {/* Carousel slides */}
+      <div className="absolute inset-0 flex">
+        {banners.map((banner, index) => (
+          <div
+            key={banner.id}
+            className={`w-full h-full flex-shrink-0 transition-opacity duration-500 ${
+              index === currentIndex ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <Image
+              src={banner.imageUrl}
+              alt={banner.alt}
+              layout="fill"
+              objectFit="cover"
+              objectPosition="center 10%" // This pushes the image down slightly
+              priority
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Improved carousel controls */}
+      <div className="absolute top-1/2 transform -translate-y-1/2 w-full flex justify-between px-4 md:px-6">
+        <button
+          className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors duration-300"
+          onClick={handlePrev}
+        >
+          <Icon icon="lucide:chevron-left" className="w-6 h-6 text-gray-800" />
+        </button>
+        <button
+          className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors duration-300"
+          onClick={handleNext}
+        >
+          <Icon icon="lucide:chevron-right" className="w-6 h-6 text-gray-800" />
+        </button>
+      </div>
+
+      {/* Improved scroll indicator */}
+      <motion.div
+        className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+        animate={{ y: [0, 10, 0] }}
+        transition={{ duration: 1.5, repeat: Infinity }}
+      >
+        <div className="backdrop-blur-sm bg-white/20 p-2 rounded-full">
+          <Icon icon="mdi:arrow-down-circle" className="w-8 h-8 md:w-12 md:h-12 text-white" />
+        </div>
+      </motion.div>
+    </section>
+  );
+};
+
+const UniqueFeatureCard = ({ icon, title, description, delay }) => {
     return (
       <motion.div
         className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
@@ -183,6 +183,7 @@ const Banner = () => {
       </motion.div>
     );
   };
+  
 export default function Home() {
     const { t } = useTranslation('common');
 
@@ -193,16 +194,16 @@ export default function Home() {
     const servicesSectionRef = useRef(null); // Ref for the services section
     const [showLoading, setShowLoading] = useState(true);
     const [puzzleImages, setPuzzleImages] = useState([
-    '/tunisia/1-The_antient_town_of_Carthage.jpg',
-    '/tunisia/4-Bardo_Museum.jpg',
-    '/tunisia/5-Dugga.jpg',
-    '/tunisia/21-The_Atlas_Mountains.jpg',
-    '/tunisia/jam_amphi.webp',
-    '/tunisia/Tenue-traditionnelle-tunisienne.jpg',
-    '/tunisia/tunisia_art.webp',
-    '/tunisia/sidi_bou_said.jpg',
-    '/tunisia/25-Remains_of_scenery.jpg',
-    '/tunisia/12-Habib_Bourguiba_Mausoleum.jpg',
+    '/tunisia/thailand-chaing-mai.jpg',
+    '/tunisia/nepal-culture.jpg',
+    '/tunisia/africa_south.webp',
+    '/tunisia/nepal.webp',
+    '/tunisia/safari.jpg',
+    '/tunisia/thailand.png',
+    '/tunisia/suisse.jpg',
+    '/tunisia/japan_city.jpg',
+    '/tunisia/japan.webp',
+    '/tunisia/japan_1.jpg',
   ]);
 
   useEffect(() => {
@@ -225,27 +226,27 @@ export default function Home() {
 
   const services = [
     {
-      title: t('Home.Our_Services_section.Leisure_Travel.Title'),
-      description: t('Home.Our_Services_section.Leisure_Travel.Description'),
+      title: t('Home.Our_Services_section.Group_Travel.Title'),
+      description: t('Home.Our_Services_section.Group_Travel.Description'),
       image: '/group_travel.jpg',
       imageAlt: 'Group Leisure Travel'
     },
     {
-      title: t('Home.Our_Services_section.GFT.Title'),
-      description: t('Home.Our_Services_section.GFT.Description'),
-      image: '/fit.jpg',
+      title: t('Home.Our_Services_section.Events_Organization.Title'),
+      description: t('Home.Our_Services_section.Events_Organization.Description'),
+      image: '/events.jpg',
       imageAlt: 'FIT Travel'
     },
     {
-      title: t('Home.Our_Services_section.Shore_Excursions.Title'),
-      description: t('Home.Our_Services_section.Shore_Excursions.Description'),
-      image: '/group_leisure_travel.webp',
+      title: t('Home.Our_Services_section.Transport.Title'),
+      description: t('Home.Our_Services_section.Transport.Description'),
+      image: '/transport.png',
       imageAlt: 'Shore Excursions'
     },
     {
-      title: t('Home.Our_Services_section.MICE.Title'),
-      description: t('Home.Our_Services_section.MICE.Description'),
-      image: '/group_leisure_travel.webp',
+      title: t('Home.Our_Services_section.Billetterie.Title'),
+      description: t('Home.Our_Services_section.Billetterie.Description'),
+      image: '/billeterie.webp',
       imageAlt: 'MICE'
     }
   ];

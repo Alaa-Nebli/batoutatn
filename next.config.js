@@ -20,7 +20,7 @@ const nextConfig = {
     env: {
         siteTitle: "Batouta Voyages",
         siteDescription: "Since its founding in 1995, Batouta Voyages has been committed to providing unique and enriching travel experiences. Originally created to meet the needs of Japanese travelers, our agency quickly diversified to welcome clients from around the world: Europe, America, the Middle East, and our local market in Tunisia.",
-        siteKeywords: "your company keywords",
+        siteKeywords: "Travel, Agency, Tunisia",
         siteUrl: "https://www.batouta.tn/",
         siteImagePreviewUrl: "/Batouta_Logo.png",
     },

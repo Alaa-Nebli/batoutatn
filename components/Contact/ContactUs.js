@@ -1,8 +1,18 @@
 import React, {useRef,useState} from "react";
 import { useInView, motion, AnimatePresence} from "framer-motion";
 import { Icon } from '@iconify/react';
+import { useTranslation } from "next-i18next";
+
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  }
+} 
 
 const Contact = () => {
+  const {t} = useTranslation('common');
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
   const [formState, setFormState] = useState({
@@ -27,19 +37,19 @@ const Contact = () => {
   const contactInfo = [
     {
       icon: "mdi:map-marker",
-      title: "Visit Us",
-      content: "97, Rue de Palestine 2ème étage 1002 TUNIS",
+      title: t('Contact.info.adress_title'),
+      content:  t('Contact.info.address'),
       color: "blue"
     },
     {
       icon: "mdi:phone",
-      title: "Call Us",
-      content: "(+216) 71 802 881",
+      title: t('Contact.info.phone_title'),
+      content:  t('Contact.info.phone'),
       color: "green"
     },
     {
       icon: "mdi:email",
-      title: "Email Us",
+      title: t('Contact.info.email_title'),
       content: "reservation.batouta@gmail.com",
       color: "purple"
     }
@@ -75,11 +85,11 @@ const Contact = () => {
           className="text-center mb-16"
         >
           <h2 className="text-5xl font-bold mb-4 bg-gradient-to-r from-orange-500 to-purple-600 text-transparent bg-clip-text">
-            Get in Touch
+         { t('Contact.title')}
           </h2>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            We'd love to hear from you. Whether you have a question about our services,
-            pricing, or anything else, our team is ready to answer all your questions.
+         { t('Contact.description')}
+            
           </p>
         </motion.div>
 
@@ -100,7 +110,7 @@ const Contact = () => {
                   <motion.div className="relative">
                     <input
                       type="text"
-                      placeholder="Your Name"
+                      placeholder={t('Contact.Email_form.name')}
                       value={formState.name}
                       onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-300"
@@ -110,7 +120,7 @@ const Contact = () => {
                   <motion.div className="relative">
                     <input
                       type="email"
-                      placeholder="Your Email"
+                      placeholder={t('Contact.Email_form.email')}
                       value={formState.email}
                       onChange={(e) => setFormState({ ...formState, email: e.target.value })}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-300"
@@ -122,7 +132,7 @@ const Contact = () => {
                 <motion.div className="relative">
                   <input
                     type="text"
-                    placeholder="Subject"
+                    placeholder={t('Contact.Email_form.subject')}
                     value={formState.subject}
                     onChange={(e) => setFormState({ ...formState, subject: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 transition-all duration-300"
@@ -132,7 +142,7 @@ const Contact = () => {
 
                 <motion.div className="relative">
                   <textarea
-                    placeholder="Your Message"
+                    placeholder={t('Contact.Email_form.message')}
                     value={formState.message}
                     onChange={(e) => setFormState({ ...formState, message: e.target.value })}
                     rows={5}
@@ -168,7 +178,7 @@ const Contact = () => {
                         className="flex items-center justify-center text-white"
                       >
                         <Icon icon="mdi:check" className="w-5 h-5 mr-2" />
-                        Message Sent!
+                        {t('Contact.Email_form.success_message')}
                       </motion.div>
                     ) : (
                       <motion.span
@@ -177,7 +187,7 @@ const Contact = () => {
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                       >
-                        Send Message
+                        {t('Contact.Email_form.send_button')}
                       </motion.span>
                     )}
                   </AnimatePresence>

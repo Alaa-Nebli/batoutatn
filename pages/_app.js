@@ -1,25 +1,44 @@
-import "@styles/globals.scss";
-import { appWithTranslation } from 'next-i18next'
-import { LoadingScreen } from "@components/loading";
-import React from "react";
-import {useEffect,useState} from 'react';
-function App({ Component, pageProps }) {
+// pages/_app.js
+import "styles//globals.scss";
+import { appWithTranslation } from 'next-i18next';
+import { LoadingScreen } from "components//loading";
+import { Layout } from "components//Layout";
+import { SessionProvider } from 'next-auth/react';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from "next/router";
+
+function App({ Component, pageProps: { session, ...pageProps } }) {
     const [isLoading, setIsLoading] = useState(true);
+    const router = useRouter();
+
+    const isAdminRoute = router.pathname.startsWith('/admin');
 
     useEffect(() => {
-        // Simulate a loading delay (e.g., for fetching data or assets)
         const timer = setTimeout(() => {
             setIsLoading(false);
-        }, 5000); // Adjust the delay as needed
+        }, 5000);
 
         return () => clearTimeout(timer);
     }, []);
 
-    // Show the Loading component during the first load
     if (isLoading) {
         return <LoadingScreen />;
     }
-    return <Component {...pageProps} />;
+
+    return (
+        <SessionProvider session={session}>
+           {
+            isAdminRoute ? (
+                <Layout>
+                    <Component {...pageProps} />
+                </Layout>
+            ) : (
+                    <Component {...pageProps} />
+            )
+           } 
+
+        </SessionProvider>
+    );
 }
 
 export default appWithTranslation(App);

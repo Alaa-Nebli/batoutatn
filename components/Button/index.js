@@ -1,10 +1,10 @@
 /**
 
 =========================================================
-** Button Exports - Styles can be edit on @stylesheet - styles/core/components/button
+** Button Exports - Styles can be edit on styles/heet - styles/core/components/button
 =========================================================
 
 **/
 
-export * from "@components/Button/Button";
-export * from "@components/Button/ButtonGroup";
+export * from "components//Button/Button";
+export * from "components//Button/ButtonGroup";

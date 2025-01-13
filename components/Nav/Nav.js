@@ -13,12 +13,13 @@ export const Nav = () => {
         { name: t('nav.home'), href: "/" },
         { name: t('nav.about'), href: "/about" },
         { name: t('nav.our_services'), href: "/our_services" },
+        { name: "Nos Programs", href: "/programs/programs" },
         {
             name: t('nav.contact'),
             href: "https://www.facebook.com/profile.php?id=100057621002945&locale=gl_ES&_rdr",
             isArrow: true,
             target: "_blank"
-        }
+        },
     ];
 
     const closeNav = () => {

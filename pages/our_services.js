@@ -1,160 +1,71 @@
 import React, { useState, useEffect,useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Layout } from "@components/Layout";
-import SEO from "@components/SEO/SEO";
+import { Layout } from "components//Layout";
+import SEO from "components//SEO/SEO";
 import Image from 'next/image';
 import { Icon } from "@iconify/react";
 import { useTranslation } from 'next-i18next';
-import Banner from '@components/Banner/Banner';
-import Contact from '@components/Contact/ContactUs';
+import Banner from 'components//Banner/Banner';
+import Contact from 'components//Contact/ContactUs';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import Link from 'next/link';
 
-export async function getStaticProps({ locale }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ['common'])),
-    },
-  }
-}
-
-// ServiceCard Component with horizontal scroll on mobile
-const ServiceCard = ({ service, index, isSelected, onClick }) => {
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      onClick(service);
-    }
-  };
-
+const ServiceCard = ({ service, onClick }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, x: 50 }}
-      whileInView={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: index * 0.2 }}
-      className="relative group min-w-[280px] w-full"
+      transition={{ duration: 0.5 }}
+      className="w-full max-w-[660px] mx-auto cursor-pointer"
       onClick={() => onClick(service)}
       role="button"
       tabIndex={0}
-      onKeyDown={handleKeyPress}
     >
-      <div 
-        className={`relative h-[220px] rounded-3xl overflow-hidden transform transition-all duration-500 ${
-          isSelected ? 'ring-4 ring-orange-500 scale-105 shadow-2xl' : 'hover:scale-102 hover:shadow-xl'
-        }`}
-      >
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent z-10" />
-        <Image
-          src={service.imageSrc}
-          alt={service.title}
-          layout="fill"
-          objectFit="cover"
-          priority={index < 2}
-          className="transition-transform duration-700 group-hover:scale-110"
-        />
-        
-        <div className="absolute inset-0 z-20 p-6 flex flex-col justify-between">
-          <div className={`bg-white/90 backdrop-blur-sm w-14 h-14 rounded-full flex items-center justify-center transform transition-transform duration-300 ${
-            isSelected ? 'scale-110' : 'group-hover:scale-110'
-          }`}>
-            <Icon icon={service.icon} className="text-2xl text-orange-500" />
-          </div>
-          
-          <div>
-            <h3 className="text-2xl font-bold text-white mb-2">{service.title}</h3>
-            <p className="text-white/90 text-sm line-clamp-2">{service.description}</p>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
-// Enhanced ServiceContent Component
-const ServiceContent = ({ service }) => {
-  if (!service) return null;
-
-  return (
-    <motion.div
-      key={service.id}
-      className="relative bg-white rounded-3xl border border-gray-100 overflow-hidden mt-8 shadow-2xl"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
-        <div className="relative h-[400px] lg:h-full">
+      <div className="relative min-h-[600px] rounded-3xl overflow-hidden shadow-xl group transition-all duration-500 ease-in-out transform hover:scale-105 hover:shadow-2xl">
+        {/* Image Section */}
+        <div className="relative h-[230px] w-full rounded-t-3xl">
           <Image
             src={service.imageSrc}
             alt={service.title}
             layout="fill"
             objectFit="cover"
-            className="transition-transform duration-700 hover:scale-105"
+            className="transition-transform duration-300 group-hover:scale-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex items-center p-12">
-            <div className="text-white max-w-md">
-              <div className="bg-orange-500/90 w-16 h-16 rounded-full flex items-center justify-center mb-6">
-                <Icon icon={service.icon} className="text-3xl" />
-              </div>
-              <h3 className="text-4xl font-bold mb-4">{service.title}</h3>
-              <p className="text-lg text-white/90">{service.description}</p>
-            </div>
-          </div>
         </div>
 
-        <div className="p-12 bg-gradient-to-br from-gray-50 to-white">
-          <div className="space-y-8">
-            <div>
-              <h4 className="text-2xl font-bold mb-6">Key Features</h4>
-              <div className="grid grid-cols-2 gap-4">
-                {service.features.map((feature, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center space-x-3 p-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300"
-                  >
-                    <div className="bg-orange-100 p-2 rounded-full">
-                      <Icon icon="mdi:check" className="text-orange-500 text-xl" />
-                    </div>
-                    <span className="text-gray-700 font-medium">{feature}</span>
-                  </div>
-                ))}
-              </div>
+        {/* Card Content */}
+        <div className="p-6 bg-white rounded-b-3xl">
+          {/* Icon and Title */}
+          <div className="flex items-center mb-6">
+            <div className="bg-orange-100 p-4 rounded-full shadow-xl">
+              <Icon icon={service.icon} className="text-orange-500 text-2xl" />
             </div>
+            <h3 className="text-2xl font-bold text-gray-800 ml-3">{service.title}</h3>
+          </div>
 
-            <div>
-              <h4 className="text-2xl font-bold mb-6">Experience Highlights</h4>
-              <div className="space-y-4">
-                {service.highlights.map((highlight, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="p-6 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
-                  >
-                    <h5 className="font-bold text-lg mb-2 text-gray-800">{highlight.title}</h5>
-                    <p className="text-gray-600">{highlight.description}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+          {/* Description */}
+          <p className="text-gray-600 text-base line-clamp-3 mb-4">{service.description}</p>
 
-            <Link href={"#contact"}   >
-            <button className="w-full py-4 px-8 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg hover:scale-102 transition-all duration-300">
-              <span className="flex items-center justify-center space-x-2">
-                <span>Learn More</span>
-                <Icon icon="mdi:arrow-right" className="text-xl" />
-              </span>
-            </button>
-            </Link>  
+          {/* Key Features */}
+          <div className="mt-4">
+            <h4 className="text-lg font-medium text-gray-800 mb-2">Key Features:</h4>
+            <ul className="space-y-3">
+              {service.features.map((feature, index) => (
+                <li key={index} className="text-gray-600 text-sm flex items-center space-x-2">
+                  <Icon icon="mdi:check-circle" className="text-green-500 text-lg" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
     </motion.div>
   );
 };
+
+
 
 // Update the TestimonialsSection component
 const TestimonialsSection = () => {
@@ -220,37 +131,36 @@ const TestimonialsSection = () => {
   );
 };
 
-// Enhanced WhyChooseUsSection
 const WhyChooseUsSection = () => {
   const { t } = useTranslation('common');
 
   const reasonsToChoose = [
     {
-      title: "Personalized Experiences",
-      description: "Tailored travel plans that match your unique preferences and dreams",
-      features: ["Custom Itineraries", "Personal Guide", "Flexible Planning"],
+      title: t('Services.WhyChooseUs.reasons.Personalized_Experiences.title'),
+      description: t('Services.WhyChooseUs.reasons.Personalized_Experiences.description'),
+      features: t('Services.WhyChooseUs.reasons.Personalized_Experiences.features', {returnObjects: true}),
       icon: "mdi:account-heart",
       gradient: "from-blue-500 to-indigo-500"
     },
     {
-      title: "Expert Knowledge",
-      description: "Years of experience and deep local insights at your service",
-      features: ["Local Expertise", "Hidden Gems", "Cultural Insights"],
+      title: t('Services.WhyChooseUs.reasons.Expertise_and_Knowledge.title'),
+      description: t('Services.WhyChooseUs.reasons.Expertise_and_Knowledge.description'),
+      features: t('Services.WhyChooseUs.reasons.Expertise_and_Knowledge.features', {returnObjects: true}),
       icon: "mdi:lightbulb",
       gradient: "from-orange-500 to-pink-500"
     },
     {
-      title: "Premium Support",
-      description: "24/7 dedicated assistance throughout your journey",
-      features: ["Always Available", "Quick Response", "Emergency Help"],
+      title: t('Services.WhyChooseUs.reasons.Convenience_and_Efficiency.title'),
+      description: t('Services.WhyChooseUs.reasons.Convenience_and_Efficiency.description'),
+      features: t('Services.WhyChooseUs.reasons.Convenience_and_Efficiency.features', {returnObjects: true}),
       icon: "mdi:headphones",
       gradient: "from-green-500 to-teal-500"
     },
     {
-      title: "Best Value",
-      description: "Competitive prices without compromising on quality",
-      features: ["Price Match", "Special Deals", "Group Discounts"],
-      icon: "mdi:currency-usd",
+      title: t('Services.WhyChooseUs.reasons.Dedicated_Customer_Support.title'),
+      description: t('Services.WhyChooseUs.reasons.Dedicated_Customer_Support.description'),
+      features: t('Services.WhyChooseUs.reasons.Dedicated_Customer_Support.features', {returnObjects: true}),
+      icon: "mdi:headphones",
       gradient: "from-purple-500 to-pink-500"
     }
   ];
@@ -287,12 +197,15 @@ const WhyChooseUsSection = () => {
                 <h3 className="text-xl font-bold text-gray-900 mb-4">{reason.title}</h3>
                 <p className="text-gray-600 mb-6">{reason.description}</p>
                 <ul className="space-y-3">
-                  {reason.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-gray-700">
-                      <Icon icon="mdi:check-circle" className="text-green-500" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
+
+                    {
+                    reason.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-center gap-2 text-gray-700">
+                        <Icon icon="mdi:check-circle" className="text-green-500" />
+                        <span>{feature}</span>
+                      </li>
+                    ))
+                  }
                 </ul>
               </div>
             </motion.div>
@@ -302,29 +215,28 @@ const WhyChooseUsSection = () => {
     </section>
   );
 };
-
 const PromiseSection = () => {
   const { t } = useTranslation('common');
   
   const promises = [
     {
       icon: "mdi:star-shooting",
-      title: "Unique Experience",
-      description: "An adventure that you've never experienced before, creating moments that will last a lifetime",
+      title: t('Services.PromiseSection.unique_experience.title'),
+      description: t('Services.PromiseSection.unique_experience.description'),
       color: "from-purple-500 to-indigo-500",
       pattern: "radial-gradient(circle at 10% 20%, rgb(255, 200, 124) 0%, rgb(252, 251, 121) 90%)"
     },
     {
       icon: "mdi:party-popper",
-      title: "Fun and Joy",
-      description: "Unforgettable moments filled with laughter and excitement alongside our passionate team and expert guides",
+      title: t('Services.PromiseSection.fun.title'),
+      description: t('Services.PromiseSection.fun.description'),
       color: "from-orange-500 to-red-500",
       pattern: "radial-gradient(circle at 10% 20%, rgb(255, 131, 98) 0%, rgb(255, 211, 165) 90%)"
     },
     {
       icon: "mdi:heart-multiple",
-      title: "Complete Satisfaction",
-      description: "We go above and beyond to ensure every aspect of your journey exceeds your expectations",
+      title: t('Services.PromiseSection.satisfaction.title'),
+      description: t('Services.PromiseSection.satisfaction.description'),
       color: "from-pink-500 to-rose-500",
       pattern: "radial-gradient(circle at 10% 20%, rgb(255, 162, 168) 0%, rgb(255, 193, 217) 90%)"
     }
@@ -345,10 +257,10 @@ const PromiseSection = () => {
           className="text-center mb-16"
         >
           <span className="text-lg font-semibold text-orange-500 mb-4 block">
-            What Sets Us Apart
+            {  t('Services.PromiseSection.subTitle') }
           </span>
           <h2 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-pink-600 mb-6">
-            Our Promise To You
+          {  t('Services.PromiseSection.title') }
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-pink-500 mx-auto" />
         </motion.div>
@@ -400,12 +312,21 @@ const PromiseSection = () => {
   );
 };
 
+export async function getStaticProps({ locale }) {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale, ['common'])),
+    },
+  }
+}
+
+
 const ServicesPage = () => {
   const { t } = useTranslation('common');
   const containerRef = useRef(null);
   const [selectedService, setSelectedService] = useState(null);
   const [isClient, setIsClient] = useState(false);
-
+  
   const services = [
     {
       id: 1,
@@ -419,37 +340,36 @@ const ServicesPage = () => {
     },
     {
       id: 2,
-      title: t('Services.ServiceCards.MICE.Title'),
-      description: t('Services.ServiceCards.MICE.Description'),
-      imageSrc: '/fit.jpg',
+      title: t('Services.ServiceCards.Transport.Title'),
+      description: t('Services.ServiceCards.Transport.Description'),
+      imageSrc: '/transport.png',
       icon: 'mdi:company',
-      features: t('Services.ServiceCards.MICE.features', { returnObjects: true }),
-      highlights: t('Services.ServiceCards.MICE.highlights', { returnObjects: true }),
+      features: t('Services.ServiceCards.Transport.features', { returnObjects: true }),
+      highlights: t('Services.ServiceCards.Transport.highlights', { returnObjects: true }),
       gradient: 'from-orange-500 to-pink-500'
     },
     {
       id: 3,
-      title: t('Services.ServiceCards.Shore_Excursions.Title'),
-      description: t('Services.ServiceCards.Shore_Excursions.Description'),
-      imageSrc: '/group_leisure_travel.webp',
+      title: t('Services.ServiceCards.Events_Organization.Title'),
+      description: t('Services.ServiceCards.Events_Organization.Description'),
+      imageSrc: '/events.jpg',
       icon: 'mdi:ship-wheel',
-      features: t('Services.ServiceCards.Shore_Excursions.features', { returnObjects: true }),
-      highlights: t('Services.ServiceCards.Shore_Excursions.highlights', { returnObjects: true }),
+      features: t('Services.ServiceCards.Events_Organization.features', { returnObjects: true }),
+      highlights: t('Services.ServiceCards.Events_Organization.highlights', { returnObjects: true }),
       gradient: 'from-green-500 to-teal-500'
     },
     {
       id: 4,
-      title: t('Services.ServiceCards.FIT.Title'),
-      description: t('Services.ServiceCards.FIT.Description'),
-      imageSrc: '/fit.jpg',
+      title: t('Services.ServiceCards.Billetterie.Title'),
+      description: t('Services.ServiceCards.Billetterie.Description'),
+      imageSrc: '/billeterie.webp',
       icon: 'mdi:human-male',
-      features: t('Services.ServiceCards.FIT.features', { returnObjects: true }),
-      highlights: t('Services.ServiceCards.FIT.highlights', { returnObjects: true }),
+      features: t('Services.ServiceCards.Billetterie.features', { returnObjects: true }),
+      highlights: t('Services.ServiceCards.Billetterie.highlights', { returnObjects: true }),
       gradient: 'from-yellow-500 to-red-500'
-    }
+    },
   ];
  
-  // Handle client-side rendering
   useEffect(() => {
     setIsClient(true);
     if (!selectedService && services.length > 0) {
@@ -458,10 +378,8 @@ const ServicesPage = () => {
   }, []);
 
   const handleServiceClick = (service) => {
-    console.log(service)
     if (selectedService?.id !== service.id) {
       setSelectedService(service);
-      // Scroll to content if on mobile
       if (window.innerWidth < 768) {
         const contentElement = document.getElementById('service-content');
         if (contentElement) {
@@ -471,47 +389,30 @@ const ServicesPage = () => {
     }
   };
 
-  
   return (
     <Layout className="bg-gradient-to-b from-white to-orange-50">
       <div className="main-wrapper relative z-10">
         <Banner 
-          Title={[
-            'Experience <span class="text-orange-500">Adventure</span>',
-            'Create <span class="text-orange-500">Memories</span>',
-            'Explore <span class="text-orange-500">Dreams</span>'
-          ]} 
+          Title={t("Services.Banner.Title")} 
           subtitle="Crafting Unforgettable Journey Experiences" 
           button_text="Start Your Adventure"
         />
         
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          {/* Updated carousel container */}
           <div className="md:-mx-4">
-            <div className="flex md:grid md:grid-cols-4 gap-6 overflow-x-auto md:overflow-x-visible snap-x snap-mandatory md:snap-none pb-6 md:pb-0">
+            {/* Update the grid to achieve the desired layout */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 md:gap-8">
               {services.map((service, index) => (
                 <ServiceCard 
                   key={service.id} 
                   service={service} 
-                  index={index}
-                  isSelected={selectedService?.id === service.id}
                   onClick={handleServiceClick}
                 />
               ))}
             </div>
           </div>
-
-          <div id="service-content" className="mt-12">
-            <AnimatePresence mode="wait">
-              {selectedService && (
-                <ServiceContent 
-                  key={selectedService.id} 
-                  service={selectedService} 
-                />
-              )}
-            </AnimatePresence>
-          </div>
         </div>
+
         <PromiseSection />
         <TestimonialsSection />
         <WhyChooseUsSection />
@@ -520,7 +421,6 @@ const ServicesPage = () => {
     </Layout>
   );
 };
-
 
 
 export default ServicesPage;

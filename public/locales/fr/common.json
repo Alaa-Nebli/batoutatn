@@ -1,0 +1,336 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "about": "À Propos",
+    "our_services": "Nos Services",
+    "contact": "Contactez-nous"
+  },
+  
+  "Home": {
+    "banner": {
+      "slide1": {
+        "title": "Découvrez la Tunisie",
+        "description": "Désert, Tunisie",
+        "alt": "Découvrez la Tunisie"
+      },
+      "slide2": {
+        "title": "Star Wars",
+        "description": "Nefta, Tunisie",
+        "alt": "Star Wars en Tunisie"
+      },
+      "slide3": {
+        "title": "Carthage Tunisie",
+        "description": "Découvrez le riche patrimoine de la Tunisie",
+        "alt": "Carthage Tunisie"
+      },
+      "slide4": {
+        "title": "Chott el-Jérid Tunisie",
+        "description": "Belle vue du Chott el-Jérid",
+        "alt": "Belle vue du Chott el-Jérid"
+      },
+      "slide5": {
+        "title": "Dougga Tunisie",
+        "description": "Le Beau",
+        "alt": "Cathédrale Saint Vincent de Paul en Tunisie"
+      },
+      "slide6": {
+        "title": "Sidi Bou Said Tunisie",
+        "description": "Sidi Bou Said, Tunisie",
+        "alt": "Scène culturelle de Tunisie"
+      },
+      "slide7": {
+        "title": "Tamerza",
+        "description": "Tamerza, Tunisie",
+        "alt": "Scène culturelle de Tunisie"
+      }
+    },
+    "Aboutus_section": {
+      "aboutus_title_1": "Qui Est",
+      "aboutus_title_Highlighted": "Batouta",
+      "aboutus_title_2": "Voyages ?",
+      "about_us_content": "Depuis sa création en 1995, Batouta Voyages s'engage à offrir des expériences de voyage uniques et enrichissantes. Créée à l'origine pour répondre aux besoins des voyageurs japonais, notre agence s'est rapidement diversifiée pour accueillir des clients du monde entier : Europe, Amérique, Moyen-Orient et notre marché local en Tunisie."
+    },
+   "Our_Services_section": {
+     "Our_Services_title": "Nos Services",
+      "Our_Services_Description": "Chez Batouta Voyages, nous nous consacrons à offrir des expériences de voyage exceptionnelles adaptées aux besoins variés de nos clients. Notre gamme complète de services comprend :",
+      "Group_Travel": {
+        "Title": "Voyages en Groupe",
+        "Description": "Vivez des expériences de voyage inoubliables en groupe, avec des itinéraires adaptés à tous les goûts."
+      },
+      "Transport": {
+        "Title": "Transport",
+        "Description": "Des solutions de transport adaptées pour garantir un voyage fluide et agréable."
+      },
+      "Events_Organization": {
+        "Title": "Organisation d'événements",
+        "Description": "Batouta Voyages vous aide à organiser des séminaires, conférences et événements d'entreprise réussis."
+      },
+      "Billetterie": {
+        "Title": "Billetterie",
+        "Description": "Réservez vos billets pour des événements, attractions et destinations en toute simplicité."
+      }
+   },
+    "What_Makes_Us_Different_Section": {
+      "What_Makes_Us_Different_Title": "Ce Qui Nous Rend Différents",
+      "What_Makes_Us_Different_Description": "Chez Batouta Voyages, nous allons au-delà du voyage ordinaire. Voici pourquoi les voyageurs nous choisissent pour rendre leurs voyages inoubliables :",
+      "Card1_Title": "Authenticité à Chaque Destination",
+      "Card1_Text": "Nous nous spécialisons dans la création d'expériences immersives qui vous connectent au cœur de chaque destination. Des joyaux cachés aux perspectives culturelles, nous vous aidons à explorer comme un local.",
+      "Card2_Title": "Voyage Sans Accroc, À Chaque Fois",
+      "Card2_Text": "Avec une attention méticuleuse aux détails, nous gérons tout—pour que vous puissiez vous concentrer sur votre aventure sans stress. Des itinéraires personnalisés au support sur le terrain, votre confort est notre priorité.",
+      "Card3_Title": "Connexions Globales, Attention Locale",
+      "Card3_Text": "Notre vaste réseau s'étend sur des destinations clés dans le monde entier, tandis que nos experts locaux s'assurent que chaque voyage est enrichi d'expériences authentiques et immersives."
+    },
+    "Button": {
+      "Explore_Service": "Découvrez la différence Batouta Voyages—où chaque voyage est une histoire qui mérite d'être racontée."
+    },
+    "SEO": {
+      "title": "Batouta - Explorez, Découvrez, Aventurez-vous",
+      "description": "Votre partenaire de confiance pour des expériences de voyage incroyables."
+    }
+  },
+
+  "AboutUs": {
+    "Banner": {
+      "title_1": "Relier les <span style='color: #fb923c;'>Cultures</span>",
+      "title_2": "Créer des <span style='color: #fb923c;'>Souvenirs</span>",
+      "title_3": "Explorer <span style='color: #fb923c;'>Ensemble</span>",
+      "description": "Connecter les cultures à travers des expériences de voyage extraordinaires depuis 1995",
+      "discover_button": "Découvrez Notre Histoire",
+      "contact_button": "Contactez-nous",
+      "scroll_label": "Défiler"
+    },
+    "WhoWeAre": {
+      "title_1": "Créer des Voyages,",
+      "title_2": "Relier les Cultures",
+      "description": "Depuis 1995, Batouta Voyages est plus qu'une simple agence de voyage - nous sommes des bâtisseurs de ponts culturels. Née d'une vision de connecter les voyageurs japonais avec le riche patrimoine de la Tunisie, nous sommes devenus un facilitateur global d'expériences de voyage significatives.",
+      "stats": {
+        "years_of_excellence": "28+",
+        "years_label": "Années d'Excellence"
+      },
+      "features": {
+        "feature1": {
+          "title": "Précision Japonaise",
+          "description": "Attention méticuleuse aux détails dans chaque voyage"
+        },
+        "feature2": {
+          "title": "Chaleur Tunisienne",
+          "description": "Hospitalité méditerranéenne authentique"
+        }
+      },
+      "buttons": {
+        "services": "Nos Services",
+        "learn_more": "En Savoir Plus"
+      }
+    },
+    "OurValues": {
+      "title": "Nos Valeurs Fondamentales",
+      "values": {
+        "innovation": {
+          "title": "Innovation",
+          "description": "Repousser les limites et adopter de nouvelles technologies pour créer des expériences extraordinaires pour nos clients."
+        },
+        "integrity": {
+          "title": "Intégrité",
+          "description": "Bâtir la confiance grâce à la transparence et maintenir les plus hauts standards éthiques dans toutes nos interactions."
+        },
+        "excellence": {
+          "title": "Excellence",
+          "description": "Viser la perfection dans chaque détail et constamment dépasser les attentes."
+        }
+      }
+    },
+    "Timeline": {
+      "title": "Notre Voyage à Travers le Temps",
+      "events": {
+        "event_1": {
+          "year": 1995,
+          "title": "Naissance de Batouta Voyages",
+          "description": "Le début de notre aventure avec pour mission de rendre le voyage accessible, immersif et inoubliable pour tous."
+        },
+        "event_2": {
+          "year": 2005,
+          "title": "Élargissement des Horizons",
+          "description": "Lancement des services de voyage internationaux et établissement de partenariats avec des destinations clés mondiales."
+        },
+        "event_3": {
+          "year": 2010,
+          "title": "Reconnaissance et Croissance",
+          "description": "Atteinte d'un jalon de clients satisfaits, gagnant la reconnaissance comme partenaire de voyage de confiance."
+        },
+        "event_4": {
+          "year": 2024,
+          "title": "S'adapter au Changement",
+          "description": "Adoption de l'innovation et des solutions numériques pour offrir des expériences de voyage sans accroc malgré les défis mondiaux."
+        }
+      }
+    }
+  },
+  
+"Services": {
+  "Banner": {
+    "title_1": "Profitez des <span style='color: #fb923c;'>Cultures</span>",
+    "title_2": "Créez des <span style='color: #fb923c;'>Souvenirs</span>",
+    "title_3": "Explorez les <span style='color: #fb923c;'>Villes</span>",
+    "subtitle": "Créer les meilleurs services qui répondent à vos besoins",
+    "button_text": "Découvrez Nos Services"
+  },
+  "ServiceCards": {
+  "Group_Travel": {
+    "Title": "Voyages en Groupe",
+    "Description": "Vivez des expériences de voyage inoubliables en groupe, avec des itinéraires adaptés à tous les goûts.",
+    "features": [
+      "Itinéraires personnalisés",
+      "Hébergements sélectionnés",
+      "Activités culturelles et de détente",
+      "Promotions pour tous les budgets"
+    ],
+    "highlights": [
+      { "title": "Vacances en Tunisie et à l'étranger", "description": "Explorez des destinations variées en groupe, en Tunisie ou à travers le monde." },
+      { "title": "Découvertes culturelles", "description": "Plongez dans l'histoire, la culture et les paysages uniques des destinations visitées." },
+      { "title": "Voyages abordables", "description": "Des offres de qualité à des prix adaptés à tous les budgets." }
+    ]
+  },
+  "Transport": {
+    "Title": "Transport",
+    "Description": "Des solutions de transport adaptées pour garantir un voyage fluide et agréable.",
+    "features": [
+      "Transport en avion, bus ou voiture",
+      "Réservation de billets d'avion",
+      "Solutions de transport personnalisées",
+      "Location de voiture"
+    ],
+    "highlights": [
+      { "title": "Réservation de billets", "description": "Réservez vos vols avec notre service personnalisé." },
+      { "title": "Transport fluide", "description": "Nous vous aidons à organiser vos trajets de manière simple et agréable." },
+      { "title": "Options variées", "description": "Des solutions de transport pour tous les types de voyages." }
+    ]
+  },
+  "Events_Organization": {
+    "Title": "Organisation d'événements",
+    "Description": "Batouta Voyages vous aide à organiser des séminaires, conférences et événements d'entreprise réussis.",
+    "features": [
+      "Planification complète d'événements",
+      "Coordination des repas et des activités",
+      "Gestion logistique des transports",
+      "Hébergement et services personnalisés"
+    ],
+    "highlights": [
+      { "title": "Événements professionnels", "description": "Un accompagnement de A à Z pour tous vos événements." },
+      { "title": "Cohésion d'équipe", "description": "Renforcez les liens à travers des activités de groupe." },
+      { "title": "Réussite garantie", "description": "Nous nous assurons que chaque aspect de votre événement soit pris en charge." }
+    ]
+  },
+  "Billetterie": {
+    "Title": "Billetterie",
+    "Description": "Réservez vos billets pour des événements, attractions et destinations en toute simplicité.",
+    "features": [
+      "Réservation de billets d'avion",
+      "Accès à des événements culturels et touristiques",
+      "Offres spéciales sur les billets",
+      "Service de billetterie pour tous types d'événements"
+    ],
+    "highlights": [
+      { "title": "Billets d'avion", "description": "Réservez vos billets d'avion aux meilleures conditions." },
+      { "title": "Événements et attractions", "description": "Accédez facilement aux événements culturels et aux attractions touristiques." },
+      { "title": "Offres spéciales", "description": "Profitez de réductions et d'offres sur vos billets." }
+    ]
+  }
+  },
+  "WhyChooseUs": {
+    "title": "Pourquoi Nous Choisir",
+    "reasons": {
+      "Personalized_Experiences": {
+        "title": "Expériences Personnalisées",
+        "description": "Notre équipe travaille étroitement avec vous pour créer des plans de voyage sur mesure.",
+        "features": ["Itinéraires personnalisés", "Recommandations sur mesure", "Horaires flexibles"]
+      },
+      "Expertise_and_Knowledge": {
+        "title": "Expertise et Connaissance",
+        "description": "Des années d'expérience dans l'industrie du voyage, garantissant un service exceptionnel.",
+        "features": ["Spécialistes des destinations", "Conseils de voyage exclusifs", "Logistique sans faille"]
+      },
+      "Convenience_and_Efficiency": {
+        "title": "Commodité et Efficacité",
+        "description": "Simplifiez la planification de vos voyages pour une expérience sans tracas.",
+        "features": ["Services tout-en-un", "Réservations simplifiées", "Solutions gain de temps"]
+      },
+      "Dedicated_Customer_Support": {
+        "title": "Support Client Dévoué",
+        "description": "Une assistance attentive et réactive tout au long de votre voyage.",
+        "features": ["Assistance 24/7", "Résolution rapide des problèmes", "Communication continue"]
+      },
+      "Commitment_to_Sustainability": {
+        "title": "Engagement pour la Durabilité",
+        "description": "Pratiques de voyage écoresponsables et respectueuses de l'environnement.",
+        "features": ["Options neutres en carbone", "Soutien aux communautés locales", "Hébergements durables"]
+      },
+      "Value_Driven_Approach": {
+        "title": "Approche Axée sur la Valeur",
+        "description": "Services de haute qualité à des prix compétitifs.",
+        "features": ["Prix compétitifs", "Offres exclusives", "Coûts transparents"]
+      }
+    }
+  },
+  "PromiseSection": {
+    "title": "Notre Promesse pour Vous",
+    "subTitle": "Ce qui nous distingue",
+    "unique_experience": {
+      "title": "Expériences Uniques",
+      "description": "Une aventure inédite créant des moments inoubliables pour toute une vie."
+    },
+    "fun": {
+      "title": "Joie et Plaisir",
+      "description": "Des moments inoubliables remplis de rires et d'excitation avec notre équipe passionnée et nos guides experts."
+    },
+    "satisfaction": {
+      "title": "Satisfaction Totale",
+      "description": "Nous allons au-delà pour que chaque aspect de votre voyage dépasse vos attentes."
+    }
+  },
+  "Testimonials": {
+    "title": "Ce que Disent Nos Clients",
+    "items": [
+      {
+        "id": 1,
+        "name": "Jean Dupont",
+        "quote": "L'équipe de cette agence de voyage a surpassé nos attentes pour rendre notre voyage inoubliable.",
+        "rating": 5
+      },
+      {
+        "id": 2,
+        "name": "Marie Durand",
+        "quote": "Travailler avec cette agence a été un jeu d'enfant. Ils ont tout géré parfaitement.",
+        "rating": 4
+      },
+      {
+        "id": 3,
+        "name": "Robert Martin",
+        "quote": "Cette agence de voyage est vraiment exceptionnelle. Leur attention aux détails a fait toute la différence.",
+        "rating": 5
+      }
+    ]
+  }
+},
+"Contact": {
+      "title": "Contactez-nous",
+      "description": "Nous serions ravis d'avoir de vos nouvelles. Que vous ayez une question sur nos services, nos tarifs ou autre chose, notre équipe est prête à répondre à toutes vos questions.",
+      "info": {
+        "adress_title": "Visitez-nous",
+        "address": "97, Rue de Palestine 2ème étage 1002 TUNIS",
+        "phone_title": "Appelez-nous",
+        "phone": "(+216) 71 802 881",
+        "email_title": "Envoyez-nous un email",
+        "email": "reservation.batouta@gmail.com"
+      },
+      "Email_form": {
+        "form_title": "Envoyez-nous un Message",
+        "name": "Nom",
+        "email": "Email",
+        "subject": "Sujet",
+        "message": "Message",
+        "send_button": "Envoyer le Message",
+        "success_message": "Message Envoyé"
+      }
+    }
+  }
+  
