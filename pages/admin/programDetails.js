@@ -3,6 +3,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { Icon } from '@iconify/react';
 import toast, { Toaster } from 'react-hot-toast';
+import Image from 'next/image';
 
 export default function ProgramCreate() {
   const { data: session, status } = useSession();
@@ -306,7 +307,7 @@ export default function ProgramCreate() {
               <div className="flex flex-wrap gap-4">
                 {imageUrls?.map((url, index) => (
                   <div key={index} className="relative">
-                    <img
+                    <Image
                       src={url}
                       alt={`Program image ${index + 1}`}
                       className="w-24 h-24 object-cover rounded-lg"
@@ -463,7 +464,7 @@ export default function ProgramCreate() {
                         <div className="flex flex-wrap gap-4">
                           {item.image && (
                             <div className="relative">
-                              <img
+                              <Image
                                 src={item.image}
                                 alt={`Timeline item ${index + 1} image`}
                                 className="w-24 h-24 object-cover rounded-lg"

@@ -108,7 +108,7 @@ const ProgramDetails = ({ programDetails }) => {
           className="text-center space-y-4"
         >
           <h2 className="text-2xl font-semibold text-gray-800">Program not found</h2>
-          <p className="text-gray-600">The program you're looking for doesn't exist or has been removed.</p>
+          <p className="text-gray-600">The program you&#39;re looking for doesn&#39;t exist or has been removed.</p>
         </motion.div>
       </div>
     );

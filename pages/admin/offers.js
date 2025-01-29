@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
+import Image from 'next/image';
 
 export default function OfferDetails() {
   const { data: session, status } = useSession();
@@ -114,7 +115,7 @@ export default function OfferDetails() {
             <div className="flex gap-4">
               {imageUrl && (
                 <div className="relative">
-                  <img
+                  <Image
                     src={imageUrl}
                     alt="Offer image"
                     className="w-24 h-24 object-cover rounded-lg"

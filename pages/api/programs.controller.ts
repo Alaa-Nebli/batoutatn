@@ -89,7 +89,7 @@ const initializeTables = async () => {
 };
 
 // Helper function to remove uploaded files
-const removeUploadedFiles = async (files: Express.Multer.File[]) => {
+const removeUploadedFiles = async (files: any) => {
   for (const file of files) {
     try {
       await fs.unlink(file.path);
@@ -195,7 +195,7 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
     try {
       // Create program logic here
     } catch (error) {
-      const files = (req as any).files as Express.Multer.File[];
+      const files = (req as any).files;
       if (files) await removeUploadedFiles(files);
 
       console.error('Error creating program:', error);
@@ -215,7 +215,7 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
     try {
       // Update program logic here
     } catch (error) {
-      const files = (req as any).files as Express.Multer.File[];
+      const files = (req as any).files ;
       if (files) await removeUploadedFiles(files);
 
       console.error('Error updating program:', error);
