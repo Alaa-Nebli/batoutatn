@@ -89,7 +89,7 @@ const initializeTables = async () => {
 };
 
 // Helper function to remove uploaded files
-const removeUploadedFiles = async (files: any) => {
+const removeUploadedFiles = async (files) => {
   for (const file of files) {
     try {
       await fs.unlink(file.path);
@@ -100,7 +100,7 @@ const removeUploadedFiles = async (files: any) => {
 };
 
 // Fetch all programs for admin
-export const fetchAllPrograms = async (req: NextApiRequest, res: NextApiResponse) => {
+export const fetchAllPrograms = async (req, res) => {
   try {
     console.log('Fetching all programs');
     
@@ -124,12 +124,12 @@ export const fetchAllPrograms = async (req: NextApiRequest, res: NextApiResponse
     res.status(200).json(programs);
   } catch (error) {
     console.error('Error fetching programs:', error);
-    res.status(500).json({ message: 'Error fetching programs', error: (error as Error).message });
+    res.status(500).json({ message: 'Error fetching programs', error: (error ).message });
   }
 };
 
 // Fetch displayed programs
-export const fetchDisplayedPrograms = async (req: NextApiRequest, res: NextApiResponse) => {
+export const fetchDisplayedPrograms = async (req, res) => {
   try {
     const [programs] = await pool.query(`
       SELECT p.*, 
@@ -152,12 +152,12 @@ export const fetchDisplayedPrograms = async (req: NextApiRequest, res: NextApiRe
     res.status(200).json(programs);
   } catch (error) {
     console.error('Error fetching programs:', error);
-    res.status(500).json({ message: 'Error fetching programs', error: (error as Error).message });
+    res.status(500).json({ message: 'Error fetching programs', error: (error).message });
   }
 };
 
 // Fetch program by ID
-export const fetchProgramById = async (req: NextApiRequest, res: NextApiResponse) => {
+export const fetchProgramById = async (req, res) => {
   try {
     const { id } = req.query;
     const [programs] = await pool.query(`
@@ -180,13 +180,13 @@ export const fetchProgramById = async (req: NextApiRequest, res: NextApiResponse
     res.status(200).json(programs[0]);
   } catch (error) {
     console.error('Error fetching program by ID:', error);
-    res.status(500).json({ message: 'Error fetching program by ID', error: (error as Error).message });
+    res.status(500).json({ message: 'Error fetching program by ID', error: (error).message });
   }
 };
 
 // Create Program
-export const createProgram = async (req: NextApiRequest, res: NextApiResponse) => {
-  upload.array('images', 10)(req as any, res as any, async (err) => {
+export const createProgram = async (req, res) => {
+  upload.array('images', 10)(req, res, async (err) => {
     if (err) {
       console.error('Error uploading files:', err);
       return res.status(500).json({ message: 'Error uploading files', error: err.message });
@@ -195,18 +195,18 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
     try {
       // Create program logic here
     } catch (error) {
-      const files = (req as any).files;
+      const files = (req).files;
       if (files) await removeUploadedFiles(files);
 
       console.error('Error creating program:', error);
-      res.status(500).json({ message: 'Error creating program', error: (error as Error).message });
+      res.status(500).json({ message: 'Error creating program', error: (error).message });
     }
   });
 };
 
 // Update Program
-export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) => {
-  upload.array('images', 10)(req as any, res as any, async (err) => {
+export const updateProgram = async (req, res) => {
+  upload.array('images', 10)(req, res, async (err) => {
     if (err) {
       console.error('Error uploading files:', err);
       return res.status(500).json({ message: 'Error uploading files', error: err.message });
@@ -215,17 +215,17 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
     try {
       // Update program logic here
     } catch (error) {
-      const files = (req as any).files ;
+      const files = (req).files ;
       if (files) await removeUploadedFiles(files);
 
       console.error('Error updating program:', error);
-      res.status(500).json({ message: 'Error updating program', error: (error as Error).message });
+      res.status(500).json({ message: 'Error updating program', error: (error).message });
     }
   });
 };
 
 // Delete Program
-export const deleteProgram = async (req: NextApiRequest, res: NextApiResponse) => {
+export const deleteProgram = async (req, res) => {
   try {
     const { id } = req.query;
 
@@ -246,12 +246,12 @@ export const deleteProgram = async (req: NextApiRequest, res: NextApiResponse) =
     res.status(200).json({ message: 'Program deleted successfully' });
   } catch (error) {
     console.error('Error deleting program:', error);
-    res.status(500).json({ message: 'Error deleting program', error: (error as Error).message });
+    res.status(500).json({ message: 'Error deleting program', error: (error).message });
   }
 };
 
 // Main handler
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req, res) {
   await initializeTables();
   console.log('Request method:', req.method);
   
