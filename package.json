@@ -13,8 +13,8 @@
         "leisure travel",
         "explore"
     ],
-    "author": "Cogneria",
-    "homepage": "https://www.cogneria.com",
+    "author": "Neuratech Solutions",
+    "homepage": "https://www.neuratech-solutions.com",
     "scripts": {
         "dev": "next dev",
         "build": "next build",
