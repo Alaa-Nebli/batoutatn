@@ -139,31 +139,16 @@
         }
       }
     },
-    "Timeline": {
-      "title": "Notre Voyage à Travers le Temps",
-      "events": {
-        "event_1": {
-          "year": 1995,
-          "title": "Naissance de Batouta Voyages",
-          "description": "Le début de notre aventure avec pour mission de rendre le voyage accessible, immersif et inoubliable pour tous."
-        },
-        "event_2": {
-          "year": 2005,
-          "title": "Élargissement des Horizons",
-          "description": "Lancement des services de voyage internationaux et établissement de partenariats avec des destinations clés mondiales."
-        },
-        "event_3": {
-          "year": 2010,
-          "title": "Reconnaissance et Croissance",
-          "description": "Atteinte d'un jalon de clients satisfaits, gagnant la reconnaissance comme partenaire de voyage de confiance."
-        },
-        "event_4": {
-          "year": 2024,
-          "title": "S'adapter au Changement",
-          "description": "Adoption de l'innovation et des solutions numériques pour offrir des expériences de voyage sans accroc malgré les défis mondiaux."
-        }
+    "our_History": {
+        "title": "Notre Histoire",
+        "paragraph_1_strong": "M. Zouhair Mbarek",
+        "paragraph_1": " est l'actuel propriétaire de Batouta Voyages. Il détient un master en ingénierie de production obtenu dans une université japonaise. Il a passé de nombreuses années à travailler au Japon pour Hitachi Corp et d'autres institutions. Après avoir voyagé à travers l'Europe et les États-Unis, il est retourné en Tunisie et a créé une agence de voyages avec son partenaire commercial",
+        "paragraph_1_strong_2": "Mourad Fourati",
+        "paragraph_2": "En 1995, Batouta Voyages est née. Parlant couramment quatre langues — japonais, anglais, français et arabe — et formée selon les normes de service du système de qualité japonais, qui mieux que nous pour offrir des forfaits sur mesure et des services de voyage en Tunisie ?",
+        "paragraph_3": "Petit à petit, Batouta Voyages a grandi, répondant aux besoins des clients du monde entier, pour des voyages personnels et professionnels.",
+        "paragraph_4": "À la question « Pourquoi créer une agence de voyage en Tunisie ? », Zouhair répond : « Je veux simplement que les gens découvrent la véritable beauté et l'histoire de la Tunisie. Nous concevons les voyages en fonction des besoins et désirs des clients ; nous créons des voyages sur mesure en Tunisie. »"
       }
-    }
+
   },
   
 "Services": {

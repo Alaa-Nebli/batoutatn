@@ -302,7 +302,9 @@ const History = () => {
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
           transition={{ duration: 0.8 }}
         >
-          {t('AboutUs.History.title', 'Our History')}
+          {t('AboutUs.our_History.title', 'Our History')}
+          <div className="w-48 m-4 h-1 bg-gradient-to-r from-orange-500 to-pink-500 mx-auto" />
+
         </motion.h2>
 
         {/* Content Layout */}
@@ -315,25 +317,18 @@ const History = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
           >
             <p className="text-lg text-gray-700 leading-relaxed">
-              <strong>Mr. Zouhair Mbarek</strong> is the current owner of Batouta Voyages. He has a master’s degree in
-              Production engineering from a Japanese university. He spent many years working in Japan for Hitachi Corp &
-              other institutions. Having travelled through Europe and the US, he returned to Tunisia and started a Travel
-              Agency with his business partner <strong>Mr. Mourad Fourati</strong> (he too has a Master’s degree from Shizuoka University).
+              <strong>{t("AboutUs.our_History.paragraph_1_strong")} </strong>{t("AboutUs.our_History.paragraph_1")} <strong> {t("AboutUs.our_History.paragraph_1_strong_2")} </strong>.
             </p>
             <p className="text-lg text-gray-700 leading-relaxed">
-              In 1995, Batouta Voyages was born. Fluent in four languages—Japanese, English, French, and Arabic—and
-              fashioned from the service standards of the Japanese quality system, who better to deliver custom packages
-              and travel services to Tunisia?
+              {t("AboutUs.our_History.paragraph_2")}
             </p>
             <p className="text-lg text-gray-700 leading-relaxed">
-              Little by little, Batouta Voyages has grown, catering to customers from all over the world, for both personal
-              and corporate travel.
+              {t("AboutUs.our_History.paragraph_3")}
             </p>
             <p className="text-lg text-gray-700 leading-relaxed">
-              To the question “Why create a travel agency in Tunisia?” Zouhair answers: “I just want people to discover
-              the true beauty and history of Tunisia. We design travel around the customer’s needs and desires; we custom
-              make Tunisia travel.”
+              {t("AboutUs.our_History.paragraph_4")}
             </p>
+
           </motion.div>
 
           {/* Image Section */}
@@ -343,16 +338,17 @@ const History = () => {
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <div className="relative rounded-3xl overflow-hidden aspect-square max-w-md mx-auto shadow-2xl">
+            <div className="relative rounded-3xl overflow-hidden aspect-square max-w-md mb-4 mx-auto shadow-2xl">
               <Image
                 width={500}
                 height={500}
-                src="/Batouta_team.png"
+                src="/mr_zouhair_mbarek.jpeg"
                 alt="Mr. Zouhair Mbarek and Batouta Voyages"
                 className="object-cover w-full h-full transform hover:scale-110 transition-transform duration-700"
                 loading="lazy"
               />
             </div>
+            <p className="text-center text-sm text-black "> Mr. Zouhair Mbarek</p>
           </motion.div>
         </div>
       </div>
