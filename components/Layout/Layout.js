@@ -8,11 +8,11 @@ import { Header } from "components//Header";
 import { Footer } from "components//Footer";
 
 const adminNavigation = [
-    { name: "login", href: '/admin/', icon: 'material-symbols:login' },
-    { name: 'dashboard', href: '/admin/dashboard', icon: 'material-symbols:dashboard' },
-    { name: 'programs', href: '/admin/programDetails', icon: 'material-symbols:view-list' },
-    { name: 'featured', href: '/admin/featured', icon: 'material-symbols:featured-play-list' },
-    { name: 'offers', href: '/admin/offers', icon: 'material-symbols:percent' },
+    { name: "Se connecter", href: '/admin/', icon: 'material-symbols:login' },
+    { name: 'Dashboard', href: '/admin/dashboard', icon: 'material-symbols:dashboard' },
+    { name: 'Programmes', href: '/admin/programDetails', icon: 'material-symbols:view-list' },
+    { name: 'A la Carte', href: '/admin/cardTravel', icon: 'material-symbols:featured-play-list' },
+    { name: 'Offres', href: '/admin/offers', icon: 'material-symbols:percent' },
 ];
 
 export const Layout = ({ children, className = "" }) => {

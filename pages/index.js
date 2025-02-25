@@ -3,7 +3,7 @@ import SEO from "components//SEO/SEO";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
-import { motion} from 'framer-motion';
+import { motion } from 'framer-motion';
 import aboutImage from 'public//batouta_team.png'; // Use your uploaded image here
 import styles from 'components//About/AboutSection.module.css'; // Ensure you have the CSS file
 import { useState, useEffect, useRef } from 'react';
@@ -18,7 +18,6 @@ export async function getStaticProps({ locale }) {
       },
     }
 }
-
 
 const Banner = () => {
   const { t } = useTranslation('common');
@@ -97,21 +96,6 @@ const Banner = () => {
       {/* Subtle global overlay */}
       <div className="absolute inset-0 bg-black/30"></div>
 
-      {/* Text content with improved container
-      <div className="absolute bottom-5 left-8 md:left-5 z-10 max-w-xl">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="backdrop-blur-sm bg-black/40 p-6 md:p-8 rounded-lg shadow-xl max-w-3xl"
-        >
-          <h3 className="text-4xl md:text-4xl font-bold text-white mb-6 text-shadow">
-            {banners[currentIndex].title}
-          </h3>
-         
-        </motion.div>
-      </div> */}
-
       {/* Carousel slides */}
       <div className="absolute inset-0 flex">
         {banners.map((banner, index) => (
@@ -126,7 +110,7 @@ const Banner = () => {
               alt={banner.alt}
               layout="fill"
               objectFit="cover"
-              objectPosition="center 10%" // This pushes the image down slightly
+              objectPosition="center 10%" 
               priority
               className="w-full h-full object-cover"
             />
@@ -182,8 +166,174 @@ const UniqueFeatureCard = ({ icon, title, description, delay }) => {
         <p className="text-gray-600 text-center leading-relaxed">{description}</p>
       </motion.div>
     );
+};
+
+// Program Card component from programs page
+const ProgramCard = ({ program }) => (
+  <motion.div
+    className="bg-white rounded-xl m-5 m-h-100 shadow-lg overflow-hidden group hover:shadow-2xl transition-all duration-500 flex flex-col"
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true, amount: 0.1 }}
+    transition={{ duration: 0.4 }}
+    whileHover={{ y: -5 }}
+  >
+    <div className="relative h-56 w-full overflow-hidden">
+      <Image
+        src={program.images && program.images.length > 0 ? `/uploads/${program.images[0]}` : '/placeholder.jpg'}
+        alt={program.title}
+        layout="fill"
+        objectFit="cover"
+        className="transform transition-transform duration-700 group-hover:scale-110"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
+        <div className="absolute bottom-4 left-4 right-4">
+          <div className="flex items-center space-x-2 text-white mb-2">
+            <Icon icon="mdi:map-marker" className="w-5 h-5" />
+            <span className="text-sm">{program.location_from} → {program.location_to}</span>
+          </div>
+          <div className="flex items-center space-x-2 text-white">
+            <Icon icon="mdi:calendar" className="w-5 h-5" />
+            <span className="text-sm">
+              {new Date(program.from_date).toLocaleDateString()} - {new Date(program.to_date).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div className="p-6 flex-grow flex flex-col">
+      <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors">
+        {program.title}
+      </h3>
+      <p className="text-gray-600 mb-4 line-clamp-2">
+        {program.description}
+      </p>
+      <div className="flex justify-between items-center mt-auto">
+        <div className="flex space-x-4">
+          <div className="flex items-center text-gray-600">
+            <Icon icon="mdi:clock-outline" className="w-5 h-5 mr-1" />
+            <span>{program.days} Days</span>
+          </div>
+          <div className="flex items-center text-orange-500 font-semibold">
+            <Icon icon="mdi:currency-usd" className="w-5 h-5 mr-1" />
+            <span>{program.price} €</span>
+          </div>
+        </div>
+        <Link href={`/programs/${program.id}`} passHref>
+          <button className="px-4 py-2 bg-orange-500 text-white rounded-lg flex items-center space-x-2 hover:bg-orange-600 transition-colors group">
+            <span>Explore</span>
+            <Icon icon="mdi:arrow-right" className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
+          </button>
+        </Link>
+      </div>
+    </div>
+  </motion.div>
+);
+
+// Programs Carousel component for Homepage
+const ProgramsCarousel = () => {
+  const { t } = useTranslation('common');
+  const [programs, setPrograms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const itemsPerView = 3; // Number of items to show at once
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        const response = await fetch('/api/programs.controller');
+        const data = await response.json();
+        setPrograms(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching programs:', error);
+        setLoading(false);
+      }
+    };
+    fetchPrograms();
+  }, []);
+
+  const handlePrev = () => {
+    setCurrentIndex((prevIndex) => Math.max(0, prevIndex - 1));
   };
-  
+
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) => Math.min(programs.length - itemsPerView, prevIndex + 1));
+  };
+
+  return (
+    <section className="py-20 px-4 md:px-8 bg-gray-50">
+      <div className="max-w-7xl mx-auto">
+        <motion.div
+          className="text-center mb-12"
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          <h2 className="text-4xl font-bold text-gray-800 mb-4">
+            {t('Home.Featured_Programs.title', 'Nos Programmes ')}
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            {t('Home.Featured_Programs.description', 'Découvrez nos programmes de voyage')}
+          </p>
+        </motion.div>
+
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
+          </div>
+        ) : (
+          <div className="relative">
+            {/* Carousel navigation */}
+            <div className="absolute top-1/2 -left-5 transform -translate-y-1/2 z-10">
+              <button
+                className="p-3 bg-white shadow-lg rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
+                onClick={handlePrev}
+                disabled={currentIndex === 0}
+              >
+                <Icon icon="mdi:chevron-left" className="w-6 h-6 text-gray-800" />
+              </button>
+            </div>
+            
+            {/* Carousel content */}
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
+              >
+                {programs.map((program) => (
+                  <div key={program.id} className="w-full md:w-1/3 flex-shrink-0 px-4">
+                    <ProgramCard program={program} />
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="absolute top-1/2 -right-5 transform -translate-y-1/2 z-10">
+              <button
+                className="p-3 bg-white shadow-lg rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
+                onClick={handleNext}
+                disabled={currentIndex >= programs.length - itemsPerView}
+              >
+                <Icon icon="mdi:chevron-right" className="w-6 h-6 text-gray-800" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-12 text-center">
+          <Link href="/programs" passHref>
+            <button className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors flex items-center space-x-2 mx-auto">
+              <span>View All Programs</span>
+              <Icon icon="mdi:arrow-right" className="w-5 h-5" />
+            </button>
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 export default function Home() {
     const { t } = useTranslation('common');
 
@@ -228,13 +378,13 @@ export default function Home() {
     {
       title: t('Home.Our_Services_section.Group_Travel.Title'),
       description: t('Home.Our_Services_section.Group_Travel.Description'),
-      image: '/group_travel.jpg',
+      image: '/group_travel.png',
       imageAlt: 'Group Leisure Travel'
     },
     {
       title: t('Home.Our_Services_section.Events_Organization.Title'),
       description: t('Home.Our_Services_section.Events_Organization.Description'),
-      image: '/events.jpg',
+      image: '/events.png',
       imageAlt: 'FIT Travel'
     },
     {
@@ -246,7 +396,7 @@ export default function Home() {
     {
       title: t('Home.Our_Services_section.Billetterie.Title'),
       description: t('Home.Our_Services_section.Billetterie.Description'),
-      image: '/billeterie.webp',
+      image: '/billeterie.png',
       imageAlt: 'MICE'
     }
   ];
@@ -340,7 +490,6 @@ export default function Home() {
                 
 
                 {/* Services Section */}
-
                 <section className={styles.servicesSection} ref={servicesSectionRef}>
                   <div className="max-w-7xl mx-auto px-4">
                     <motion.div
@@ -358,78 +507,55 @@ export default function Home() {
                       </p>
                     </motion.div>
 
-                    <div className="grid gap-8 md:grid-cols-2">
-                      {services.map((service, index) => (
-                        <motion.div
-                          key={index}
-                          className="flex items-center gap-8 p-6 bg-gray-50 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg transition-all duration-300 hover:shadow-orange-200"
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          whileInView={{ opacity: 1, scale: 1 }}
-                          viewport={{ once: false, amount: 0.1 }}
-                          transition={{ duration: 0.3, delay: index * 0.1 }}
-                        >
-                          {index % 2 === 0 ? (
-                            <>
-                              <div className="flex-1 pr-4">
-                                <h3 className="text-2xl font-semibold mb-4">{service.title}</h3>
-                                <p className="text-gray-600">{service.description}</p>
-                              </div>
-                              <div className="w-48 h-48 relative flex-shrink-0 overflow-hidden rounded-lg ">
-                                <motion.div
-                                  whileHover={{ scale: 1.1 }}
-                                  transition={{ duration: 0.3 }}
-                                  className="w-full h-full "
-                                >
-                                  <Image
-                                    src={service.image}
-                                    alt={service.imageAlt}
-                                    layout="fill"
-                                    objectFit="cover"
-                                    className="transition-transform duration-300"
-                                  />
-                                </motion.div>
-                              </div>
-                            </>
-                          ) : (
-                            <>
-                              <div className="w-48 h-48 relative flex-shrink-0 overflow-hidden rounded-lg ">
-                                <motion.div
-                                  whileHover={{ scale: 1.1 }}
-                                  transition={{ duration: 0.3 }}
-                                  className="w-full h-full"
-                                >
-                                  <Image
-                                    src={service.image}
-                                    alt={service.imageAlt}
-                                    layout="fill"
-                                    objectFit="cover"
-                                    className="transition-transform duration-300"
-                                  />
-                                </motion.div>
-                              </div>
-                              <div className="flex-1 pl-4">
-                                <h3 className="text-2xl font-semibold mb-4">{service.title}</h3>
-                                <p className="text-gray-600">{service.description}</p>
-                              </div>
-                            </>
-                          )}
-                        </motion.div>
-                      ))}
-                    </div>
-                    
-                    {/* Centered Orange Button with Light Orange Shadow */}
-                    <div className="flex justify-center mt-8">
-                      <Link href={"/our_services"} >
-                      <button className="px-8 py-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold group hover:shadow-lg transition-all duration-300 hover:shadow-orange-200">
-                        <span className="flex items-center justify-center">
-                        {t('Home.Button.Explore_Service')}
-                          <Icon icon="mdi:arrow-right" className="ml-2 transform group-hover:translate-x-1 transition-transform" />
-                        </span>
-                      </button>
-                      </Link>
-                    </div>
+
+                  <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+                    {services.map((service, index) => (
+                      <motion.div
+                        key={index}
+                        className="flex flex-col h-full items-center text-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:shadow-orange-200 border border-gray-100"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: false, amount: 0.1 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                      >
+                        {/* Image container with fixed height */}
+                        <div className="w-full h-48 relative overflow-hidden rounded-lg mb-6">
+                          <motion.div 
+                            whileHover={{ scale: 1.1 }} 
+                            transition={{ duration: 0.3 }} 
+                            className="w-full h-full"
+                          >
+                            <Image
+                              src={service.image}
+                              alt={service.imageAlt}
+                              layout="fill"
+                              objectFit="cover"
+                              className="transition-transform duration-300"
+                            />
+                          </motion.div>
+                        </div>
+
+                        {/* Text Content - with flex-grow to push button to bottom */}
+                        <div className="flex-grow flex flex-col">
+                          <h3 className="text-2xl font-semibold mb-3">{service.title}</h3>
+                          <p className="text-gray-600 mb-6">{service.description}</p>
+                        </div>
+
+                        {/* "Explore More" Button - now all buttons will align */}
+                        <Link href="/our_services">
+                          <button className="mt-auto px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold transition-all duration-300 hover:bg-orange-600 hover:scale-105">
+                            Explore More
+                          </button>
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+
                   </div>
                 </section>
+
+                {/* NEW: Programs Carousel Section */}
+                <ProgramsCarousel />
 
                 {/* What Makes Us Different Section */}
                 <section className="py-20 px-4 md:px-8 bg-white">
@@ -463,7 +589,6 @@ export default function Home() {
                 </section>
 
                 <ContactUs />
-
                                 
             </div>
         </Layout>

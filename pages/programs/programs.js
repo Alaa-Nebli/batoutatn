@@ -1,4 +1,4 @@
-// OurPrograms.js
+import React, { useState, useEffect } from 'react';
 import { Layout } from "components/Layout";
 import SEO from "components/SEO/SEO";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -19,159 +19,219 @@ export async function getStaticProps({ locale }) {
 
 const ProgramCard = ({ program }) => (
   <motion.div
-    className="bg-white rounded-lg shadow-md overflow-hidden group hover:shadow-xl transition-shadow duration-300"
+    className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-2xl transition-all duration-500"
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true, amount: 0.1 }}
     transition={{ duration: 0.4 }}
-    whileHover={{ scale: 1.02 }}
+    whileHover={{ y: -5 }}
   >
-    <div className="relative h-64 w-full overflow-hidden">
+    <div className="relative h-72 w-full overflow-hidden">
       <Image
-        src={program.coverImage}
+        src={program.images && program.images.length > 0 ? `/uploads/${program.images[0]}` : '/placeholder.jpg'}
         alt={program.title}
         layout="fill"
         objectFit="cover"
-        className="transition-transform duration-500 group-hover:scale-105"
-        priority
+        className="transform transition-transform duration-700 group-hover:scale-110"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-    </div>
-    <div className="p-6">
-      <h3 className="text-2xl font-semibold text-gray-800 group-hover:text-orange-600 transition-colors">
-        {program.title}
-      </h3>
-      <p className="text-gray-600 mt-2 mb-4 line-clamp-3">
-        {program.shortDescription}
-      </p>
-      <div className="flex justify-between items-center">
-        <div className="flex space-x-4 text-sm text-gray-500">
-          <div className="flex items-center">
-            <Icon icon="mdi:calendar" className="w-5 h-5 mr-1" />
-            <span>{program.duration}</span>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
+        <div className="absolute bottom-4 left-4 right-4">
+          <div className="flex items-center space-x-2 text-white mb-2">
+            <Icon icon="mdi:map-marker" className="w-5 h-5" />
+            <span className="text-sm">{program.location_from} → {program.location_to}</span>
           </div>
-          <div className="flex items-center">
-            <Icon icon="mdi:map-marker" className="w-5 h-5 mr-1" />
-            <span>{program.destination}</span>
+          <div className="flex items-center space-x-2 text-white">
+            <Icon icon="mdi:calendar" className="w-5 h-5" />
+            <span className="text-sm">
+              {new Date(program.from_date).toLocaleDateString()} - {new Date(program.to_date).toLocaleDateString()}
+            </span>
           </div>
         </div>
-        <Link href={`/programs/${program.id}`}>
-            Explore
-            <Icon icon="mdi:arrow-right" className="ml-1" />
+      </div>
+    </div>
+    <div className="p-6">
+      <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors">
+        {program.title}
+      </h3>
+      <p className="text-gray-600 mb-4 line-clamp-2">
+        {program.description}
+      </p>
+      <div className="flex justify-between items-center">
+        <div className="flex space-x-4">
+          <div className="flex items-center text-gray-600">
+            <Icon icon="mdi:clock-outline" className="w-5 h-5 mr-1" />
+            <span>{program.days} Days</span>
+          </div>
+          <div className="flex items-center text-orange-500 font-semibold">
+            <Icon icon="mdi:currency-usd" className="w-5 h-5 mr-1" />
+            <span>{program.price} €</span>
+          </div>
+        </div>
+        <Link href={`/programs/${program.id}`} passHref>
+          <button className="px-4 py-2 bg-orange-500 text-white rounded-lg flex items-center space-x-2 hover:bg-orange-600 transition-colors group">
+            <span>Explore</span>
+            <Icon icon="mdi:arrow-right" className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
+          </button>
         </Link>
       </div>
     </div>
   </motion.div>
 );
 
-export default function OurPrograms() {
-  const { t } = useTranslation('common');
+const ImageGallery = ({ images }) => (
+  <div className="grid grid-cols-4 gap-4 mb-12">
+    {images.slice(0, 4).map((image, index) => (
+      <motion.div
+        key={index}
+        className="relative h-24 rounded-lg overflow-hidden"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ delay: index * 0.1 }}
+      >
+        <Image
+          src={`/uploads/${image}`}
+          alt={`Gallery image ${index + 1}`}
+          layout="fill"
+          objectFit="cover"
+          className="hover:scale-110 transition-transform duration-500"
+        />
+      </motion.div>
+    ))}
+  </div>
+);
 
-  const programs = [
-    {
-      id: 1,
-      title: "Discover Tunisia: Historical Journey",
-      shortDescription: "Explore the rich historical heritage of Tunisia, from ancient Carthage to Roman ruins.",
-      coverImage: "/tunisia/carthage-tunis-tunisia.jpg",
-      duration: "7 Days",
-      destination: "Tunis, Carthage, Dougga",
-    },
-    {
-      id: 2,
-      title: "Sahara Desert Adventure",
-      shortDescription: "Experience the magic of the Tunisian Sahara, with desert landscapes and traditional Berber culture.",
-      coverImage: "/tunisia/Chott-Jerid-Tunisia.jpg",
-      duration: "5 Days",
-      destination: "Tozeur, Douz, Ksar Ghilane",
-    },
-    {
-      id: 3,
-      title: "Coastal Wonders of Tunisia",
-      shortDescription: "A journey through Tunisia's stunning Mediterranean coastline, exploring charming seaside towns and pristine beaches.",
-      coverImage: "/tunisia/sidi_bou_said.jpg",
-      duration: "6 Days",
-      destination: "Sidi Bou Said, Hammamet, Monastir",
-    },
-    {
-      id: 4,
-      title: "Cultural Immersion Experience",
-      shortDescription: "Dive deep into Tunisian culture, traditions, cuisine, and local way of life across different regions.",
-      coverImage: "/tunisia/tunisia_art.webp",
-      duration: "8 Days",
-      destination: "Various Cities",
-    },
-  ];
+export default function Programs() {
+  const { t } = useTranslation('common');
+  const [programs, setPrograms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedDestination, setSelectedDestination] = useState('all');
+  const [featuredProgram, setFeaturedProgram] = useState(null);
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        const response = await fetch('/api/programs.controller');
+        const data = await response.json();
+        setPrograms(data);
+        setFeaturedProgram(data[0]); // Set the first program as featured
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching programs:', error);
+        setLoading(false);
+      }
+    };
+    fetchPrograms();
+  }, []);
+
+  const destinations = ['all', ...new Set(programs.map(p => p.location_to))];
+
+  const filteredPrograms = selectedDestination === 'all' 
+    ? programs 
+    : programs.filter(p => p.location_to === selectedDestination);
 
   return (
     <Layout>
       <SEO
-        title="Our Travel Programs"
-        description="Discover our curated travel experiences across Tunisia"
+        title="Travel Programs | Discover Amazing Destinations"
+        description="Explore our curated collection of travel programs and adventures across the globe."
       />
-      <div className="main-wrapper bg-gray-50">
-        {/* Hero Section */}
-        <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/tunisia/tunisia_landscapes.jpg"
-              layout="fill"
-              objectFit="cover"
-              alt="Tunisia Travel Programs"
-              className="opacity-70"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent"></div>
-          </div>
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative z-10 text-center max-w-4xl px-4"
-          >
-            <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
-              Extraordinary Journeys Await
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-200 mb-10 max-w-3xl mx-auto">
-              Discover meticulously crafted travel experiences that reveal the heart and soul of Tunisia.
-            </p>
-            <div className="flex justify-center space-x-6">
-              <a
-                href="#programs"
-                className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors text-lg flex items-center"
-              >
-                View Programs
-                <Icon icon="mdi:arrow-down" className="ml-2" />
-              </a>
-              <Link href="/contact">
-                  Custom Trip
-              </Link>
+      <div className="main-wrapper mt-20">
+        {/* Hero Section with Featured Program */}
+        {featuredProgram && (
+          <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
+            <div className="absolute inset-0">
+              <Image
+                src={`/uploads/${featuredProgram.images[0]}`}
+                layout="fill"
+                objectFit="cover"
+                alt={featuredProgram.title}
+                className="brightness-50"
+                priority
+              />
             </div>
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="relative z-10 text-center max-w-4xl px-4"
+            >
+              <span className="inline-block px-4 py-2 bg-orange-500 text-white rounded-full mb-4">
+                Featured Program
+              </span>
+              <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
+                {featuredProgram.title}
+              </h1>
+              <p className="text-xl text-gray-200 mb-8">
+                {featuredProgram.description}
+              </p>
+              {featuredProgram.images.length > 1 && (
+                <ImageGallery images={featuredProgram.images.slice(1)} />
+              )}
+              <div className="flex justify-center space-x-4">
+                <Link href={`/programs/${featuredProgram.id}`} passHref>
+                  <button className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors flex items-center space-x-2">
+                    <span>Explore This Program</span>
+                    <Icon icon="mdi:arrow-right" className="w-5 h-5" />
+                  </button>
+                </Link>
+                <a href="#programs" className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors flex items-center space-x-2">
+                  <span>View All Programs</span>
+                  <Icon icon="mdi:arrow-down" className="w-5 h-5" />
+                </a>
+              </div>
+            </motion.div>
+          </section>
+        )}
+
+        {/* Programs Section */}
+        <section id="programs" className="py-20 px-4 md:px-8 bg-gray-50">
+          <div className="max-w-7xl mx-auto">
+            <motion.div
+              className="text-center mb-12"
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl font-bold text-gray-800 mb-4">
+                Available Programs
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Choose from our selection of carefully crafted travel experiences
+              </p>
+            </motion.div>
+
+            {/* Destination Filter */}
+            <div className="flex justify-center mb-12 space-x-4 overflow-x-auto pb-4">
+              {destinations.map((dest) => (
+                <button
+                  key={dest}
+                  onClick={() => setSelectedDestination(dest)}
+                  className={`px-6 py-3 rounded-full transition-all ${
+                    selectedDestination === dest
+                      ? 'bg-orange-500 text-white shadow-lg'
+                      : 'bg-white text-gray-600 hover:bg-orange-100'
+                  }`}
+                >
+                  {dest.charAt(0).toUpperCase() + dest.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
+              </div>
+            ) : (
+              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {filteredPrograms.map((program) => (
+                  <ProgramCard key={program.id} program={program} />
+                ))}
+              </div>
+            )}
+          </div>
         </section>
 
-        <section id="programs" className="py-20 px-4 md:px-8">
-  <div className="max-w-7xl mx-auto">
-    <motion.div
-      className="text-center mb-16"
-      initial={{ opacity: 0, y: -20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.1 }}
-      transition={{ duration: 0.6 }}
-    >
-      <h2 className="text-5xl font-bold text-gray-800">
-        Curated Travel Experiences
-      </h2>
-      <p className="text-xl text-gray-600 mt-4">
-        From ancient historical sites to breathtaking landscapes, our programs are designed to immerse you in the essence of Tunisia.
-      </p>
-    </motion.div>
-    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-      {programs.map((program) => (
-        <ProgramCard key={program.id} program={program} />
-      ))}
-    </div>
-  </div>
-</section>
-
-<ContactUs />
+        <ContactUs />
       </div>
     </Layout>
   );

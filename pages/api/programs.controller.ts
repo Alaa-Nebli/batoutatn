@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { Express } from 'express';
 import mysql from 'mysql2/promise';
 import multer from 'multer';
 import path from 'path';
@@ -33,12 +34,14 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ 
+// Configure multer for multiple file fields
+const upload = multer({
   storage,
-  limits: { 
-    fileSize: 5 * 1024 * 1024 // 5MB file size limit
-  }
-});
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB file size limit
+}).fields([
+  { name: 'program_images', maxCount: 10 },
+  { name: 'timeline_images', maxCount: 50 }
+]);
 
 // Flag to track table initialization
 let tablesInitialized = false;
@@ -52,6 +55,7 @@ const initializeTables = async () => {
       CREATE TABLE IF NOT EXISTS programs (
         id INT AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
+        metadata TEXT,
         description TEXT NOT NULL,
         images JSON,
         location_from VARCHAR(255) NOT NULL,
@@ -186,27 +190,93 @@ export const fetchProgramById = async (req, res) => {
 
 // Create Program
 export const createProgram = async (req, res) => {
-  upload.array('images', 10)(req, res, async (err) => {
+  upload(req, res, async (err) => {
     if (err) {
       console.error('Error uploading files:', err);
       return res.status(500).json({ message: 'Error uploading files', error: err.message });
     }
 
     try {
-      // Create program logic here
-    } catch (error) {
-      const files = (req).files;
-      if (files) await removeUploadedFiles(files);
+      const programData = JSON.parse(req.body.programData);
+      const programImages = req.files['program_images'] || [];
+      const timelineImages = req.files['timeline_images'] || [];
 
+      // Save program images paths
+      const imageUrls = programImages.map(file => file.filename);
+
+      // First, add the metadata column if it doesn't exist
+      try {
+        await pool.query(`
+          ALTER TABLE programs
+          ADD COLUMN IF NOT EXISTS metadata TEXT AFTER title
+        `);
+      } catch (alterError) {
+        console.warn('Metadata column might already exist:', alterError);
+      }
+
+      // Insert program data
+      const [result] = await pool.query(
+        `INSERT INTO programs (
+          title, metadata, description, images, location_from, location_to,
+          days, price, from_date, to_date, display
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          programData.title,
+          programData.metadata || '',
+          programData.description,
+          JSON.stringify(imageUrls),
+          programData.location_from,
+          programData.location_to,
+          programData.days,
+          programData.price,
+          programData.from_date,
+          programData.to_date,
+          programData.display
+        ]
+      );
+
+      const programId = result.insertId;
+
+      // Handle timeline items with images
+      if (programData.timeline && programData.timeline.length > 0) {
+        const timelineValues = programData.timeline.map((item, index) => [
+          programId,
+          item.title,
+          item.description,
+          timelineImages[index]?.filename || null,
+          item.sort_order
+        ]);
+
+        await pool.query(
+          `INSERT INTO program_timeline 
+           (package_id, title, description, image, sort_order)
+           VALUES ?`,
+          [timelineValues]
+        );
+      }
+
+      res.status(201).json({ 
+        message: 'Program created successfully',
+        programId: programId
+      });
+    } catch (error) {
+      // Clean up uploaded files if database operation fails
+      if (req.files) {
+        const allFiles = [
+          ...(req.files['program_images'] || []),
+          ...(req.files['timeline_images'] || [])
+        ];
+        await removeUploadedFiles(allFiles);
+      }
       console.error('Error creating program:', error);
-      res.status(500).json({ message: 'Error creating program', error: (error).message });
+      res.status(500).json({ message: 'Error creating program', error: error.message });
     }
   });
 };
 
 // Update Program
 export const updateProgram = async (req, res) => {
-  upload.array('images', 10)(req, res, async (err) => {
+  upload(req, res, async (err) => {
     if (err) {
       console.error('Error uploading files:', err);
       return res.status(500).json({ message: 'Error uploading files', error: err.message });

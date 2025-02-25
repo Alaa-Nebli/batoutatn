@@ -196,44 +196,45 @@ export default function ProgramCreate() {
     if (!validateForm()) {
       return;
     }
-
+  
     setIsSubmitting(true);
-
+  
     try {
-      // Create FormData for multipart form submission
       const formDataMultipart = new FormData();
       
-      // Append text fields
-      formDataMultipart.append('title', formData.title);
-      formDataMultipart.append('metadata', formData.metadata);
-      formDataMultipart.append('description', formData.description);
-      formDataMultipart.append('locationFrom', formData.locationFrom);
-      formDataMultipart.append('locationTo', formData.locationTo);
-      formDataMultipart.append('days', formData.days);
-      formDataMultipart.append('price', formData.price);
-      formDataMultipart.append('fromDate', formData.fromDate);
-      formDataMultipart.append('toDate', formData.toDate);
-      formDataMultipart.append('display', formData.display.toString());
+      // Create the program data object
+      const programData = {
+        title: formData.title,
+        metadata: formData.metadata,
+        description: formData.description,
+        location_from: formData.locationFrom,
+        location_to: formData.locationTo,
+        days: parseInt(formData.days),
+        price: parseFloat(formData.price),
+        from_date: formData.fromDate,
+        to_date: formData.toDate,
+        display: formData.display,
+        timeline: formData.timeline.map((item, index) => ({
+          title: item.title,
+          description: item.description,
+          image: '',  // We'll handle images separately
+          sort_order: index + 1
+        }))
+      };
+  
+      // Append the program data as JSON string
+      formDataMultipart.append('programData', JSON.stringify(programData));
       
-      // Append main program images
+      // Append main program images with the correct field name
       images.forEach((file) => {
-        formDataMultipart.append('images', file);
+        formDataMultipart.append('program_images', file);
       });
       
-      // Append timeline as JSON
-      const timelineWithImages = formData.timeline.map((item, index) => {
-        const timelineItem = { ...item };
-        
-        // If there's a timeline image, append it
-        if (timelineImages[index]) {
-          formDataMultipart.append('timelineImages', timelineImages[index]);
-        }
-        
-        return timelineItem;
+      // Append timeline images
+      Object.entries(timelineImages).forEach(([index, file]) => {
+        formDataMultipart.append('timeline_images', file);
       });
-      
-      formDataMultipart.append('timeline', JSON.stringify(timelineWithImages));
-
+  
       // Submit to API
       const response = await fetch('/api/programs.controller', {
         method: 'POST',
@@ -254,7 +255,7 @@ export default function ProgramCreate() {
       setIsSubmitting(false);
     }
   };
-
+  
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <Toaster position="top-right" reverseOrder={false} />
