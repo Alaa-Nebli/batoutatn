@@ -60,18 +60,19 @@ const ProgramCard = ({ program }) => (
         <div className="flex space-x-4">
           <div className="flex items-center text-gray-600">
             <Icon icon="mdi:clock-outline" className="w-5 h-5 mr-1" />
-            <span>{program.days} Days</span>
+            <span>{program.days} Jours</span>
           </div>
           <div className="flex items-center text-orange-500 font-semibold">
             <Icon icon="mdi:currency-usd" className="w-5 h-5 mr-1" />
-            <span>{program.price} €</span>
+            <span>{program.price} TND</span>
           </div>
         </div>
-        <Link href={`/programs/${program.id}`} passHref>
-          <button className="px-4 py-2 bg-orange-500 text-white rounded-lg flex items-center space-x-2 hover:bg-orange-600 transition-colors group">
-            <span>Explore</span>
-            <Icon icon="mdi:arrow-right" className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
-          </button>
+        <Link 
+          href={`/programs/${program.id}`} 
+          className="px-4 py-2 bg-orange-500 text-white rounded-lg flex items-center space-x-2 hover:bg-orange-600 transition-colors group"
+        >
+          <span>Details</span>
+          <Icon icon="mdi:arrow-right" className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
     </div>
@@ -156,7 +157,7 @@ export default function Programs() {
               className="relative z-10 text-center max-w-4xl px-4"
             >
               <span className="inline-block px-4 py-2 bg-orange-500 text-white rounded-full mb-4">
-                Featured Program
+                Programme à la Une
               </span>
               <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
                 {featuredProgram.title}
@@ -170,12 +171,13 @@ export default function Programs() {
               <div className="flex justify-center space-x-4">
                 <Link href={`/programs/${featuredProgram.id}`} passHref>
                   <button className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors flex items-center space-x-2">
-                    <span>Explore This Program</span>
+                    <span>Découvrez Ce Programme
+                  </span>
                     <Icon icon="mdi:arrow-right" className="w-5 h-5" />
                   </button>
                 </Link>
                 <a href="#programs" className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors flex items-center space-x-2">
-                  <span>View All Programs</span>
+                  <span>Voir Tous les Programmes</span>
                   <Icon icon="mdi:arrow-down" className="w-5 h-5" />
                 </a>
               </div>
@@ -193,10 +195,10 @@ export default function Programs() {
               viewport={{ once: true }}
             >
               <h2 className="text-4xl font-bold text-gray-800 mb-4">
-                Available Programs
+                Programmes Disponible
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Choose from our selection of carefully crafted travel experiences
+              Choisissez parmi notre sélection d'expériences de voyage soigneusement conçues.
               </p>
             </motion.div>
 

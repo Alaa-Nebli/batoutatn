@@ -32,7 +32,7 @@ export default function Dashboard() {
   }
 
   if (status === 'unauthenticated') {
-    router.push('/auth/signin');
+    router.push('/admin/');
     return null;
   }
 

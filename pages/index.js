@@ -212,16 +212,16 @@ const ProgramCard = ({ program }) => (
         <div className="flex space-x-4">
           <div className="flex items-center text-gray-600">
             <Icon icon="mdi:clock-outline" className="w-5 h-5 mr-1" />
-            <span>{program.days} Days</span>
+            <span>{program.days} Jours </span>
           </div>
           <div className="flex items-center text-orange-500 font-semibold">
             <Icon icon="mdi:currency-usd" className="w-5 h-5 mr-1" />
-            <span>{program.price} €</span>
+            <span>{program.price} TND</span>
           </div>
         </div>
         <Link href={`/programs/${program.id}`} passHref>
           <button className="px-4 py-2 bg-orange-500 text-white rounded-lg flex items-center space-x-2 hover:bg-orange-600 transition-colors group">
-            <span>Explore</span>
+            <span>Voir Plus</span>
             <Icon icon="mdi:arrow-right" className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
           </button>
         </Link>
@@ -231,7 +231,7 @@ const ProgramCard = ({ program }) => (
 );
 
 // Programs Carousel component for Homepage
-const ProgramsCarousel = () => {
+const TripsCarousel = () => {
   const { t } = useTranslation('common');
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -262,8 +262,12 @@ const ProgramsCarousel = () => {
   };
 
   return (
-    <section className="py-20 px-4 md:px-8 bg-gray-50">
-      <div className="max-w-7xl mx-auto">
+    <>
+      {
+        programs.length > 0 ? (
+          <section className="py-20 px-4 md:px-8 bg-gray-50">
+
+          <div className="max-w-7xl mx-auto">
         <motion.div
           className="text-center mb-12"
           initial={{ opacity: 0, y: -20 }}
@@ -271,10 +275,10 @@ const ProgramsCarousel = () => {
           viewport={{ once: true }}
         >
           <h2 className="text-4xl font-bold text-gray-800 mb-4">
-            {t('Home.Featured_Programs.title', 'Nos Programmes ')}
+          Nos voyages à l'étranger
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            {t('Home.Featured_Programs.description', 'Découvrez nos programmes de voyage')}
+            Découvrez nos voyages
           </p>
         </motion.div>
 
@@ -301,11 +305,11 @@ const ProgramsCarousel = () => {
                 className="flex transition-transform duration-500 ease-in-out"
                 style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
               >
-                {programs.map((program) => (
+                { programs.map((program) => (
                   <div key={program.id} className="w-full md:w-1/3 flex-shrink-0 px-4">
                     <ProgramCard program={program} />
                   </div>
-                ))}
+                )) }
               </div>
             </div>
             
@@ -324,15 +328,22 @@ const ProgramsCarousel = () => {
         <div className="mt-12 text-center">
           <Link href="/programs" passHref>
             <button className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors flex items-center space-x-2 mx-auto">
-              <span>View All Programs</span>
+              <span>Voir nos voyage </span>
               <Icon icon="mdi:arrow-right" className="w-5 h-5" />
             </button>
           </Link>
         </div>
       </div>
-    </section>
+      </section>
+    ) : null
+      }
+      </>
   );
+  
 };
+
+
+
 
 export default function Home() {
     const { t } = useTranslation('common');
@@ -544,7 +555,7 @@ export default function Home() {
                         {/* "Explore More" Button - now all buttons will align */}
                         <Link href="/our_services">
                           <button className="mt-auto px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold transition-all duration-300 hover:bg-orange-600 hover:scale-105">
-                            Explore More
+                            Voir Plus
                           </button>
                         </Link>
                       </motion.div>
@@ -555,7 +566,7 @@ export default function Home() {
                 </section>
 
                 {/* NEW: Programs Carousel Section */}
-                <ProgramsCarousel />
+                <TripsCarousel />
 
                 {/* What Makes Us Different Section */}
                 <section className="py-20 px-4 md:px-8 bg-white">

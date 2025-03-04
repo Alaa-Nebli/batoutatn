@@ -10,9 +10,9 @@ import { Footer } from "components//Footer";
 const adminNavigation = [
     { name: "Se connecter", href: '/admin/', icon: 'material-symbols:login' },
     { name: 'Dashboard', href: '/admin/dashboard', icon: 'material-symbols:dashboard' },
-    { name: 'Programmes', href: '/admin/programDetails', icon: 'material-symbols:view-list' },
-    { name: 'A la Carte', href: '/admin/cardTravel', icon: 'material-symbols:featured-play-list' },
-    { name: 'Offres', href: '/admin/offers', icon: 'material-symbols:percent' },
+    { name: 'Voyages a l\'étranger', href: '/admin/programDetails', icon: 'material-symbols:view-list' },
+    { name: 'Programmes en tunisie', href: '/admin/cardTravel', icon: 'material-symbols:featured-play-list' },
+    { name: 'A la une', href: '/admin/offers', icon: 'material-symbols:percent' },
 ];
 
 export const Layout = ({ children, className = "" }) => {

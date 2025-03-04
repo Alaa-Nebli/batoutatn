@@ -37,7 +37,8 @@ const TimelineItem = ({ day, isActive, onClick, content }) => (
 
     <motion.div
       initial={false}
-      animate={{ height: isActive ? 'auto' : 0 }}
+      animate={{ height: isActive ? 'auto' : 0, opacity: isActive ? 1 : 0 }}
+      transition={{ duration: 0.3 }}
       className="overflow-hidden"
     >
       <div className="p-6 grid md:grid-cols-2 gap-6">
@@ -80,7 +81,8 @@ const ProgramHighlights = ({ highlights }) => (
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ delay: idx * 0.1 }}
+        transition={{ delay: idx * 0.2, duration: 0.5 }}
+        whileHover={{ scale: 1.05 }}
         className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300"
       >
         <Icon icon={highlight.icon} className="w-12 h-12 text-orange-500 mb-4" />
@@ -99,7 +101,7 @@ const ImageGallery = ({ images }) => (
         initial={{ opacity: 0, scale: 0.9 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: true }}
-        transition={{ delay: idx * 0.1 }}
+        transition={{ delay: idx * 0.1, duration: 0.5 }}
         className="relative aspect-square rounded-xl overflow-hidden group"
       >
         <Image
@@ -108,6 +110,7 @@ const ImageGallery = ({ images }) => (
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"
         />
+        <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </motion.div>
     ))}
   </div>
@@ -195,38 +198,62 @@ export default function ProgramDetails() {
       />
 
       {/* Hero Section */}
-      <section className="relative h-[90vh]">
-        <div className="absolute inset-0">
-          <Image
-            src={`/uploads/${program.images[0]}`}
-            alt={program.title}
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
-        </div>
+      <section className="relative h-[90vh] overflow-hidden">
+      <motion.div
+        className="absolute inset-0"
+        initial={{ scale: 1.1 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
+      >
+        <Image
+          src={`/uploads/${program.images[0]}`}
+          alt={program.title}
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
+      </motion.div>
 
-        <div className="relative h-full max-w-7xl mx-auto px-4 flex items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="max-w-3xl text-white"
+      <motion.div
+        className="relative h-full max-w-7xl mx-auto px-4 flex items-center"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5, duration: 1 }}
+      >
+        <div className="max-w-3xl text-white">
+          <motion.h1
+            className="text-5xl md:text-7xl font-bold mb-6"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.8, duration: 1 }}
           >
-            <h1 className="text-5xl md:text-7xl font-bold mb-6">{program.title}</h1>
-            <p className="text-xl mb-8 text-gray-200">{program.description}</p>
-            <div className="flex flex-wrap gap-6">
-              {highlights.map((highlight, idx) => (
-                <div key={idx} className="flex items-center space-x-2">
-                  <Icon icon={highlight.icon} className="w-6 h-6" />
-                  <span>{highlight.description}</span>
-                </div>
-              ))}
-            </div>
+            {program.title}
+          </motion.h1>
+          <motion.p
+            className="text-xl mb-8 text-gray-200"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1, duration: 1 }}
+          >
+            {program.description}
+          </motion.p>
+          <motion.div
+            className="flex flex-wrap gap-6"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 1 }}
+          >
+            {highlights.map((highlight, idx) => (
+              <div key={idx} className="flex items-center space-x-2">
+                <Icon icon={highlight.icon} className="w-6 h-6" />
+                <span>{highlight.description}</span>
+              </div>
+            ))}
           </motion.div>
         </div>
-      </section>
-
+      </motion.div>
+    </section>
       {/* Program Highlights */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">

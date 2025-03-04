@@ -16,7 +16,7 @@
     "author": "Neuratech Solutions",
     "homepage": "https://www.neuratech-solutions.com",
     "scripts": {
-        "dev": "next dev",
+        "dev": "prisma generate && next dev",
         "build": "next build",
         "start": "next start",
         "lint": "next lint"
@@ -27,7 +27,10 @@
         "@fortawesome/react-fontawesome": "^0.2.0",
         "@headlessui/react": "^1.7.14",
         "@iconify/react": "^4.1.1",
+        "@prisma/client": "^6.4.1",
         "@vercel/og": "^0.0.21",
+        "bcryptjs": "^3.0.2",
+        "date-fns": "^4.1.0",
         "eslint-config-next": "13.1.2",
         "express": "^4.21.2",
         "framer-motion": "^10.18.0",
@@ -55,16 +58,21 @@
         "uuid": "^8.3.2"
     },
     "devDependencies": {
+        "@swc/core": "^1.11.7",
         "@types/express": "^5.0.0",
+        "@types/node": "^22.13.9",
         "autoprefixer": "^10.4.13",
         "clsx": "^1.2.1",
         "eslint": "^8.36.0",
         "eslint-config-prettier": "^8.8.0",
         "postcss": "^8.4.21",
         "prettier": "2.8.6",
+        "prisma": "^6.4.1",
         "sass": "^1.57.1",
         "stylelint": "^14.16.1",
         "tailwindcss": "^3.2.4",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.2",
         "vitest": "^0.27.1"
     }
 }

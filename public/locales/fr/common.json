@@ -104,16 +104,16 @@
       "title_2": "Relier les Cultures",
       "description": "Depuis 1995, Batouta Voyages est plus qu'une simple agence de voyage - nous sommes des bâtisseurs de ponts culturels. Née d'une vision de connecter les voyageurs japonais avec le riche patrimoine de la Tunisie, nous sommes devenus un facilitateur global d'expériences de voyage significatives.",
       "stats": {
-        "years_of_excellence": "28+",
+        "years_of_excellence": "30+",
         "years_label": "Années d'Excellence"
       },
       "features": {
         "feature1": {
-          "title": "Précision Japonaise",
+          "title": "vision international",
           "description": "Attention méticuleuse aux détails dans chaque voyage"
         },
         "feature2": {
-          "title": "Chaleur Tunisienne",
+          "title": "Chaleur Locale",
           "description": "Hospitalité méditerranéenne authentique"
         }
       },
@@ -160,66 +160,66 @@
     "button_text": "Découvrez Nos Services"
   },
   "ServiceCards": {
-  "Group_Travel": {
-    "Title": "Voyages en Groupe",
-    "Description": "Vivez des expériences de voyage inoubliables en groupe, avec des itinéraires adaptés à tous les goûts.",
-    "features": [
-      "Itinéraires personnalisés",
-      "Hébergements sélectionnés",
-      "Activités culturelles et de détente",
-      "Promotions pour tous les budgets"
-    ],
-    "highlights": [
-      { "title": "Vacances en Tunisie et à l'étranger", "description": "Explorez des destinations variées en groupe, en Tunisie ou à travers le monde." },
-      { "title": "Découvertes culturelles", "description": "Plongez dans l'histoire, la culture et les paysages uniques des destinations visitées." },
-      { "title": "Voyages abordables", "description": "Des offres de qualité à des prix adaptés à tous les budgets." }
-    ]
-  },
-  "Transport": {
-    "Title": "Transport",
-    "Description": "Des solutions de transport adaptées pour garantir un voyage fluide et agréable.",
-    "features": [
-      "Transport en avion, bus ou voiture",
-      "Réservation de billets d'avion",
-      "Solutions de transport personnalisées",
-      "Location de voiture"
-    ],
-    "highlights": [
-      { "title": "Réservation de billets", "description": "Réservez vos vols avec notre service personnalisé." },
-      { "title": "Transport fluide", "description": "Nous vous aidons à organiser vos trajets de manière simple et agréable." },
-      { "title": "Options variées", "description": "Des solutions de transport pour tous les types de voyages." }
-    ]
-  },
-  "Events_Organization": {
-    "Title": "Organisation d'événements",
-    "Description": "Batouta Voyages vous aide à organiser des séminaires, conférences et événements d'entreprise réussis.",
-    "features": [
-      "Planification complète d'événements",
-      "Coordination des repas et des activités",
-      "Gestion logistique des transports",
-      "Hébergement et services personnalisés"
-    ],
-    "highlights": [
-      { "title": "Événements professionnels", "description": "Un accompagnement de A à Z pour tous vos événements." },
-      { "title": "Cohésion d'équipe", "description": "Renforcez les liens à travers des activités de groupe." },
-      { "title": "Réussite garantie", "description": "Nous nous assurons que chaque aspect de votre événement soit pris en charge." }
-    ]
-  },
-  "Billetterie": {
-    "Title": "Billetterie",
-    "Description": "Réservez vos billets pour des événements, attractions et destinations en toute simplicité.",
-    "features": [
-      "Réservation de billets d'avion",
-      "Accès à des événements culturels et touristiques",
-      "Offres spéciales sur les billets",
-      "Service de billetterie pour tous types d'événements"
-    ],
-    "highlights": [
-      { "title": "Billets d'avion", "description": "Réservez vos billets d'avion aux meilleures conditions." },
-      { "title": "Événements et attractions", "description": "Accédez facilement aux événements culturels et aux attractions touristiques." },
-      { "title": "Offres spéciales", "description": "Profitez de réductions et d'offres sur vos billets." }
-    ]
-  }
+    "Group_Travel": {
+      "Title": "Voyages en Groupe",
+      "Description": "Vivez des expériences de voyage inoubliables en groupe, avec des itinéraires adaptés à tous les goûts.",
+      "features": [
+        "Itinéraires personnalisés",
+        "Hébergements sélectionnés",
+        "Activités culturelles et de détente",
+        "Promotions pour tous les budgets"
+      ],
+      "highlights": [
+        { "title": "Vacances en Tunisie et à l'étranger", "description": "Explorez des destinations variées en groupe, en Tunisie ou à travers le monde." },
+        { "title": "Découvertes culturelles", "description": "Plongez dans l'histoire, la culture et les paysages uniques des destinations visitées." },
+        { "title": "Voyages abordables", "description": "Des offres de qualité à des prix adaptés à tous les budgets." }
+      ]
+    },
+    "Transport": {
+      "Title": "Transport",
+      "Description": "Des solutions de transport adaptées pour garantir un voyage fluide et agréable.",
+      "features": [
+        "Transport en avion, bus ou voiture",
+        "Réservation de billets d'avion",
+        "Solutions de transport personnalisées",
+        "Location de voiture"
+      ],
+      "highlights": [
+        { "title": "Réservation de billets", "description": "Réservez vos vols avec notre service personnalisé." },
+        { "title": "Transport fluide", "description": "Nous vous aidons à organiser vos trajets de manière simple et agréable." },
+        { "title": "Options variées", "description": "Des solutions de transport pour tous les types de voyages." }
+      ]
+    },
+    "Events_Organization": {
+      "Title": "Organisation d'événements",
+      "Description": "Batouta Voyages vous aide à organiser des séminaires, conférences et événements d'entreprise réussis.",
+      "features": [
+        "Planification complète d'événements",
+        "Coordination des repas et des activités",
+        "Gestion logistique des transports",
+        "Hébergement et services personnalisés"
+      ],
+      "highlights": [
+        { "title": "Événements professionnels", "description": "Un accompagnement de A à Z pour tous vos événements." },
+        { "title": "Cohésion d'équipe", "description": "Renforcez les liens à travers des activités de groupe." },
+        { "title": "Réussite garantie", "description": "Nous nous assurons que chaque aspect de votre événement soit pris en charge." }
+      ]
+    },
+    "Billetterie": {
+      "Title": "Billetterie",
+      "Description": "Réservez vos billets pour des événements, attractions et destinations en toute simplicité.",
+      "features": [
+        "Réservation de billets d'avion",
+        "Accès à des événements culturels et touristiques",
+        "Offres spéciales sur les billets",
+        "Service de billetterie pour tous types d'événements"
+      ],
+      "highlights": [
+        { "title": "Billets d'avion", "description": "Réservez vos billets d'avion aux meilleures conditions." },
+        { "title": "Événements et attractions", "description": "Accédez facilement aux événements culturels et aux attractions touristiques." },
+        { "title": "Offres spéciales", "description": "Profitez de réductions et d'offres sur vos billets." }
+      ]
+    }
   },
   "WhyChooseUs": {
     "title": "Pourquoi Nous Choisir",
@@ -272,50 +272,73 @@
       "description": "Nous allons au-delà pour que chaque aspect de votre voyage dépasse vos attentes."
     }
   },
-  "Testimonials": {
-    "title": "Ce que Disent Nos Clients",
-    "items": [
-      {
-        "id": 1,
-        "name": "Jean Dupont",
-        "quote": "L'équipe de cette agence de voyage a surpassé nos attentes pour rendre notre voyage inoubliable.",
-        "rating": 5
+  "wcgi": {
+    "title": "Ce Qui Compte Le Plus",
+    "sections": {
+      "Eat": {
+        "title": "Manger",
+        "description": "Nous vous promettons de manger localement."
       },
-      {
-        "id": 2,
-        "name": "Marie Durand",
-        "quote": "Travailler avec cette agence a été un jeu d'enfant. Ils ont tout géré parfaitement.",
-        "rating": 4
+      "Stay": {
+        "title": "Séjour",
+        "description": "Nous vous promettons des séjours écoresponsables."
       },
-      {
-        "id": 3,
-        "name": "Robert Martin",
-        "quote": "Cette agence de voyage est vraiment exceptionnelle. Leur attention aux détails a fait toute la différence.",
-        "rating": 5
-      }
-    ]
-  }
-},
-"Contact": {
-      "title": "Contactez-nous",
-      "description": "Nous serions ravis d'avoir de vos nouvelles. Que vous ayez une question sur nos services, nos tarifs ou autre chose, notre équipe est prête à répondre à toutes vos questions.",
-      "info": {
-        "adress_title": "Visitez-nous",
-        "address": "97, Rue de Palestine 2ème étage 1002 TUNIS",
-        "phone_title": "Appelez-nous",
-        "phone": "(+216) 71 802 881",
-        "email_title": "Envoyez-nous un email",
-        "email": "reservation.batouta@gmail.com"
+      "Transport": {
+        "title": "Transport",
+        "description": "Nous vous promettons des options de transport alternatives."
       },
-      "Email_form": {
-        "form_title": "Envoyez-nous un Message",
-        "name": "Nom",
-        "email": "Email",
-        "subject": "Sujet",
-        "message": "Message",
-        "send_button": "Envoyer le Message",
-        "success_message": "Message Envoyé"
+      "Experience": {
+        "title": "Expérience",
+        "description": "Nous vous promettons des expériences significatives."
+      },
+      "Empower": {
+        "title": "Autonomisation",
+        "description": "Nous nous engageons à soutenir les communautés locales."
+      },
+      "Make": {
+        "title": "Agir",
+        "description": "Nous vous promettons que vous pouvez faire une différence."
       }
     }
   }
+},
+"Contact": {
+        "title": "Contactez-nous",
+        "description": "Nous serions ravis de vous entendre. Que vous ayez une question sur nos services, nos tarifs ou tout autre sujet, notre équipe est prête à répondre à toutes vos demandes.",
+        "info": {
+          "address_title": "Visitez-nous",
+          "address": "97, Rue de Palestine 2ème étage 1002 TUNIS",
+          "phone_title": "Appelez-nous",
+          "phone": "(+216) 71 802 881",
+          "email_title": "Envoyez-nous un email",
+          "email": "reservation.batouta@gmail.com"
+        }, 
+        "Email_form": {
+          "form_title": "Envoyez-nous un message",
+          "name": "Nom",
+          "email": "Email",
+          "subject": "Sujet",
+          "message": "Message",
+          "send_button": "Envoyer le message", 
+          "success_message" : "Message envoyé"
+        }
+      },
+    "footer": {
+          "explore": "Explorer",
+          "connect_with_us": "Connectez-vous avec nous",
+          "sitemap": "Plan du site",
+          "about_us": "À propos de nous",
+          "our_services": "Nos services",
+          "our_history": "Notre histoire",
+          "our_values": "Nos valeurs",
+          "home": "Accueil",
+          "contact_us": "Nous contacter",
+          "unisco_sites": "Sites Unesco",
+          "general_conditions": "Conditions générales",
+          "facebook": "Facebook",
+          "instagram": "Instagram",
+          "designed_by": "Conçu par"
+      }
+
+}
   

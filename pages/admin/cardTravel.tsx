@@ -183,8 +183,7 @@ export default function TravelOnCardCreate() {
       return false;
     }
     
-    // ignore eslint warning
-    // eslint-disable-next-line no-unused-vars
+    
     for (const [index, item] of formData.attractions.entries()) {
       if (!item.title.trim()) {
         toast.error(`Attraction ${index + 1} title is required`);
