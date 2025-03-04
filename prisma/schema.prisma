@@ -34,9 +34,9 @@ model Trip {
   location_to  String
   days         Int
   price        Float
-  from_date    Date        // Only date (no time)
-  to_date      Date        // Only date (no time)
-  display      Boolean     @default(false)
+  from_date    DateTime
+  to_date      DateTime
+  display      Boolean     @default(true)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
   timeline     TripTimeline[]
@@ -49,7 +49,7 @@ model TripTimeline {
   title       String
   description String
   image       String?
-  date        Date     // Only date (no time)
+  date        DateTime
   sortOrder   Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

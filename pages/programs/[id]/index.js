@@ -116,6 +116,7 @@ const ImageGallery = ({ images }) => (
   </div>
 );
 
+
 export default function ProgramDetails() {
   const router = useRouter();
   const { id } = router.query;
@@ -127,15 +128,16 @@ export default function ProgramDetails() {
   useEffect(() => {
     const fetchProgramDetails = async () => {
       if (!id) return;
-      
+
       try {
         const response = await fetch(`/api/programs.controller?id=${id}`);
         if (!response.ok) throw new Error('Program not found');
-        
+
         const data = await response.json();
+        console.log(data[0])
         setProgram(data);
       } catch (err) {
-        setError(err.message);
+        setError(err.message || 'Failed to fetch program details');
       } finally {
         setLoading(false);
       }
@@ -176,18 +178,18 @@ export default function ProgramDetails() {
     {
       icon: "mdi:map-marker-radius",
       title: "Destination",
-      description: `${program.location_from} to ${program.location_to}`
+      description: `${program.location_from} to ${program.location_to}`,
     },
     {
       icon: "mdi:calendar-clock",
       title: "Duration",
-      description: `${program.days} Days of Adventure`
+      description: `${program.days} Days of Adventure`,
     },
     {
       icon: "mdi:currency-usd",
       title: "Investment",
-      description: `Starting from €${program.price}`
-    }
+      description: `Starting from €${program.price}`,
+    },
   ];
 
   return (
@@ -199,61 +201,62 @@ export default function ProgramDetails() {
 
       {/* Hero Section */}
       <section className="relative h-[90vh] overflow-hidden">
-      <motion.div
-        className="absolute inset-0"
-        initial={{ scale: 1.1 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
-      >
-        <Image
-          src={`/uploads/${program.images[0]}`}
-          alt={program.title}
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
-      </motion.div>
+        <motion.div
+          className="absolute inset-0"
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+        >
+          <Image
+            src={`/uploads/${program.images[0]}`}
+            alt={program.title}
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-transparent" />
+        </motion.div>
 
-      <motion.div
-        className="relative h-full max-w-7xl mx-auto px-4 flex items-center"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.5, duration: 1 }}
-      >
-        <div className="max-w-3xl text-white">
-          <motion.h1
-            className="text-5xl md:text-7xl font-bold mb-6"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.8, duration: 1 }}
-          >
-            {program.title}
-          </motion.h1>
-          <motion.p
-            className="text-xl mb-8 text-gray-200"
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 1, duration: 1 }}
-          >
-            {program.description}
-          </motion.p>
-          <motion.div
-            className="flex flex-wrap gap-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 1 }}
-          >
-            {highlights.map((highlight, idx) => (
-              <div key={idx} className="flex items-center space-x-2">
-                <Icon icon={highlight.icon} className="w-6 h-6" />
-                <span>{highlight.description}</span>
-              </div>
-            ))}
-          </motion.div>
-        </div>
-      </motion.div>
-    </section>
+        <motion.div
+          className="relative h-full max-w-7xl mx-auto px-4 flex items-center"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 1 }}
+        >
+          <div className="max-w-3xl text-white">
+            <motion.h1
+              className="text-5xl md:text-7xl font-bold mb-6"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.8, duration: 1 }}
+            >
+              {program.title}
+            </motion.h1>
+            <motion.p
+              className="text-xl mb-8 text-gray-200"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 1, duration: 1 }}
+            >
+              {program.description}
+            </motion.p>
+            <motion.div
+              className="flex flex-wrap gap-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1.2, duration: 1 }}
+            >
+              {highlights.map((highlight, idx) => (
+                <div key={idx} className="flex items-center space-x-2">
+                  <Icon icon={highlight.icon} className="w-6 h-6" />
+                  <span>{highlight.description}</span>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </motion.div>
+      </section>
+
       {/* Program Highlights */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
@@ -266,7 +269,6 @@ export default function ProgramDetails() {
             <h2 className="text-4xl font-bold text-gray-800 mb-4">Program Highlights</h2>
             <p className="text-xl text-gray-600">Discover what makes this journey unique</p>
           </motion.div>
-          
           <ProgramHighlights highlights={highlights} />
         </div>
       </section>
@@ -283,7 +285,6 @@ export default function ProgramDetails() {
             <h2 className="text-4xl font-bold text-gray-800 mb-4">Journey Preview</h2>
             <p className="text-xl text-gray-600">Glimpses of your upcoming adventure</p>
           </motion.div>
-
           <ImageGallery images={program.images} />
         </div>
       </section>
@@ -300,7 +301,6 @@ export default function ProgramDetails() {
             <h2 className="text-4xl font-bold text-gray-800 mb-4">Your Journey Timeline</h2>
             <p className="text-xl text-gray-600">Day by day breakdown of your adventure</p>
           </motion.div>
-
           <div className="space-y-4">
             {program.timeline.map((timelineItem, idx) => (
               <TimelineItem
@@ -314,8 +314,6 @@ export default function ProgramDetails() {
           </div>
         </div>
       </section>
-
-
 
       <ContactUs />
     </Layout>

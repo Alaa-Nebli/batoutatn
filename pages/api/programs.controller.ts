@@ -63,25 +63,7 @@ export const fetchAllPrograms = async (req: NextApiRequest, res: NextApiResponse
   }
 };
 
-// Fetch displayed programs
-export const fetchDisplayedPrograms = async (req: NextApiRequest, res: NextApiResponse) => {
-  try {
-    const programs = await prisma.trip.findMany({
-      where: { display: true },
-      include: {
-        timeline: {
-          orderBy: { sort_order: 'asc' }
-        }
-      },
-      orderBy: { created_at: 'desc' }
-    });
 
-    res.status(200).json(programs);
-  } catch (error) {
-    console.error('Error fetching programs:', error);
-    res.status(500).json({ message: 'Error fetching programs', error: (error as Error).message });
-  }
-};
 
 // Fetch program by ID
 export const fetchProgramById = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -108,7 +90,6 @@ export const fetchProgramById = async (req: NextApiRequest, res: NextApiResponse
   }
 };
 
-// Create Program
 export const createProgram = async (req: NextApiRequest, res: NextApiResponse) => {
   upload(req, res, async (err) => {
     if (err) {
@@ -121,16 +102,41 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
       const programImages = req.files['program_images'] || [];
       const timelineImages = req.files['timeline_images'] || [];
 
-      // Validate dates
-      const fromDate = new Date(programData.from_date);
-      const toDate = new Date(programData.to_date);
+      // Log the input data for debugging
+      console.log('fromDate:', programData.fromDate);
+      console.log('days:', programData.days);
 
-      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-        return res.status(400).json({ message: 'Invalid date format for from_date or to_date' });
+      // Validate fromDate
+      const fromDate = new Date(programData.fromDate);
+      if (isNaN(fromDate.getTime())) {
+        console.error('Invalid fromDate:', programData.fromDate);
+        return res.status(400).json({ message: 'Invalid date format for fromDate' });
       }
+
+      // Calculate toDate if it's empty
+      let toDate: Date;
+      if (!programData.toDate || programData.toDate.trim() === '') {
+        // Calculate toDate by adding days to fromDate
+        toDate = new Date(fromDate);
+        toDate.setDate(toDate.getDate() + programData.days);
+      } else {
+        // Use the provided toDate
+        toDate = new Date(programData.toDate);
+        if (isNaN(toDate.getTime())) {
+          console.error('Invalid toDate:', programData.toDate);
+          return res.status(400).json({ message: 'Invalid date format for toDate' });
+        }
+      }
+
+      // Log the calculated toDate for debugging
+      console.log('Calculated toDate:', toDate);
 
       // Save program images paths
       const imageUrls = programImages.map(file => file.filename);
+
+      // Ensure the dates are in ISO 8601 format (YYYY-MM-DDTHH:mm:ssZ)
+      const formattedFromDate = fromDate.toISOString();
+      const formattedToDate = toDate.toISOString();
 
       // Create program with timeline
       const program = await prisma.trip.create({
@@ -139,12 +145,12 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
           metadata: programData.metadata || null,
           description: programData.description,
           images: imageUrls,
-          location_from: programData.location_from,
-          location_to: programData.location_to,
+          location_from: programData.locationFrom,
+          location_to: programData.locationTo,
           days: programData.days,
           price: programData.price,
-          from_date: fromDate,
-          to_date: toDate,
+          from_date: formattedFromDate,
+          to_date: formattedToDate,
           display: programData.display,
           timeline: {
             create: programData.timeline?.map((item, index) => ({
@@ -293,9 +299,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       case 'DELETE':
         return deleteProgram(req, res);
       case 'GET':
-        if (req.query.admin) return fetchAllPrograms(req, res);
         if (req.query.id) return fetchProgramById(req, res);
-        return fetchDisplayedPrograms(req, res);
+        return fetchAllPrograms(req, res);
       default:
         res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);
         res.status(405).end(`Method ${req.method} Not Allowed`);
