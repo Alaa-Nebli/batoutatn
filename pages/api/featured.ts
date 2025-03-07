@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs/promises';
-
 // Prevent potential memory leak warning
 export const config = {
   api: {
@@ -32,7 +31,7 @@ const upload = multer({
 ]);
 
 // Helper function to remove uploaded files
-const removeUploadedFiles = async (files: multer.File[]) => {
+const removeUploadedFiles = async (files: Express.Multer.File[]) => {
   for (const file of files) {
     try {
       await fs.unlink(file.path);
@@ -84,6 +83,8 @@ export const fetchFeaturedById = async (req: NextApiRequest, res: NextApiRespons
 
 // Create featured item
 export const createFeatured = async (req: NextApiRequest, res: NextApiResponse) => {
+  // @ts-ignore
+
   upload(req, res, async (err) => {
     if (err) {
       console.error('Error uploading files:', err);
@@ -124,7 +125,7 @@ export const createFeatured = async (req: NextApiRequest, res: NextApiResponse) 
       });
     } catch (error) {
       // Clean up uploaded files if database operation fails
-      const files = (req as any).files as { [fieldname: string]: multer.File[] };
+      const files = (req as any).files as { [fieldname: string]: Express.Multer.File[] };
       if (files && files['banner_image']) {
         await removeUploadedFiles(files['banner_image']);
       }
@@ -136,6 +137,7 @@ export const createFeatured = async (req: NextApiRequest, res: NextApiResponse) 
 
 // Update featured item
 export const updateFeatured = async (req: NextApiRequest, res: NextApiResponse) => {
+  // @ts-ignore
   upload(req, res, async (err) => {
     if (err) {
       console.error('Error uploading files:', err);
@@ -201,7 +203,7 @@ export const updateFeatured = async (req: NextApiRequest, res: NextApiResponse) 
       });
     } catch (error) {
       // Clean up uploaded files if database operation fails
-      const files = (req as any).files as { [fieldname: string]: multer.File[] };
+      const files = (req as any).files as { [fieldname: string]:Express.Multer.File[] };
       if (files && files['banner_image']) {
         await removeUploadedFiles(files['banner_image']);
       }
