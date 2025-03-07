@@ -3,10 +3,10 @@
         "jsx": "react",
         "baseUrl": ".",
         "paths": {
-            "components//*": ["components/*"],
-            "styles//*": ["styles/*"],
+            "@components/*": ["components/*"],
+            "@styles/*": ["styles/*"],
             "@utils/*": ["utils/*"],
-            "public//*": ["public/*"],
+            "@public/*": ["public/*"],
             "@AppComponents/*": ["components/App/*"]
         }
     }
