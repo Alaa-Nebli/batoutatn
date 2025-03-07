@@ -11,54 +11,49 @@ export default function OfferDetails() {
   const isEditing = !!id;
 
   const [formData, setFormData] = useState({
-    title: '',
-    alt_text: '',
-    program_id: '',
-    custom_route: '',
-    sort_order: 0,
-    active: true
+    tripId: '',
+    cta: ''
   });
-  const [imageFile, setImageFile] = useState(null);
+  const [bannerImage, setBannerImage] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [loading, setLoading] = useState(false);
-  const [programs, setPrograms] = useState([]);
+  const [trips, setTrips] = useState([]);
 
   useEffect(() => {
-    // Fetch programs for the dropdown
-    const fetchPrograms = async () => {
+    // Fetch trips for the dropdown
+    const fetchTrips = async () => {
       try {
-        const response = await fetch('/api/programs?admin=true');
+        const response = await fetch('/api/programs.controller');
         if (response.ok) {
           const data = await response.json();
-          setPrograms(data);
+          setTrips(data);
         }
       } catch (error) {
-        console.error('Error fetching programs:', error);
+        console.error('Error fetching trips:', error);
       }
     };
 
-    // Fetch offer data if editing
+    // Fetch featured offer data if editing
     const fetchOfferData = async () => {
       try {
-        const response = await fetch(`/api/featured-offers?admin=true&id=${id}`);
+        const response = await fetch(`/api/featured?id=${id}`);
         if (response.ok) {
           const data = await response.json();
           setFormData({
-            title: data.title,
-            alt_text: data.alt_text,
-            program_id: data.program_id || '',
-            custom_route: data.custom_route || '',
-            sort_order: data.sort_order,
-            active: data.active
+            tripId: data.tripId || '',
+            cta: data.cta || ''
           });
-          setPreviewUrl(`/uploads/banners/${data.image}`);
+          // Set preview URL for the existing image
+          if (data.image) {
+            setPreviewUrl(`/uploads/${data.image}`);
+          }
         }
       } catch (error) {
-        console.error('Error fetching offer:', error);
+        console.error('Error fetching featured offer:', error);
       }
     };
 
-    fetchPrograms();
+    fetchTrips();
     if (isEditing) {
       fetchOfferData();
     }
@@ -78,10 +73,10 @@ export default function OfferDetails() {
   }
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: value,
     }));
   };
 
@@ -89,12 +84,12 @@ export default function OfferDetails() {
     const file = e.target.files[0];
     if (!file) return;
 
-    setImageFile(file);
+    setBannerImage(file);
     setPreviewUrl(URL.createObjectURL(file));
   };
 
   const removeImage = () => {
-    setImageFile(null);
+    setBannerImage(null);
     setPreviewUrl('');
   };
 
@@ -103,21 +98,24 @@ export default function OfferDetails() {
     setLoading(true);
 
     try {
+      // Create FormData object for file upload
       const submitFormData = new FormData();
-      Object.entries(formData).forEach(([key, value]) => {
-        submitFormData.append(key, value);
-      });
-
-      if (imageFile) {
-        submitFormData.append('image', imageFile);
+      
+      // Add the featured data as JSON
+      submitFormData.append('featuredData', JSON.stringify(formData));
+      
+      // Add the banner image if provided
+      if (bannerImage) {
+        submitFormData.append('banner_image', bannerImage);
       }
 
-      const url = `/api/featured-offers${id ? `?id=${id}` : ''}`;
+      const url = `/api/featured${id ? `?id=${id}` : ''}`;
       const method = id ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
         method,
         body: submitFormData,
+        // Don't set Content-Type header, it will be set automatically with the boundary for FormData
       });
 
       if (response.ok) {
@@ -127,7 +125,7 @@ export default function OfferDetails() {
         throw new Error(error.message);
       }
     } catch (error) {
-      console.error('Error saving offer:', error);
+      console.error('Error saving featured offer:', error);
       // Here you might want to show an error message to the user
     } finally {
       setLoading(false);
@@ -142,19 +140,25 @@ export default function OfferDetails() {
         </h1>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium mb-2">Title</label>
-            <input
-              type="text"
-              name="title"
-              value={formData.title}
+            <label className="block text-sm font-medium mb-2">Select Trip</label>
+            <select
+              name="tripId"
+              value={formData.tripId}
               onChange={handleInputChange}
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
-            />
+            >
+              <option value="">Select a trip</option>
+              {trips.map((trip) => (
+                <option key={trip.id} value={trip.id}>
+                  {trip.title}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Banner Image</label>
+            <label className="block text-sm font-medium mb-2">Banner Image {!isEditing && '(Required)'}</label>
             <div className="flex gap-4">
               {previewUrl && (
                 <div className="relative">
@@ -178,9 +182,11 @@ export default function OfferDetails() {
                 <label className="w-60 h-32 flex items-center justify-center border-2 border-dashed rounded-lg cursor-pointer hover:bg-gray-50">
                   <input
                     type="file"
+                    name="banner_image"
                     accept="image/*"
                     onChange={handleImageChange}
                     className="hidden"
+                    required={!isEditing}
                   />
                   <span className="text-gray-400">+ Add Banner Image</span>
                 </label>
@@ -189,67 +195,16 @@ export default function OfferDetails() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Image Alt Text</label>
+            <label className="block text-sm font-medium mb-2">Call To Action Text</label>
             <input
               type="text"
-              name="alt_text"
-              value={formData.alt_text}
+              name="cta"
+              value={formData.cta}
               onChange={handleInputChange}
+              placeholder="e.g., Book Now, Learn More, Explore"
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Link to Program (Optional)</label>
-            <select
-              name="program_id"
-              value={formData.program_id}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Select a program</option>
-              {programs.map((program) => (
-                <option key={program.id} value={program.id}>
-                  {program.title}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Custom Route (Optional)</label>
-            <input
-              type="text"
-              name="custom_route"
-              value={formData.custom_route}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="/custom-page"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2">Sort Order</label>
-            <input
-              type="number"
-              name="sort_order"
-              value={formData.sort_order}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="active"
-              checked={formData.active}
-              onChange={handleInputChange}
-              className="w-4 h-4"
-            />
-            <label className="text-sm font-medium">Active</label>
           </div>
 
           <div className="flex justify-end gap-4 pt-4 border-t">
@@ -267,11 +222,11 @@ export default function OfferDetails() {
               disabled={loading}
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              {isEditing ? 'Update' : 'Create'} Offer
+              {isEditing ? 'Update' : 'Create'} Featured Offer
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-};
+}

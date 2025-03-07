@@ -19,86 +19,158 @@ export async function getStaticProps({ locale }) {
     }
 }
 
+
 const Banner = () => {
   const { t } = useTranslation('common');
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [featuredItems, setFeaturedItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const banners = [
+  // Default banners to use as fallback
+  const defaultBanners = [
     {
       id: 1,
       imageUrl: '/tunisia/japan.webp',
       title: "Discover Japan",
       description: t('Home.banner.slide1.description'),
-      alt: "Japan"
+      alt: "Japan",
+      cta: "Explore Japan",
+      tripId: "japan-tour"
     },
     {
       id: 2,
       imageUrl: '/tunisia/nepal_places.jpg',
       title: t('Home.banner.slide2.title'),
       description: t('Home.banner.slide2.description'),
-      alt: t('Home.banner.slide2.alt')
+      alt: t('Home.banner.slide2.alt'),
+      cta: "Visit Nepal",
+      tripId: "nepal-tour"
     },
     {
       id: 3,
       imageUrl: '/tunisia/thailand-chaing-mai.jpg',
       title: t('Home.banner.slide3.title'),
       description: t('Home.banner.slide3.description'),
-      alt: t('Home.banner.slide3.alt')
+      alt: t('Home.banner.slide3.alt'),
+      cta: "Discover Thailand",
+      tripId: "thailand-tour"
     },
     {
       id: 4,
       imageUrl: '/tunisia/suisse.jpg',
       title: t('Home.banner.slide4.title'),
       description: t('Home.banner.slide4.description'),
-      alt: t('Home.banner.slide4.alt')
+      alt: t('Home.banner.slide4.alt'),
+      cta: "Explore Switzerland",
+      tripId: "switzerland-tour"
     },
     {
       id: 5,
       imageUrl: '/tunisia/thailand_1.jpg',
       title: t('Home.banner.slide5.title'),
       description: t('Home.banner.slide5.description'),
-      alt: t('Home.banner.slide5.alt')
+      alt: t('Home.banner.slide5.alt'),
+      cta: "Visit Thailand",
+      tripId: "thailand-experience"
     },
     {
       id: 6,
       imageUrl: '/tunisia/africa_south.webp',
       title: t('Home.banner.slide6.title'),
       description: t('Home.banner.slide6.description'),
-      alt: t('Home.banner.slide6.alt')
+      alt: t('Home.banner.slide6.alt'),
+      cta: "Discover South Africa",
+      tripId: "south-africa-tour"
     },
     {
       id: 7,
       imageUrl: '/tunisia/safari.png',
       title: t('Home.banner.slide7.title'),
       description: t('Home.banner.slide7.description'),
-      alt: t('Home.banner.slide7.alt')
+      alt: t('Home.banner.slide7.alt'),
+      cta: "Safari Adventure",
+      tripId: "safari-tour"
     }
   ];
 
+  // Fetch featured items from the API
+  useEffect(() => {
+    const fetchFeaturedItems = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/api/featured');
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch featured items: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        setFeaturedItems(data);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching featured items:', err);
+        setError(err);
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedItems();
+  }, []);
+
+  // Determine which banners to display
+  const displayBanners = featuredItems.length > 0 
+    ? featuredItems.map(item => ({
+        id: item.id,
+        imageUrl: `/uploads/${item.image}`,
+        title: item.trip?.name || "",
+        description: item.trip?.description || "",
+        alt: item.trip?.name || "Featured destination",
+        cta: item.cta || "Explore Destination",
+        tripId: item.tripId
+      }))
+    : defaultBanners;
+
   const handlePrev = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + banners.length) % banners.length);
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + displayBanners.length) % displayBanners.length);
   };
 
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % displayBanners.length);
   };
 
   useEffect(() => {
     const interval = setInterval(() => {
       handleNext();
-    }, 3000);
+    }, 4000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [displayBanners.length]);
+
+  if (loading) {
+    return (
+      <section className="relative h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+          <p className="mt-4 text-gray-600">Loading amazing destinations...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (error) {
+    console.warn('Falling back to default banners due to API error');
+    // We'll silently fall back to default banners if there's an error
+  }
 
   return (
     <section className="relative h-screen overflow-hidden">
       {/* Subtle global overlay */}
-      <div className="absolute inset-0 bg-black/30"></div>
+      <div className="absolute inset-0 bg-black/30 z-10"></div>
 
       {/* Carousel slides */}
       <div className="absolute inset-0 flex">
-        {banners.map((banner, index) => (
+        {displayBanners.map((banner, index) => (
           <div
             key={banner.id}
             className={`w-full h-full flex-shrink-0 transition-opacity duration-500 ${
@@ -114,21 +186,53 @@ const Banner = () => {
               priority
               className="w-full h-full object-cover"
             />
+            
+            {/* Content overlay for featured items */}
+            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
+              <div className="max-w-4xl mx-auto  backdrop-blur-sm p-6 rounded-lg">
+                <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">{banner.title}</h2>
+                <p className="text-lg md:text-xl text-white mb-6 max-w-2xl mx-auto">{banner.description}</p>
+                
+                {banner.tripId && (
+                  <Link href={`/programs/${banner.tripId}`} passHref legacyBehavior>
+                    <a className="inline-block px-6 py-3 bg-white text-black font-medium text-lg rounded-full hover:bg-gray-100 transition-colors duration-300 shadow-lg transform hover:scale-105 active:scale-100">
+                      {banner.cta}
+                    </a>
+                  </Link>
+                )}
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
+      {/* Carousel indicator dots */}
+      <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-30 flex space-x-2">
+        {displayBanners.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-3 h-3 rounded-full transition-all duration-300 ${
+              index === currentIndex ? 'bg-white scale-125' : 'bg-white/50'
+            }`}
+            aria-label={`Go to slide ${index + 1}`}
+          />
+        ))}
+      </div>
+
       {/* Improved carousel controls */}
-      <div className="absolute top-1/2 transform -translate-y-1/2 w-full flex justify-between px-4 md:px-6">
+      <div className="absolute top-1/2 transform -translate-y-1/2 w-full flex justify-between px-4 md:px-6 z-30">
         <button
           className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors duration-300"
           onClick={handlePrev}
+          aria-label="Previous slide"
         >
           <Icon icon="lucide:chevron-left" className="w-6 h-6 text-gray-800" />
         </button>
         <button
           className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors duration-300"
           onClick={handleNext}
+          aria-label="Next slide"
         >
           <Icon icon="lucide:chevron-right" className="w-6 h-6 text-gray-800" />
         </button>
@@ -136,7 +240,7 @@ const Banner = () => {
 
       {/* Improved scroll indicator */}
       <motion.div
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30"
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 1.5, repeat: Infinity }}
       >
@@ -147,6 +251,7 @@ const Banner = () => {
     </section>
   );
 };
+
 
 const UniqueFeatureCard = ({ icon, title, description, delay }) => {
     return (
@@ -342,9 +447,6 @@ const TripsCarousel = () => {
   
 };
 
-
-
-
 export default function Home() {
     const { t } = useTranslation('common');
 
@@ -387,24 +489,28 @@ export default function Home() {
 
   const services = [
     {
+      id:"1", 
       title: t('Home.Our_Services_section.Group_Travel.Title'),
       description: t('Home.Our_Services_section.Group_Travel.Description'),
       image: '/group_travel.png',
       imageAlt: 'Group Leisure Travel'
     },
     {
+      id : "2",
       title: t('Home.Our_Services_section.Events_Organization.Title'),
       description: t('Home.Our_Services_section.Events_Organization.Description'),
       image: '/events.png',
       imageAlt: 'FIT Travel'
     },
     {
+      id : "3", 
       title: t('Home.Our_Services_section.Transport.Title'),
       description: t('Home.Our_Services_section.Transport.Description'),
       image: '/transport.png',
       imageAlt: 'Shore Excursions'
     },
     {
+      id : "4",
       title: t('Home.Our_Services_section.Billetterie.Title'),
       description: t('Home.Our_Services_section.Billetterie.Description'),
       image: '/billeterie.png',
@@ -553,7 +659,9 @@ export default function Home() {
                         </div>
 
                         {/* "Explore More" Button - now all buttons will align */}
-                        <Link href="/our_services">
+                        <Link   
+                          href={`/services/${service.id}`}
+                        >
                           <button className="mt-auto px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold transition-all duration-300 hover:bg-orange-600 hover:scale-105">
                             Voir Plus
                           </button>

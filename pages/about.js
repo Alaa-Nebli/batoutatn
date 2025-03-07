@@ -366,40 +366,41 @@ const OurValues = () => {
     {
       icon: "mdi:heart",
       color: "text-red-500",
-      title: "Passion for travel",
-      description: "We love what we do! Our teams across Asia aim to inspire guests with a true appreciation for ‘Our Asia’."
+      title: "Passion pour le voyage",
+      description: "Nous aimons ce que nous faisons ! Nos équipes à travers l'Asie visent à inspirer nos invités avec une véritable appréciation de ‘Notre Asie’."
     },
     {
       icon: "mdi:map",
       color: "text-blue-500",
-      title: "Local knowledge",
-      description: "Our offices across Asia offer expert insights and on the ground knowledge about each destination."
+      title: "Connaissance locale",
+      description: "Nos bureaux en Asie offrent des connaissances approfondies et une expertise sur chaque destination."
     },
     {
       icon: "mdi:earth",
       color: "text-green-500",
-      title: "Global representation",
-      description: "We have representatives around the globe offering multilingual services in every time zone."
+      title: "Représentation mondiale",
+      description: "Nous avons des représentants à travers le monde offrant des services multilingues dans tous les fuseaux horaires."
     },
     {
       icon: "mdi:account",
       color: "text-yellow-500",
-      title: "Customer service",
-      description: "We want our guests to touch, taste and experience the beating heart of every destination they visit."
+      title: "Service client",
+      description: "Nous voulons que nos invités touchent, goûtent et vivent le cœur battant de chaque destination qu'ils visitent."
     },
     {
       icon: "mdi:lightbulb",
       color: "text-purple-500",
       title: "Innovation",
-      description: "We continue to seek new solutions and integrate new technologies into our wide range of services."
+      description: "Nous cherchons continuellement de nouvelles solutions et intégrons les dernières technologies dans notre large gamme de services."
     },
     {
       icon: "mdi:leaf",
       color: "text-green-700",
-      title: "Responsibility",
-      description: "We focus on ethical and sustainable tours, including authentic interactions with local people and places."
+      title: "Responsabilité",
+      description: "Nous mettons l'accent sur des circuits éthiques et durables, incluant des interactions authentiques avec les populations et lieux locaux."
     }
   ];
+  
 
   return (
     <section ref={ref} className="py-16 px-4 bg-gray-50">

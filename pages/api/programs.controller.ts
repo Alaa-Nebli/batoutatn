@@ -4,6 +4,10 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs/promises';
 
+interface NextApiRequestWithFiles extends NextApiRequest {
+  files?: { [fieldname: string]: multer.File[] };
+}
+
 // Prevent potential memory leak warning
 export const config = {
   api: {
@@ -33,7 +37,7 @@ const upload = multer({
 ]);
 
 // Helper function to remove uploaded files
-const removeUploadedFiles = async (files: Express.Multer.File[]) => {
+const removeUploadedFiles = async (files: multer.File[]) => {
   for (const file of files) {
     try {
       await fs.unlink(file.path);
@@ -74,7 +78,7 @@ export const fetchProgramById = async (req: NextApiRequest, res: NextApiResponse
       where: { id: id as string },
       include: {
         timeline: {
-          orderBy: { sort_order: 'asc' }
+          orderBy: { sortOrder: 'asc' }
         }
       }
     });
@@ -99,8 +103,8 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
 
     try {
       const programData = JSON.parse(req.body.programData);
-      const programImages = req.files['program_images'] || [];
-      const timelineImages = req.files['timeline_images'] || [];
+      const programImages = (req as NextApiRequest & { files: { [fieldname: string]: multer.File[] } }).files['program_images'] || [];
+      const timelineImages = (req as NextApiRequest & { files: { [fieldname: string]: multer.File[] } }).files['timeline_images'] || [];
 
       // Log the input data for debugging
       console.log('fromDate:', programData.fromDate);
@@ -173,7 +177,7 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
       });
     } catch (error) {
       // Clean up uploaded files if database operation fails
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const files = (req as NextApiRequest & { files: { [fieldname: string]: multer.File[] } }).files;
       if (files) {
         const allFiles = [
           ...(files['program_images'] || []),
@@ -198,8 +202,8 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
     try {
       const programData = JSON.parse(req.body.programData);
       const { id } = req.query;
-      const programImages = req.files['program_images'] || [];
-      const timelineImages = req.files['timeline_images'] || [];
+      const programImages = (req as NextApiRequest & { files: { [fieldname: string]: multer.File[] } }).files['program_images'] || [];
+      const timelineImages = (req as NextApiRequest & { files: { [fieldname: string]: multer.File[] } }).files['timeline_images'] || [];
 
       // Save program images paths
       const imageUrls = programImages.map(file => file.filename);
@@ -236,12 +240,8 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
         }
       });
 
-      res.status(200).json({ 
-        message: 'Program updated successfully',
-        programId: program.id
-      });
     } catch (error) {
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const files = (req as NextApiRequestWithFiles).files;
       if (files) {
         const allFiles = [
           ...(files['program_images'] || []),
@@ -307,6 +307,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   } finally {
     // Ensure Prisma client is disconnected after each request
-    await prisma.$disconnect();
+    // await prisma.$disconnect();
+    console.log("Done")
   }
 }

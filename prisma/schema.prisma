@@ -65,3 +65,20 @@ model Featured {
   updatedAt DateTime @updatedAt
   trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
 }
+
+
+model LocalProgram {
+  id           String      @id @default(cuid())
+  title        String      @unique
+  metadata     String?
+  description  String
+  images       Json
+  location_from String
+  location_to  String
+  days         Int
+  price        Float
+  from_date    DateTime
+  to_date      DateTime
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}

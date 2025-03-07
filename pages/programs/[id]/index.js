@@ -23,7 +23,7 @@ const TimelineItem = ({ day, isActive, onClick, content }) => (
     >
       <div className="flex items-center space-x-4">
         <span className={`text-2xl font-bold ${isActive ? 'text-white' : 'text-orange-500'}`}>
-          Day {day}
+          Jour {day}
         </span>
         <h3 className="text-lg font-semibold">{content.title}</h3>
       </div>
@@ -46,7 +46,7 @@ const TimelineItem = ({ day, isActive, onClick, content }) => (
           <p className="text-gray-600 leading-relaxed">{content.description}</p>
           {content.highlights && (
             <div className="space-y-2">
-              <h4 className="font-semibold text-gray-800">Highlights:</h4>
+              <h4 className="font-semibold text-gray-800">Points forts :</h4>
               <ul className="space-y-2">
                 {content.highlights.map((highlight, idx) => (
                   <li key={idx} className="flex items-start space-x-2">
@@ -106,7 +106,7 @@ const ImageGallery = ({ images }) => (
       >
         <Image
           src={`/uploads/${image}`}
-          alt={`Gallery image ${idx + 1}`}
+          alt={`Image de galerie ${idx + 1}`}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"
         />
@@ -131,13 +131,13 @@ export default function ProgramDetails() {
 
       try {
         const response = await fetch(`/api/programs.controller?id=${id}`);
-        if (!response.ok) throw new Error('Program not found');
+        if (!response.ok) throw new Error('Programme non trouvé');
 
         const data = await response.json();
         console.log(data[0])
         setProgram(data);
       } catch (err) {
-        setError(err.message || 'Failed to fetch program details');
+        setError(err.message || 'Échec du chargement des détails du programme');
       } finally {
         setLoading(false);
       }
@@ -161,11 +161,11 @@ export default function ProgramDetails() {
       <Layout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center space-y-4">
-            <h2 className="text-2xl font-bold text-gray-800">Program Not Found</h2>
-            <p className="text-gray-600">The program you're looking for doesn't exist or has been removed.</p>
+            <h2 className="text-2xl font-bold text-gray-800">Programme non trouvé</h2>
+            <p className="text-gray-600">Le programme que vous recherchez n'existe pas ou a été supprimé.</p>
             <Link href="/programs">
               <button className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
-                View All Programs
+                Voir tous les programmes
               </button>
             </Link>
           </div>
@@ -178,28 +178,28 @@ export default function ProgramDetails() {
     {
       icon: "mdi:map-marker-radius",
       title: "Destination",
-      description: `${program.location_from} to ${program.location_to}`,
+      description: `${program.location_from} à ${program.location_to}`,
     },
     {
       icon: "mdi:calendar-clock",
-      title: "Duration",
-      description: `${program.days} Days of Adventure`,
+      title: "Durée",
+      description: `${program.days} jours d'aventure`,
     },
     {
       icon: "mdi:currency-usd",
-      title: "Investment",
-      description: `Starting from €${program.price}`,
+      title: "Investissement",
+      description: `À partir de ${program.price}€`,
     },
   ];
 
   return (
     <Layout>
       <SEO
-        title={`${program.title} | Travel Experience`}
+        title={`${program.title} | Expérience de Voyage`}
         description={program.description}
       />
 
-      {/* Hero Section */}
+      {/* Section Héro */}
       <section className="relative h-[90vh] overflow-hidden">
         <motion.div
           className="absolute inset-0"
@@ -257,7 +257,7 @@ export default function ProgramDetails() {
         </motion.div>
       </section>
 
-      {/* Program Highlights */}
+      {/* Points forts du programme */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
@@ -266,14 +266,14 @@ export default function ProgramDetails() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Program Highlights</h2>
-            <p className="text-xl text-gray-600">Discover what makes this journey unique</p>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Points forts du programme</h2>
+            <p className="text-xl text-gray-600">Découvrez ce qui rend ce voyage unique</p>
           </motion.div>
           <ProgramHighlights highlights={highlights} />
         </div>
       </section>
 
-      {/* Image Gallery */}
+      {/* Galerie d'images */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
@@ -282,14 +282,14 @@ export default function ProgramDetails() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Journey Preview</h2>
-            <p className="text-xl text-gray-600">Glimpses of your upcoming adventure</p>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Aperçu du voyage</h2>
+            <p className="text-xl text-gray-600">Découvrez votre prochaine aventure en images</p>
           </motion.div>
           <ImageGallery images={program.images} />
         </div>
       </section>
 
-      {/* Detailed Timeline */}
+      {/* Chronologie détaillée */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
           <motion.div
@@ -298,8 +298,8 @@ export default function ProgramDetails() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl font-bold text-gray-800 mb-4">Your Journey Timeline</h2>
-            <p className="text-xl text-gray-600">Day by day breakdown of your adventure</p>
+            <h2 className="text-4xl font-bold text-gray-800 mb-4">Itinéraire de votre voyage</h2>
+            <p className="text-xl text-gray-600">Déroulement jour par jour de votre aventure</p>
           </motion.div>
           <div className="space-y-4">
             {program.timeline.map((timelineItem, idx) => (

@@ -103,14 +103,7 @@ const EsteemSection = ({ t }) => {
   const [hovered, setHovered] = useState(Array(6).fill(false));
 
   const principles = [
-    { 
-      title: t('Services.wcgi.sections.eat.title'), 
-      description: t('Services.wcgi.sections.eat.description'), 
-      image: "/tunisia/Tunisian-Food.jpeg",
-      icon: "🍽️",
-      bgColor: "bg-orange",
-      overlayColor: "from-orange-400/90 to-orange-500/90"
-    },
+    
     { 
       title: t('Services.wcgi.sections.Stay.title'), 
       description: t('Services.wcgi.sections.Stay.description'), 
