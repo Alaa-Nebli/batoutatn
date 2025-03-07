@@ -5,7 +5,7 @@ import path from 'path';
 import fs from 'fs/promises';
 
 interface NextApiRequestWithFiles extends NextApiRequest {
-  files?: { [fieldname: string]: multer.File[] };
+  files?: { [fieldname: string]: Express.Multer.File[] };
 }
 
 // Prevent potential memory leak warning
@@ -37,7 +37,7 @@ const upload = multer({
 ]);
 
 // Helper function to remove uploaded files
-const removeUploadedFiles = async (files: multer.File[]) => {
+const removeUploadedFiles = async (files: Express.Multer.File[]) => {
   for (const file of files) {
     try {
       await fs.unlink(file.path);
@@ -95,6 +95,7 @@ export const fetchProgramById = async (req: NextApiRequest, res: NextApiResponse
 };
 
 export const createProgram = async (req: NextApiRequest, res: NextApiResponse) => {
+  // @ts-ignore
   upload(req, res, async (err) => {
     if (err) {
       console.error('Error uploading files:', err);
@@ -103,8 +104,8 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
 
     try {
       const programData = JSON.parse(req.body.programData);
-      const programImages = (req as NextApiRequest & { files: { [fieldname: string]: multer.File[] } }).files['program_images'] || [];
-      const timelineImages = (req as NextApiRequest & { files: { [fieldname: string]: multer.File[] } }).files['timeline_images'] || [];
+      const programImages = (req as NextApiRequest & { files: { [fieldname: string]: Express.Multer.File[] } }).files['program_images'] || [];
+      const timelineImages = (req as NextApiRequest & { files: { [fieldname: string]: Express.Multer.File[] } }).files['timeline_images'] || [];
 
       // Log the input data for debugging
       console.log('fromDate:', programData.fromDate);
@@ -157,7 +158,7 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
           to_date: formattedToDate,
           display: programData.display,
           timeline: {
-            create: programData.timeline?.map((item, index) => ({
+            create: programData.timeline?.map((item: { title: string; description: string; sortOrder: number; date: string }, index: number) => ({
               title: item.title,
               description: item.description,
               image: timelineImages[index]?.filename || null,
@@ -177,7 +178,7 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
       });
     } catch (error) {
       // Clean up uploaded files if database operation fails
-      const files = (req as NextApiRequest & { files: { [fieldname: string]: multer.File[] } }).files;
+      const files = (req as NextApiRequest & { files: { [fieldname: string]: Express.Multer.File[] } }).files;
       if (files) {
         const allFiles = [
           ...(files['program_images'] || []),
@@ -193,6 +194,7 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
 
 // Update Program
 export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) => {
+  // @ts-ignore
   upload(req, res, async (err) => {
     if (err) {
       console.error('Error uploading files:', err);
@@ -202,8 +204,8 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
     try {
       const programData = JSON.parse(req.body.programData);
       const { id } = req.query;
-      const programImages = (req as NextApiRequest & { files: { [fieldname: string]: multer.File[] } }).files['program_images'] || [];
-      const timelineImages = (req as NextApiRequest & { files: { [fieldname: string]: multer.File[] } }).files['timeline_images'] || [];
+      const programImages = (req as NextApiRequest & { files: { [fieldname: string]: Express.Multer.File[] } }).files['program_images'] || [];
+      const timelineImages = (req as NextApiRequest & { files: { [fieldname: string]: Express.Multer.File[] } }).files['timeline_images'] || [];
 
       // Save program images paths
       const imageUrls = programImages.map(file => file.filename);
@@ -226,7 +228,7 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
           timeline: {
             // Delete existing timeline and recreate
             deleteMany: {},
-            create: programData.timeline?.map((item, index) => ({
+            create: programData.timeline?.map((item: { title: string; description: string; sortOrder: number; date: string }, index: number) => ({
               title: item.title,
               description: item.description,
               image: timelineImages[index]?.filename || null,
