@@ -198,7 +198,7 @@ export default function Programs() {
                 Programmes Disponible
               </h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Choisissez parmi notre sélection d'expériences de voyage soigneusement conçues.
+              Choisissez parmi notre sélection d &lsquo; expériences de voyage soigneusement conçues.
               </p>
             </motion.div>
 

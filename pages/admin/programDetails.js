@@ -26,19 +26,7 @@ export default function ProgramCreate() {
   const [timelineImages, setTimelineImages] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Authentication and loading checks
-  if (status === 'loading') {
-    return <div className="flex justify-center items-center h-screen">
-      <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-    </div>;
-  }
-
-  if (status === 'unauthenticated') {
-    router.push('/admin');
-    return null;
-  }
-
-  // Automatic timeline generation
+  // Move the useEffect hook here, before any conditional returns
   useEffect(() => {
     if (formData.fromDate && formData.days) {
       const days = parseInt(formData.days);
@@ -63,6 +51,13 @@ export default function ProgramCreate() {
       setTimelineImages({});
     }
   }, [formData.fromDate, formData.days]);
+
+  // Add useEffect for handling authentication
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/admin');
+    }
+  }, [status, router]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -213,6 +208,16 @@ export default function ProgramCreate() {
     }
   };
   
+  // Show loading state
+  if (status === 'loading') {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+  
+  // Only render the form if authenticated
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <Toaster position="top-right" reverseOrder={false} />
