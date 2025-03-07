@@ -1,15 +1,15 @@
-import { Layout } from "components//Layout";
-import SEO from "components//SEO/SEO";
+import { Layout } from "components/Layout";
+import SEO from "components/SEO/SEO";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import aboutImage from 'public//batouta_team.png'; // Use your uploaded image here
-import styles from 'components//About/AboutSection.module.css'; // Ensure you have the CSS file
+import aboutImage from 'public/batouta_team.png';
+import styles from 'components/About/AboutSection.module.css'; 
 import { useState, useEffect, useRef } from 'react';
 import Link from "next/link";
 import { Icon } from "@iconify/react";
-import { ContactUs } from "components//Contact";
+import { ContactUs } from "components/Contact";
 
 export async function getStaticProps({ locale }) {
     return {
