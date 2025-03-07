@@ -7,6 +7,7 @@ import { Layout } from "components/Layout";
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { ContactUs } from 'components/Contact';
+import Image from 'next/image';
 
 // Helper function to get service data from translations
 const getServiceData = (t) => {
@@ -61,7 +62,7 @@ const AutoCarousel = ({ images }) => {
             index === currentIndex ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <img
+          <Image
             src={image}
             alt={`City view ${index + 1}`}
             className="w-full h-full object-cover"

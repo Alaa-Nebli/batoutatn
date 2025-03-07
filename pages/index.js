@@ -380,7 +380,7 @@ const TripsCarousel = () => {
           viewport={{ once: true }}
         >
           <h2 className="text-4xl font-bold text-gray-800 mb-4">
-          Nos voyages à l'étranger
+          Nos voyages à l &lsquo; étranger
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Découvrez nos voyages

@@ -162,7 +162,7 @@ export default function ProgramDetails() {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center space-y-4">
             <h2 className="text-2xl font-bold text-gray-800">Programme non trouvé</h2>
-            <p className="text-gray-600">Le programme que vous recherchez n'existe pas ou a été supprimé.</p>
+            <p className="text-gray-600">Le programme que vous recherchez n &lsquo; existe pas ou a été supprimé.</p>
             <Link href="/programs">
               <button className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
                 Voir tous les programmes
