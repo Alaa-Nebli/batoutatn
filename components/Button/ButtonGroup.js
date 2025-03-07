@@ -1,5 +1,5 @@
 import { getTextAlign } from "@utils/helper";
-import { SectionContainer } from "@components/Section";
+import { SectionContainer } from "components//Section";
 
 export const ButtonGroup = ({ className = "", alignment, children }) => {
     const alignClass = getTextAlign(alignment);

@@ -6,4 +6,4 @@
 
 **/
 
-export * from "@components/Section/SectionContainer";
+export * from "components//Section/SectionContainer";

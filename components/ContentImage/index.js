@@ -6,4 +6,4 @@
 
 **/
 
-export * from "@components/ContentImage/ContentImage";
+export * from "components//ContentImage/ContentImage";

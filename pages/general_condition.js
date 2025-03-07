@@ -1,6 +1,6 @@
 // pages/general-conditions.js
-import { Layout } from "@components/Layout";
-import SEO from "@components/SEO/SEO";
+import { Layout } from "components//Layout";
+import SEO from "components//SEO/SEO";
 import Head from 'next/head';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';

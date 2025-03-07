@@ -4,8 +4,8 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Icon } from "@iconify/react";
 import { useState } from 'react';
-import { Header } from "@components/Header";
-import { Footer } from "@components/Footer";
+import { Header } from "components//Header";
+import { Footer } from "components//Footer";
 
 const adminNavigation = [
     { name: "Se connecter", href: '/admin/', icon: 'material-symbols:login' },

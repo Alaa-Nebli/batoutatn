@@ -1,1 +1,1 @@
-export * from "@components/SEO/SEO";
+export * from "components//SEO/SEO";
