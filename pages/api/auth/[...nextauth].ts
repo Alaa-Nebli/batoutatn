@@ -4,8 +4,6 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from "../../../utils/db";
 import { comparePassword } from '../../../utils/pwd_hash';
 import 'next-auth';
-import { Session } from 'next-auth';
-import { JWT } from 'next-auth/jwt';
 
 declare module 'next-auth' {
   interface Session {

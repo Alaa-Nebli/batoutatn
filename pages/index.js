@@ -4,7 +4,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import aboutImage from 'public//batouta_team.png'; // Use your uploaded image here
 import styles from 'components//About/AboutSection.module.css'; // Ensure you have the CSS file
 import { useState, useEffect, useRef } from 'react';
 import Link from "next/link";
@@ -584,7 +583,7 @@ export default function Home() {
                          viewport={{ once: false, amount: 0.2 }}
                          transition={{ duration: 0.8 }} 
                     >
-                        <Image src={aboutImage} alt="Batouta Team" layout="responsive" />
+                        <Image src={"/batouta_team.png"} width={150} height={150} alt="Batouta Team" layout="responsive" />
                     </motion.div>
                 </section>
 
@@ -711,7 +710,5 @@ export default function Home() {
                                 
             </div>
         </Layout>
-    
-
     );
 }
