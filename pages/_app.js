@@ -1,8 +1,8 @@
 // pages/_app.js
 import "styles//globals.scss";
 import { appWithTranslation } from 'next-i18next';
-import { LoadingScreen } from "components//loading";
-import { Layout } from "components//Layout";
+import { LoadingScreen } from "@components/loading";
+import { Layout } from "@components/Layout";
 import { SessionProvider } from 'next-auth/react';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from "next/router";

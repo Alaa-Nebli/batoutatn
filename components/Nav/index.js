@@ -6,4 +6,4 @@
 
 **/
 
-export * from "components//Nav/Nav";
+export * from "@components/Nav/Nav";
