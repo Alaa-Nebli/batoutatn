@@ -14,6 +14,7 @@ export async function getStaticProps({ locale }) {
     },
   };
 }
+
 const WhyChooseUsSection = () => {
   const { t } = useTranslation('common');
 
@@ -249,97 +250,113 @@ const EsteemSection = ({ t }) => {
 const ServicesPage = () => {
   const { t } = useTranslation('common');
   const servicesSectionRef = useRef(null);
-  
+
   const services = [
     {
       title: t('Home.Our_Services_section.Group_Travel.Title'),
       description: t('Home.Our_Services_section.Group_Travel.Description'),
       image: '/group_travel.png',
-      imageAlt: 'Group Leisure Travel'
+      imageAlt: 'Group Leisure Travel',
     },
     {
       title: t('Home.Our_Services_section.Events_Organization.Title'),
       description: t('Home.Our_Services_section.Events_Organization.Description'),
       image: '/events.png',
-      imageAlt: 'FIT Travel'
+      imageAlt: 'FIT Travel',
     },
     {
       title: t('Home.Our_Services_section.Transport.Title'),
       description: t('Home.Our_Services_section.Transport.Description'),
       image: '/transport.png',
-      imageAlt: 'Shore Excursions'
+      imageAlt: 'Shore Excursions',
     },
     {
       title: t('Home.Our_Services_section.Billetterie.Title'),
       description: t('Home.Our_Services_section.Billetterie.Description'),
       image: '/billeterie.png',
-      imageAlt: 'MICE'
-    }
+      imageAlt: 'MICE',
+    },
   ];
+
   return (
     <Layout className="bg-gradient-to-b from-white to-orange-50">
       <div className="main-wrapper pt-20 relative z-10">
-        <div  id='our-services' className='mt-5'/>
+        <div id="our-services" className="mt-5" />
         {/* Services Section */}
-        <section  ref={servicesSectionRef}>
-                  <div className="max-w-7xl mx-auto px-4">
-                    <motion.div
-                      className="text-center mb-16"
-                      initial={{ opacity: 0, y: -50 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: false, amount: 0.1 }}
-                      transition={{ duration: 0.8 }}
-                    >
-                      <h2 className="text-4xl font-bold mb-4">
-                        {t('Home.Our_Services_section.Our_Services_title')}
-                      </h2>
-                      <p className="text-gray-600 max-w-2xl mx-auto">
-                        {t('Home.Our_Services_section.Our_Services_Description')}
-                      </p>
-                    </motion.div>
+        <section ref={servicesSectionRef} className="py-20">
+          <div className="max-w-7xl mx-auto px-4">
+            <motion.div
+              className="text-center mb-16"
+              initial={{ opacity: 0, y: -50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.1 }}
+              transition={{ duration: 0.8 }}
+            >
+              <h2 className="text-4xl font-bold mb-4">
+                {t('Home.Our_Services_section.Our_Services_title')}
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                {t('Home.Our_Services_section.Our_Services_Description')}
+              </p>
+            </motion.div>
 
+            {services.map((service, index) => (
+              <motion.div
+                key={index}
+                className={`flex flex-col ${
+                  index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
+                } items-center gap-8 mb-20`}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.1 }}
+                transition={{ duration: 0.5, delay: index * 0.2 }}
+              >
+                {/* Image Container */}
+                <div className="w-full md:w-1/2 relative overflow-hidden rounded-2xl shadow-lg">
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full h-full"
+                  >
+                    <Image
+                      src={service.image}
+                      alt={service.imageAlt}
+                      layout="responsive"
+                      width={600}
+                      height={400}
+                      objectFit="cover"
+                      className="rounded-2xl"
+                    />
+                  </motion.div>
+                </div>
 
-                  <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-                    {services.map((service, index) => (
-                      <motion.div
-                        key={index}
-                        className="flex flex-col h-full items-center text-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:shadow-orange-200 border border-gray-100"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: false, amount: 0.1 }}
-                        transition={{ duration: 0.3, delay: index * 0.1 }}
-                      >
-                        {/* Image container with fixed height */}
-                        <div className="w-full h-48 relative overflow-hidden rounded-lg mb-6">
-                          <motion.div 
-                            whileHover={{ scale: 1.1 }} 
-                            transition={{ duration: 0.3 }} 
-                            className="w-full h-full"
-                          >
-                            <Image
-                              src={service.image}
-                              alt={service.imageAlt}
-                              layout="fill"
-                              objectFit="cover"
-                              className="transition-transform duration-300"
-                            />
-                          </motion.div>
-                        </div>
+                {/* Text Content */}
+                <div className="w-full md:w-1/2">
+                  <motion.h3
+                    className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-500"
+                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: false, amount: 0.1 }}
+                    transition={{ duration: 0.5, delay: index * 0.2 + 0.2 }}
+                  >
+                    {service.title}
+                  </motion.h3>
+                  <motion.p
+                    className="text-gray-600 text-lg"
+                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: false, amount: 0.1 }}
+                    transition={{ duration: 0.5, delay: index * 0.2 + 0.3 }}
+                  >
+                    {service.description}
+                  </motion.p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </section>
 
-                        {/* Text Content - with flex-grow to push button to bottom */}
-                        <div className="flex-grow flex flex-col">
-                          <h3 className="text-2xl font-semibold mb-3">{service.title}</h3>
-                          <p className="text-gray-600 mb-6">{service.description}</p>
-                        </div>
-
-                        
-                      </motion.div>
-                    ))}
-                  </div>
-
-                  </div>
-                </section>
-        <EsteemSection t={t}/>
+        <EsteemSection t={t} />
         <WhyChooseUsSection />
         <Contact />
       </div>

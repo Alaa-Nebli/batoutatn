@@ -31,65 +31,43 @@ const Banner = () => {
     {
       id: 1,
       imageUrl: '/tunisia/japan.webp',
-      title: "Discover Japan",
-      description: t('Home.banner.slide1.description'),
       alt: "Japan",
-      cta: "Explore Japan",
-      tripId: "japan-tour"
     },
     {
       id: 2,
       imageUrl: '/tunisia/nepal_places.jpg',
-      title: t('Home.banner.slide2.title'),
-      description: t('Home.banner.slide2.description'),
       alt: t('Home.banner.slide2.alt'),
-      cta: "Visit Nepal",
-      tripId: "nepal-tour"
+
     },
     {
       id: 3,
       imageUrl: '/tunisia/thailand-chaing-mai.jpg',
-      title: t('Home.banner.slide3.title'),
-      description: t('Home.banner.slide3.description'),
       alt: t('Home.banner.slide3.alt'),
-      cta: "Discover Thailand",
-      tripId: "thailand-tour"
+
     },
     {
       id: 4,
       imageUrl: '/tunisia/suisse.jpg',
-      title: t('Home.banner.slide4.title'),
-      description: t('Home.banner.slide4.description'),
+      // title: t('Home.banner.slide4.title'),
+      // description: t('Home.banner.slide4.description'),
       alt: t('Home.banner.slide4.alt'),
-      cta: "Explore Switzerland",
-      tripId: "switzerland-tour"
     },
     {
       id: 5,
       imageUrl: '/tunisia/thailand_1.jpg',
-      title: t('Home.banner.slide5.title'),
-      description: t('Home.banner.slide5.description'),
       alt: t('Home.banner.slide5.alt'),
-      cta: "Visit Thailand",
-      tripId: "thailand-experience"
+   
     },
     {
       id: 6,
       imageUrl: '/tunisia/africa_south.webp',
-      title: t('Home.banner.slide6.title'),
-      description: t('Home.banner.slide6.description'),
       alt: t('Home.banner.slide6.alt'),
-      cta: "Discover South Africa",
-      tripId: "south-africa-tour"
+
     },
     {
       id: 7,
       imageUrl: '/tunisia/safari.png',
-      title: t('Home.banner.slide7.title'),
-      description: t('Home.banner.slide7.description'),
       alt: t('Home.banner.slide7.alt'),
-      cta: "Safari Adventure",
-      tripId: "safari-tour"
     }
   ];
 
@@ -367,83 +345,81 @@ const TripsCarousel = () => {
 
   return (
     <>
-      {
-        programs.length > 0 ? (
-          <section className="py-20 px-4 md:px-8 bg-gray-50">
-
+      {programs.length > 0 ? (
+        <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-white to-orange-50">
           <div className="max-w-7xl mx-auto">
-        <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">
-          Nos voyages à l &lsquo; étranger
-          </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Découvrez nos voyages
-          </p>
-        </motion.div>
+            {/* Section Title */}
+            <motion.div
+              className="text-center mb-16"
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+            >
+              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-500">
+                Nos voyages à l&apos;étranger
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Découvrez nos voyages exclusifs et inoubliables.
+              </p>
+            </motion.div>
 
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
-          </div>
-        ) : (
-          <div className="relative">
-            {/* Carousel navigation */}
-            <div className="absolute top-1/2 -left-5 transform -translate-y-1/2 z-10">
-              <button
-                className="p-3 bg-white shadow-lg rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
-                onClick={handlePrev}
-                disabled={currentIndex === 0}
-              >
-                <Icon icon="mdi:chevron-left" className="w-6 h-6 text-gray-800" />
-              </button>
-            </div>
-            
-            {/* Carousel content */}
-            <div className="overflow-hidden">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
-              >
-                { programs.map((program) => (
-                  <div key={program.id} className="w-full md:w-1/3 flex-shrink-0 px-4">
-                    <ProgramCard program={program} />
-                  </div>
-                )) }
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
               </div>
-            </div>
-            
-            <div className="absolute top-1/2 -right-5 transform -translate-y-1/2 z-10">
-              <button
-                className="p-3 bg-white shadow-lg rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
-                onClick={handleNext}
-                disabled={currentIndex >= programs.length - itemsPerView}
-              >
-                <Icon icon="mdi:chevron-right" className="w-6 h-6 text-gray-800" />
-              </button>
+            ) : (
+              <div className="relative">
+                {/* Carousel Navigation */}
+                <div className="absolute top-1/2 -left-5 transform -translate-y-1/2 z-10">
+                  <button
+                    className="p-3 bg-white shadow-lg rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
+                    onClick={handlePrev}
+                    disabled={currentIndex === 0}
+                  >
+                    <Icon icon="mdi:chevron-left" className="w-6 h-6 text-gray-800" />
+                  </button>
+                </div>
+
+                {/* Carousel Content */}
+                <div className="overflow-hidden">
+                  <div
+                    className="flex transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
+                  >
+                    {programs.map((program) => (
+                      <div key={program.id} className="w-full md:w-1/3 flex-shrink-0 px-4">
+                        <ProgramCard program={program} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="absolute top-1/2 -right-5 transform -translate-y-1/2 z-10">
+                  <button
+                    className="p-3 bg-white shadow-lg rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
+                    onClick={handleNext}
+                    disabled={currentIndex >= programs.length - itemsPerView}
+                  >
+                    <Icon icon="mdi:chevron-right" className="w-6 h-6 text-gray-800" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Call to Action */}
+            <div className="mt-12 text-center">
+              <Link href="/programs" passHref>
+                <button className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors flex items-center space-x-2 mx-auto">
+                  <span>Voir nos voyages</span>
+                  <Icon icon="mdi:arrow-right" className="w-5 h-5" />
+                </button>
+              </Link>
             </div>
           </div>
-        )}
-
-        <div className="mt-12 text-center">
-          <Link href="/programs" passHref>
-            <button className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors flex items-center space-x-2 mx-auto">
-              <span>Voir nos voyage </span>
-              <Icon icon="mdi:arrow-right" className="w-5 h-5" />
-            </button>
-          </Link>
-        </div>
-      </div>
-      </section>
-    ) : null
-      }
-      </>
+        </section>
+      ) : null}
+    </>
   );
-  
 };
 
 export default function Home() {
@@ -606,8 +582,9 @@ export default function Home() {
                 
 
                 {/* Services Section */}
-                <section className={styles.servicesSection} ref={servicesSectionRef}>
-                  <div className="max-w-7xl mx-auto px-4">
+                <section className="py-20 px-4 bg-gradient-to-b from-white to-orange-50" ref={servicesSectionRef}>
+                  <div className="max-w-7xl mx-auto">
+                    {/* Section Title */}
                     <motion.div
                       className="text-center mb-16"
                       initial={{ opacity: 0, y: -50 }}
@@ -615,7 +592,7 @@ export default function Home() {
                       viewport={{ once: false, amount: 0.1 }}
                       transition={{ duration: 0.8 }}
                     >
-                      <h2 className="text-4xl font-bold mb-4">
+                      <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-500">
                         {t('Home.Our_Services_section.Our_Services_title')}
                       </h2>
                       <p className="text-gray-600 max-w-2xl mx-auto">
@@ -623,52 +600,46 @@ export default function Home() {
                       </p>
                     </motion.div>
 
-
-                  <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-                    {services.map((service, index) => (
-                      <motion.div
-                        key={index}
-                        className="flex flex-col h-full items-center text-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 hover:shadow-orange-200 border border-gray-100"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: false, amount: 0.1 }}
-                        transition={{ duration: 0.3, delay: index * 0.1 }}
-                      >
-                        {/* Image container with fixed height */}
-                        <div className="w-full h-48 relative overflow-hidden rounded-lg mb-6">
-                          <motion.div 
-                            whileHover={{ scale: 1.1 }} 
-                            transition={{ duration: 0.3 }} 
-                            className="w-full h-full"
-                          >
+                    {/* Service Cards Grid */}
+                    <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+                      {services.map((service, index) => (
+                        <motion.div
+                          key={index}
+                          className="relative group overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500"
+                          initial={{ opacity: 0, y: 20 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: false, amount: 0.1 }}
+                          transition={{ duration: 0.5, delay: index * 0.1 }}
+                        >
+                          {/* Image Container */}
+                          <div className="relative h-64 overflow-hidden">
                             <Image
                               src={service.image}
                               alt={service.imageAlt}
                               layout="fill"
                               objectFit="cover"
-                              className="transition-transform duration-300"
+                              className="transition-transform duration-500 group-hover:scale-110"
                             />
-                          </motion.div>
-                        </div>
+                            {/* Gradient Overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
+                          </div>
 
-                        {/* Text Content - with flex-grow to push button to bottom */}
-                        <div className="flex-grow flex flex-col">
-                          <h3 className="text-2xl font-semibold mb-3">{service.title}</h3>
-                          <p className="text-gray-600 mb-6">{service.description}</p>
-                        </div>
+                          {/* Text Content */}
+                          <div className="absolute inset-0 flex flex-col justify-end p-6 text-white z-10">
+                            <h3 className="text-2xl font-bold mb-2">{service.title}</h3>
+                            <p className="text-gray-200 mb-4 line-clamp-2">{service.description}</p>
+                            <Link href={`/services/${service.id}`}>
+                              <button className="px-6 py-2 bg-orange-500 text-white rounded-full font-semibold hover:bg-orange-600 transition-colors duration-300">
+                                Voir Plus
+                              </button>
+                            </Link>
+                          </div>
 
-                        {/* "Explore More" Button - now all buttons will align */}
-                        <Link   
-                          href={`/services/${service.id}`}
-                        >
-                          <button className="mt-auto px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold transition-all duration-300 hover:bg-orange-600 hover:scale-105">
-                            Voir Plus
-                          </button>
-                        </Link>
-                      </motion.div>
-                    ))}
-                  </div>
-
+                          {/* Hover Effect */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
                 </section>
 
@@ -676,15 +647,16 @@ export default function Home() {
                 <TripsCarousel />
 
                 {/* What Makes Us Different Section */}
-                <section className="py-20 px-4 md:px-8 bg-white">
+                <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-white to-orange-50">
                   <div className="max-w-7xl mx-auto">
+                    {/* Section Title */}
                     <motion.div
                       className="text-center mb-16"
                       initial={{ opacity: 0, y: -20 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: false, amount: 0.1 }}
                     >
-                      <h2 className="text-4xl font-bold mb-6 text-gray-800">
+                      <h2 className="text-4xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-500">
                         {t('Home.What_Makes_Us_Different_Section.What_Makes_Us_Different_Title')}
                       </h2>
                       <p className="text-gray-600 max-w-2xl mx-auto">
@@ -692,6 +664,7 @@ export default function Home() {
                       </p>
                     </motion.div>
 
+                    {/* Cards Grid */}
                     <div className="grid md:grid-cols-3 gap-8">
                       {uniqueFeatures.map((feature, index) => (
                         <UniqueFeatureCard
