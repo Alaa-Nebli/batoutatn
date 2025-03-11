@@ -218,7 +218,7 @@ const ServiceDetails = ({ serviceId }) => {
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-4xl font-bold text-gray-900 mb-6">Prêt à commencer votre voyage ?</h2>
           <p className="text-xl text-gray-600 mb-8">
-            Contactez-nous dès aujourd'hui pour planifier votre aventure inoubliable.
+            Contactez-nous dès aujourd &lsquo; hui pour planifier votre aventure inoubliable.
           </p>
           <button className="bg-orange-500 text-white px-8 py-3 rounded-full font-semibold hover:bg-orange-600 transition-colors duration-300">
             Contactez-nous
