@@ -1,32 +1,34 @@
-// import { PrismaClient } from '@prisma/client';
-// import { hashPassword } from '../../../utils/pwd_hash.js';
+// node --loader ts-node/esm pages/api/auth/createSuperAdmin.ts 
 
-// const prisma = new PrismaClient();
+import { PrismaClient } from '@prisma/client';
+import { hashPassword } from '../../../utils/pwd_hash.js';
 
-// async function main() {
-//   // Create admin user
-//   const hashedPassword = await hashPassword('Admin123');
+const prisma = new PrismaClient();
+
+async function main() {
+  // Create admin user
+  const hashedPassword = await hashPassword('Batouta@2025');
   
-//   const admin = await prisma.user.upsert({
-//     where: { username: 'admin' },
-//     update: {},
-//     create: {
-//       username: 'admin',
-//       email: 'admin@example.com',
-//       password: hashedPassword,
-//       name: 'System Administrator',
-//       role: 'ADMIN'
-//     }
-//   });
+  const admin = await prisma.user.upsert({
+    where: { username: 'admin' },
+    update: {},
+    create: {
+      username: 'Batouta',
+      email: 'admin@example.com',
+      password: hashedPassword,
+      name: 'System Administrator',
+      role: 'ADMIN'
+    }
+  });
 
-//   console.log({ admin });
-// }
+  console.log({ admin });
+}
 
-// main()
-//   .catch((e) => {
-//     console.error(e);
-//     process.exit(1);
-//   })
-//   .finally(async () => {
-//     await prisma.$disconnect();
-//   });
+main()
+  .catch((e) => {
+    console.error(e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

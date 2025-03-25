@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+"use client";
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { Icon } from '@iconify/react';
@@ -6,10 +7,34 @@ import toast, { Toaster } from 'react-hot-toast';
 import Image from 'next/image';
 import { format, addDays } from 'date-fns';
 
+// Define types for better type safety
+interface TimelineItem {
+  title: string;
+  description: string;
+  date: string;
+  image: string;
+}
+
+interface FormData {
+  title: string;
+  metadata: string;
+  description: string;
+  locationFrom: string;
+  locationTo: string;
+  days: string;
+  price: string;
+  fromDate: string;
+  toDate: string;
+  timeline: TimelineItem[];
+  display: boolean;
+}
+
 export default function ProgramCreate() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [formData, setFormData] = useState({
+  
+  // Initial state with type annotation
+  const [formData, setFormData] = useState<FormData>({
     title: '',
     metadata: '',
     description: '',
@@ -22,11 +47,13 @@ export default function ProgramCreate() {
     timeline: [],
     display: true,
   });
-  const [images, setImages] = useState([]);
-  const [timelineImages, setTimelineImages] = useState({});
+
+  // Use more specific type for images
+  const [images, setImages] = useState<File[]>([]);
+  const [timelineImages, setTimelineImages] = useState<{[key: number]: File}>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Move the useEffect hook here, before any conditional returns
+  // Generate timeline when days and fromDate change
   useEffect(() => {
     if (formData.fromDate && formData.days) {
       const days = parseInt(formData.days);
@@ -52,94 +79,187 @@ export default function ProgramCreate() {
     }
   }, [formData.fromDate, formData.days]);
 
-  // Add useEffect for handling authentication
+  // Authentication check
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/admin');
     }
   }, [status, router]);
 
-  const handleInputChange = (e) => {
+  // Handle input changes with type safety
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-  };
+  }, []);
 
-  const handleTimelineChange = (index, field, value) => {
-    const newTimeline = [...formData.timeline];
-    newTimeline[index] = {
-      ...newTimeline[index],
-      [field]: value
-    };
-    setFormData(prev => ({
-      ...prev,
-      timeline: newTimeline
-    }));
-  };
-
-  const handleImageUpload = (e, isTimelineImage = false, timelineIndex) => {
-    const files = e.target.files ? Array.from(e.target.files) : [];
-    
-    if (isTimelineImage && timelineIndex !== undefined) {
-      // Timeline image upload
-      setTimelineImages(prev => ({
-        ...prev,
-        [timelineIndex]: files[0]
-      }));
-      
-      // Update timeline item image path (for display)
-      const newTimeline = [...formData.timeline];
-      newTimeline[timelineIndex].image = URL.createObjectURL(files[0]);
-      setFormData(prev => ({
+  // Handle timeline changes with type safety
+  const handleTimelineChange = useCallback((index: number, field: keyof TimelineItem, value: string) => {
+    setFormData(prev => {
+      const newTimeline = [...prev.timeline];
+      newTimeline[index] = {
+        ...newTimeline[index],
+        [field]: value
+      };
+      return {
         ...prev,
         timeline: newTimeline
-      }));
-    } else {
-      // Main program images upload
-      setImages(prev => [...prev, ...files]);
-    }
-  };
+      };
+    });
+  }, []);
 
-  const removeImage = (index, isTimelineImage = false, timelineIndex) => {
+  // Improved image upload handler
+  const handleImageUpload = useCallback((
+    e: React.ChangeEvent<HTMLInputElement>, 
+    isTimelineImage = false, 
+    timelineIndex?: number
+  ) => {
+    try {
+      // Null check for files
+      const files = e.target.files ? Array.from(e.target.files) : [];
+      
+      if (files.length === 0) {
+        toast.error('No files selected');
+        return;
+      }
+
+      // Validate files
+      const validFiles = files.filter(file => {
+        // Check image type
+        if (!file.type.startsWith('image/')) {
+          toast.error(`File ${file.name} is not an image`);
+          return false;
+        }
+        
+        // Check file size
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error(`File ${file.name} is too large (max 5MB)`);
+          return false;
+        }
+        
+        return true;
+      });
+
+      if (validFiles.length === 0) return;
+
+      if (isTimelineImage && timelineIndex !== undefined) {
+        // Timeline image upload
+        if (validFiles.length > 1) {
+          toast.error('Only one image allowed per timeline day');
+          return;
+        }
+
+        const file = validFiles[0];
+        const objectUrl = URL.createObjectURL(file);
+
+        setTimelineImages(prev => ({
+          ...prev,
+          [timelineIndex]: file
+        }));
+        
+        setFormData(prev => {
+          const newTimeline = [...prev.timeline];
+          newTimeline[timelineIndex] = {
+            ...newTimeline[timelineIndex],
+            image: objectUrl
+          };
+          return {
+            ...prev,
+            timeline: newTimeline
+          };
+        });
+      } else {
+        // Main program images upload
+        setImages(prev => {
+          // Filter out duplicates
+          const newFiles = validFiles.filter(
+            file => !prev.some(existing => existing.name === file.name)
+          );
+          
+          if (newFiles.length !== validFiles.length) {
+            toast.error('Some duplicate files were skipped');
+          }
+          
+          return [...prev, ...newFiles];
+        });
+      }
+
+      // Reset file input
+      e.target.value = '';
+    } catch (error) {
+      console.error('Error handling image upload:', error);
+      toast.error('Failed to process image upload');
+    }
+  }, []);
+
+  // Remove image handler
+  const removeImage = useCallback((
+    index: number, 
+    isTimelineImage = false, 
+    timelineIndex?: number
+  ) => {
     if (isTimelineImage && timelineIndex !== undefined) {
       // Remove timeline image
-      const newTimelineImages = { ...timelineImages };
-      delete newTimelineImages[timelineIndex];
-      setTimelineImages(newTimelineImages);
+      setTimelineImages(prev => {
+        const newTimelineImages = { ...prev };
+        delete newTimelineImages[timelineIndex];
+        return newTimelineImages;
+      });
       
       // Clear image in timeline
-      const newTimeline = [...formData.timeline];
-      newTimeline[timelineIndex].image = '';
-      setFormData(prev => ({
-        ...prev,
-        timeline: newTimeline
-      }));
+      setFormData(prev => {
+        const newTimeline = [...prev.timeline];
+        if (newTimeline[timelineIndex]) {
+          // Revoke previous object URL if exists
+          if (newTimeline[timelineIndex].image) {
+            URL.revokeObjectURL(newTimeline[timelineIndex].image);
+          }
+          
+          newTimeline[timelineIndex] = {
+            ...newTimeline[timelineIndex],
+            image: ''
+          };
+        }
+        return {
+          ...prev,
+          timeline: newTimeline
+        };
+      });
     } else {
       // Remove main program image
+      // Revoke object URL if it exists
+      const imageToRemove = images[index];
+      if (imageToRemove) {
+        const objectUrl = URL.createObjectURL(imageToRemove);
+        URL.revokeObjectURL(objectUrl);
+      }
+      
       setImages(prev => prev.filter((_, i) => i !== index));
     }
-  };
+  }, [images]);
 
-  const validateForm = () => {
-    // Existing validation logic...
-    return true; // Simplified for brevity
-  };
+  // Validate form (placeholder implementation)
+  const validateForm = useCallback(() => {
+    // Add your validation logic here
+    return true;
+  }, []);
 
-  const handleSubmit = async (e) => {
+  // Submit handler
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
       return;
     }
-  
+
     setIsSubmitting(true);
-  
+
     try {
       const formDataMultipart = new FormData();
       
-      // Create the program data object
+      // Prepare program data
       const programData = {
         ...formData,
         location_from: formData.locationFrom,
@@ -149,13 +269,13 @@ export default function ProgramCreate() {
         timeline: formData.timeline.map((item, index) => ({
           title: item.title,
           description: item.description,
-          image: '',
+          image: '', // Remove local object URLs
           sortOrder: index + 1,
           date: item.date
         }))
       };
-  
-      // Append the program data as JSON string
+
+      // Append data to FormData
       formDataMultipart.append('programData', JSON.stringify(programData));
       
       // Append main program images
@@ -167,7 +287,7 @@ export default function ProgramCreate() {
       Object.entries(timelineImages).forEach(([index, file]) => {
         formDataMultipart.append('timeline_images', file);
       });
-  
+
       // Submit to API
       const response = await fetch('/api/programs.controller', {
         method: 'POST',
@@ -206,9 +326,27 @@ export default function ProgramCreate() {
     } finally {
       setIsSubmitting(false);
     }
-  };
-  
-  // Show loading state
+  }, [formData, images, timelineImages, router, validateForm]);
+
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      // Clean up main program images
+      images.forEach(file => {
+        const objectUrl = URL.createObjectURL(file);
+        URL.revokeObjectURL(objectUrl);
+      });
+
+      // Clean up timeline images
+      formData.timeline.forEach(item => {
+        if (item.image) {
+          URL.revokeObjectURL(item.image);
+        }
+      });
+    };
+  }, [images, formData.timeline]);
+
+  // Loading state
   if (status === 'loading') {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -217,7 +355,7 @@ export default function ProgramCreate() {
     );
   }
   
-  // Only render the form if authenticated
+  // Render the form (rest of the component remains the same as in your original code)
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <Toaster position="top-right" reverseOrder={false} />
@@ -347,40 +485,45 @@ export default function ProgramCreate() {
               </div>
           {/* Main Program Images Section */}
           <div className="mt-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Program Images</h2>
-            <div className="flex flex-wrap gap-4">
-              {images.map((image, index) => (
-                <div key={index} className="relative">
-                  <Image
-                    src={URL.createObjectURL(image)}
-                    alt={`Program image ${index + 1}`}
-                    width={100}
-                    height={100}
-                    className="w-24 h-24 object-cover rounded-lg"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                  >
-                    <Icon icon="mdi:close" className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-              <label className="cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  multiple
-                />
-                <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center hover:bg-gray-100">
-                  <Icon icon="mdi:plus" className="w-8 h-8 text-gray-400" />
-                </div>
-              </label>
-            </div>
-          </div>
+                      <h2 className="text-xl font-semibold text-gray-800 mb-4">Program Images</h2>
+                      <div className="flex flex-wrap gap-4">
+                        {images.map((image, index) => (
+                          <div key={image.name} className="relative">
+                            <Image
+                              src={URL.createObjectURL(image)}
+                              alt={`Program image ${index + 1}`}
+                              width={100}
+                              height={100}
+                              className="w-24 h-24 object-cover rounded-lg"
+                              // Add onLoadingComplete to release object URL
+                              onLoadingComplete={(img) => {
+                                // Trigger URL revocation after image is loaded
+                                URL.revokeObjectURL(img.src);
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                            >
+                              <Icon icon="mdi:close" className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                        <label className="cursor-pointer">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                            multiple
+                          />
+                          <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center hover:bg-gray-100">
+                            <Icon icon="mdi:plus" className="w-8 h-8 text-gray-400" />
+                          </div>
+                        </label>
+                      </div>
+                    </div>
 
           {/* Timeline Section */}
           <div className="mt-8">

@@ -15,8 +15,7 @@ export default function Dashboard() {
 
   const fetchPrograms = async () => {
     try {
-      const response = await axios.get('/api/programs.controller?admin=true');
-      console.log(response.data);
+      const response = await axios.get('/api/programs.controller');
       setStats({ programs: response.data });
     } catch (error) {
       console.error('Error fetching programs:', error);

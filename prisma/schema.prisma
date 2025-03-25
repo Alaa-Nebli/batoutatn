@@ -66,7 +66,6 @@ model Featured {
   trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
 }
 
-
 model LocalProgram {
   id           String      @id @default(cuid())
   title        String      @unique
@@ -81,4 +80,18 @@ model LocalProgram {
   to_date      DateTime
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
+  timeline     ProgramTimeline[]
+}
+
+model ProgramTimeline {
+  id          String   @id @default(cuid())
+  programId   String
+  title       String
+  description String
+  image       String?
+  date        DateTime
+  sortOrder   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  localProgram LocalProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
 }

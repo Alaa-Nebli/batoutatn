@@ -10,8 +10,8 @@ import { Footer } from "components//Footer";
 const adminNavigation = [
     { name: "Se connecter", href: '/admin/', icon: 'material-symbols:login' },
     { name: 'Dashboard', href: '/admin/dashboard', icon: 'material-symbols:dashboard' },
-    { name: 'Voyages a l\'étranger', href: '/admin/programDetails', icon: 'material-symbols:view-list' },
-    { name: 'Programmes en tunisie', href: '/admin/cardTravel', icon: 'material-symbols:featured-play-list' },
+    { name: 'Voyages a l\'étranger', href: '/admin/trip', icon: 'material-symbols:view-list' },
+    { name: 'Programmes en tunisie', href: '/admin/programs', icon: 'material-symbols:featured-play-list' },
     { name: 'A la une', href: '/admin/offers', icon: 'material-symbols:percent' },
 ];
 

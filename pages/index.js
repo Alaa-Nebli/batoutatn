@@ -122,6 +122,7 @@ const Banner = () => {
     }, 4000);
 
     return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayBanners.length]);
 
   if (loading) {
@@ -168,7 +169,6 @@ const Banner = () => {
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
               <div className="max-w-4xl mx-auto  backdrop-blur-sm p-6 rounded-lg">
                 <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">{banner.title}</h2>
-                <p className="text-lg md:text-xl text-white mb-6 max-w-2xl mx-auto">{banner.description}</p>
                 
                 {banner.tripId && (
                   <Link href={`/programs/${banner.tripId}`} passHref legacyBehavior>
@@ -312,116 +312,6 @@ const ProgramCard = ({ program }) => (
   </motion.div>
 );
 
-// Programs Carousel component for Homepage
-const TripsCarousel = () => {
-  const { t } = useTranslation('common');
-  const [programs, setPrograms] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerView = 3; // Number of items to show at once
-
-  useEffect(() => {
-    const fetchPrograms = async () => {
-      try {
-        const response = await fetch('/api/programs.controller');
-        const data = await response.json();
-        setPrograms(data);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching programs:', error);
-        setLoading(false);
-      }
-    };
-    fetchPrograms();
-  }, []);
-
-  const handlePrev = () => {
-    setCurrentIndex((prevIndex) => Math.max(0, prevIndex - 1));
-  };
-
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) => Math.min(programs.length - itemsPerView, prevIndex + 1));
-  };
-
-  return (
-    <>
-      {programs.length > 0 ? (
-        <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-white to-orange-50">
-          <div className="max-w-7xl mx-auto">
-            {/* Section Title */}
-            <motion.div
-              className="text-center mb-16"
-              initial={{ opacity: 0, y: -20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-500">
-                Nos voyages à l&apos;étranger
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Découvrez nos voyages exclusifs et inoubliables.
-              </p>
-            </motion.div>
-
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
-              </div>
-            ) : (
-              <div className="relative">
-                {/* Carousel Navigation */}
-                <div className="absolute top-1/2 -left-5 transform -translate-y-1/2 z-10">
-                  <button
-                    className="p-3 bg-white shadow-lg rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
-                    onClick={handlePrev}
-                    disabled={currentIndex === 0}
-                  >
-                    <Icon icon="mdi:chevron-left" className="w-6 h-6 text-gray-800" />
-                  </button>
-                </div>
-
-                {/* Carousel Content */}
-                <div className="overflow-hidden">
-                  <div
-                    className="flex transition-transform duration-500 ease-in-out"
-                    style={{ transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)` }}
-                  >
-                    {programs.map((program) => (
-                      <div key={program.id} className="w-full md:w-1/3 flex-shrink-0 px-4">
-                        <ProgramCard program={program} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="absolute top-1/2 -right-5 transform -translate-y-1/2 z-10">
-                  <button
-                    className="p-3 bg-white shadow-lg rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
-                    onClick={handleNext}
-                    disabled={currentIndex >= programs.length - itemsPerView}
-                  >
-                    <Icon icon="mdi:chevron-right" className="w-6 h-6 text-gray-800" />
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Call to Action */}
-            <div className="mt-12 text-center">
-              <Link href="/programs" passHref>
-                <button className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors flex items-center space-x-2 mx-auto">
-                  <span>Voir nos voyages</span>
-                  <Icon icon="mdi:arrow-right" className="w-5 h-5" />
-                </button>
-              </Link>
-            </div>
-          </div>
-        </section>
-      ) : null}
-    </>
-  );
-};
-
 export default function Home() {
     const { t } = useTranslation('common');
 
@@ -464,31 +354,31 @@ export default function Home() {
 
   const services = [
     {
-      id:"1", 
+      id:"outbound", 
       title: t('Home.Our_Services_section.Group_Travel.Title'),
       description: t('Home.Our_Services_section.Group_Travel.Description'),
-      image: '/group_travel.png',
+      image: '/travel3.jpg',
       imageAlt: 'Group Leisure Travel'
     },
     {
-      id : "2",
+      id : "excursions",
       title: t('Home.Our_Services_section.Events_Organization.Title'),
       description: t('Home.Our_Services_section.Events_Organization.Description'),
-      image: '/events.png',
+      image: '/excursions.jpg',
       imageAlt: 'FIT Travel'
     },
     {
-      id : "3", 
+      id : "transport", 
       title: t('Home.Our_Services_section.Transport.Title'),
       description: t('Home.Our_Services_section.Transport.Description'),
       image: '/transport.png',
       imageAlt: 'Shore Excursions'
     },
     {
-      id : "4",
+      id : "ticketing",
       title: t('Home.Our_Services_section.Billetterie.Title'),
       description: t('Home.Our_Services_section.Billetterie.Description'),
-      image: '/billeterie.png',
+      image: '/billeterie.webp',
       imageAlt: 'MICE'
     }
   ];
@@ -583,69 +473,71 @@ export default function Home() {
 
                 {/* Services Section */}
                 <section className="py-20 px-4 bg-gradient-to-b from-white to-orange-50" ref={servicesSectionRef}>
-                  <div className="max-w-7xl mx-auto">
-                    {/* Section Title */}
-                    <motion.div
-                      className="text-center mb-16"
-                      initial={{ opacity: 0, y: -50 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: false, amount: 0.1 }}
-                      transition={{ duration: 0.8 }}
-                    >
-                      <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-500">
-                        {t('Home.Our_Services_section.Our_Services_title')}
-                      </h2>
-                      <p className="text-gray-600 max-w-2xl mx-auto">
-                        {t('Home.Our_Services_section.Our_Services_Description')}
-                      </p>
-                    </motion.div>
+                <div className="max-w-7xl mx-auto">
+                  {/* Section Title */}
+                  <motion.div
+                    className="text-center mb-16"
+                    initial={{ opacity: 0, y: -50 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.1 }}
+                    transition={{ duration: 0.8 }}
+                  >
+                    <h2 className="text-4xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-500">
+                      {t('Home.Our_Services_section.Our_Services_title')}
+                    </h2>
+                    <p className="text-gray-600 max-w-2xl mx-auto">
+                      {t('Home.Our_Services_section.Our_Services_Description')}
+                    </p>
+                  </motion.div>
 
-                    {/* Service Cards Grid */}
-                    <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-                      {services.map((service, index) => (
-                        <motion.div
-                          key={index}
-                          className="relative group overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500"
-                          initial={{ opacity: 0, y: 20 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: false, amount: 0.1 }}
-                          transition={{ duration: 0.5, delay: index * 0.1 }}
-                        >
-                          {/* Image Container */}
-                          <div className="relative h-64 overflow-hidden">
-                            <Image
-                              src={service.image}
-                              alt={service.imageAlt}
-                              layout="fill"
-                              objectFit="cover"
-                              className="transition-transform duration-500 group-hover:scale-110"
-                            />
-                            {/* Gradient Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
-                          </div>
+                  {/* Service Cards Grid */}
+                  <div className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-2">
+                    {services.map((service, index) => (
+                      <motion.div
+                        key={index}
+                        className="relative group overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500"
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: false, amount: 0.1 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                      >
+                        {/* Image Container */}
+                        <div className="relative h-80 overflow-hidden">
+                          <Image
+                            src={service.image}
+                            alt={service.imageAlt}
+                            layout="fill"
+                            objectFit="fill"
+                            className="transition-transform duration-500 group-hover:scale-110"
+                          />
+                          {/* Gradient Overlay */}
+                        </div>
 
-                          {/* Text Content */}
-                          <div className="absolute inset-0 flex flex-col justify-end p-6 text-white z-10">
-                            <h3 className="text-2xl font-bold mb-2">{service.title}</h3>
-                            <p className="text-gray-200 mb-4 line-clamp-2">{service.description}</p>
-                            <Link href={`/services/${service.id}`}>
-                              <button className="px-6 py-2 bg-orange-500 text-white rounded-full font-semibold hover:bg-orange-600 transition-colors duration-300">
-                                Voir Plus
-                              </button>
-                            </Link>
-                          </div>
+                        {/* Text Content */}
+                        <div className="absolute inset-0 flex flex-col justify-end p-6 text-white z-10">
+                          <h3 className="text-2xl font-bold mb-2">{service.title}</h3>
+                          <Link href={`/services/${service.id}`}>
+                            <button className="px-6 py-2 bg-orange-500 text-white rounded-full font-semibold hover:bg-orange-600 transition-colors duration-300">
+                              Voir Plus
+                            </button>
+                          </Link>
+                        </div>
 
-                          {/* Hover Effect */}
-                          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                        </motion.div>
-                      ))}
-                    </div>
+                        {/* Hover Effect */}
+                      </motion.div>
+                    ))}
                   </div>
-                </section>
-
-                {/* NEW: Programs Carousel Section */}
-                <TripsCarousel />
-
+                </div>
+              </section>
+                            
+                <Image 
+                  src="/banner.png"
+                  layout="responsive"
+                  width={1920}
+                  height={720}
+                  alt="Japanese Shape"
+                  className={styles.japaneseShape2}
+                />
                 {/* What Makes Us Different Section */}
                 <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-white to-orange-50">
                   <div className="max-w-7xl mx-auto">

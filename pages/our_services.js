@@ -255,13 +255,13 @@ const ServicesPage = () => {
     {
       title: t('Home.Our_Services_section.Group_Travel.Title'),
       description: t('Home.Our_Services_section.Group_Travel.Description'),
-      image: '/group_travel.png',
+      image: '/outgoing_travel.jpg',
       imageAlt: 'Group Leisure Travel',
     },
     {
       title: t('Home.Our_Services_section.Events_Organization.Title'),
       description: t('Home.Our_Services_section.Events_Organization.Description'),
-      image: '/events.png',
+      image: '/excursions.jpg',
       imageAlt: 'FIT Travel',
     },
     {
@@ -273,7 +273,7 @@ const ServicesPage = () => {
     {
       title: t('Home.Our_Services_section.Billetterie.Title'),
       description: t('Home.Our_Services_section.Billetterie.Description'),
-      image: '/billeterie.png',
+      image: '/billeterie.webp',
       imageAlt: 'MICE',
     },
   ];

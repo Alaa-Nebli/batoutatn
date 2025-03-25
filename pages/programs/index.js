@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { Layout } from "components/Layout";
 import SEO from "components/SEO/SEO";
@@ -17,90 +18,154 @@ export async function getStaticProps({ locale }) {
   };
 }
 
-const ProgramCard = ({ program }) => (
-  <motion.div
-    className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-2xl transition-all duration-500"
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, amount: 0.1 }}
-    transition={{ duration: 0.4 }}
-    whileHover={{ y: -5 }}
-  >
-    <div className="relative h-72 w-full overflow-hidden">
-      <Image
-        src={program.images && program.images.length > 0 ? `/uploads/${program.images[0]}` : '/placeholder.jpg'}
-        alt={program.title}
-        layout="fill"
-        objectFit="cover"
-        className="transform transition-transform duration-700 group-hover:scale-110"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
-        <div className="absolute bottom-4 left-4 right-4">
-          <div className="flex items-center space-x-2 text-white mb-2">
-            <Icon icon="mdi:map-marker" className="w-5 h-5" />
-            <span className="text-sm">{program.location_from} → {program.location_to}</span>
-          </div>
-          <div className="flex items-center space-x-2 text-white">
-            <Icon icon="mdi:calendar" className="w-5 h-5" />
-            <span className="text-sm">
-              {new Date(program.from_date).toLocaleDateString()} - {new Date(program.to_date).toLocaleDateString()}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div className="p-6">
-      <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors">
-        {program.title}
-      </h3>
-      <p className="text-gray-600 mb-4 line-clamp-2">
-        {program.description}
-      </p>
-      <div className="flex justify-between items-center">
-        <div className="flex space-x-4">
-          <div className="flex items-center text-gray-600">
-            <Icon icon="mdi:clock-outline" className="w-5 h-5 mr-1" />
-            <span>{program.days} Jours</span>
-          </div>
-          <div className="flex items-center text-orange-500 font-semibold">
-            <Icon icon="mdi:currency-usd" className="w-5 h-5 mr-1" />
-            <span>{program.price} TND</span>
-          </div>
-        </div>
-        <Link 
-          href={`/programs/${program.id}`} 
-          className="px-4 py-2 bg-orange-500 text-white rounded-lg flex items-center space-x-2 hover:bg-orange-600 transition-colors group"
-        >
-          <span>Details</span>
-          <Icon icon="mdi:arrow-right" className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
-        </Link>
-      </div>
-    </div>
-  </motion.div>
-);
-
-const ImageGallery = ({ images }) => (
-  <div className="grid grid-cols-4 gap-4 mb-12">
-    {images.slice(0, 4).map((image, index) => (
-      <motion.div
-        key={index}
-        className="relative h-24 rounded-lg overflow-hidden"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: index * 0.1 }}
-      >
+const ProgramCard = ({ program }) => {
+  
+  return (
+    <motion.div
+      className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.4 }}
+      whileHover={{ y: -5 }}
+    >
+      <div className="relative aspect-video w-full overflow-hidden">
         <Image
-          src={`/uploads/${image}`}
-          alt={`Gallery image ${index + 1}`}
-          layout="fill"
-          objectFit="cover"
-          className="hover:scale-110 transition-transform duration-500"
+          src={program.images?.[0] ? `/uploads/${program.images[0]}` : '/placeholder.jpg'}
+          alt={program.title}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          priority={program.featured}
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+          <div className="absolute bottom-4 left-4 right-4">
+            <div className="flex items-center space-x-2 text-white mb-2">
+              <Icon icon="mdi:map-marker" className="w-5 h-5 text-orange-300" />
+              <span className="text-sm font-medium">{program.location_from} → {program.location_to}</span>
+            </div>
+            <div className="flex items-center space-x-2 text-white">
+              <Icon icon="mdi:calendar" className="w-5 h-5 text-orange-300" />
+              <span className="text-sm font-medium">
+                {new Date(program.from_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} - {new Date(program.to_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors">
+          {program.title}
+        </h3>
+        <p className="text-gray-600 mb-4 line-clamp-3 text-sm">
+          {program.description}
+        </p>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-wrap gap-4">
+            <div className="flex items-center text-gray-600 text-sm">
+              <Icon icon="mdi:clock-outline" className="w-4 h-4 mr-1.5" />
+              <span>{program.days} Jours</span>
+            </div>
+            <div className="flex items-center text-orange-500 font-semibold">
+              <Icon icon="mdi:currency-usd" className="w-4 h-4 mr-1.5" />
+              <span>{program.price} TND</span>
+            </div>
+          </div>
+          <Link 
+            href={`/programs/${program.id}`} 
+            className="px-4 py-2 bg-orange-500 text-white rounded-lg flex items-center space-x-2 hover:bg-orange-600 transition-colors text-sm group"
+          >
+            <span>Détails</span>
+            <Icon icon="mdi:arrow-right" className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const FeaturedProgram = ({ program }) => {
+ 
+  return (
+    <section className="relative mt-24 h-[80vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0">
+        <Image
+          src={`/uploads/${program.images[0]}`}
+          fill
+          alt={program.title}
+          className="object-cover brightness-75"
+          priority
+          sizes="100vw"
+        />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+      
+      <motion.div
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+        className="relative z-10 text-center max-w-6xl px-4"
+      >
+        <motion.span 
+          className="inline-block px-4 py-2 bg-orange-500 text-white rounded-full mb-6 text-sm font-medium"
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+          Programme à la Une
+        </motion.span>
+        
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+          {program.title}
+        </h1>
+        
+        <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-3xl mx-auto line-clamp-3">
+          {program.description}
+        </p>
+        
+        <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <Link href={`/programs/${program.id}`} passHref>
+            <motion.button 
+              className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2 font-medium"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span>Découvrir ce programme</span>
+              <Icon icon="mdi:arrow-right" className="w-5 h-5" />
+            </motion.button>
+          </Link>
+          <a 
+            href="#programs" 
+            className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors flex items-center justify-center space-x-2 font-medium"
+          >
+            <span>Voir tous les programmes</span>
+            <Icon icon="mdi:arrow-down" className="w-5 h-5" />
+          </a>
+        </div>
+        
+        <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          {program.images.slice(1, 5).map((image, index) => (
+            <motion.div
+              key={index}
+              className="relative aspect-square rounded-lg overflow-hidden shadow-lg"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 + index * 0.1 }}
+            >
+              <Image
+                src={`/uploads/${image}`}
+                alt={`Preview ${index + 1}`}
+                fill
+                className="object-cover hover:scale-110 transition-transform duration-500"
+                sizes="(max-width: 768px) 50vw, 25vw"
+              />
+            </motion.div>
+          ))}
+        </div>
       </motion.div>
-    ))}
-  </div>
-);
+    </section>
+  );
+};
 
 export default function Programs() {
   const { t } = useTranslation('common');
@@ -112,10 +177,15 @@ export default function Programs() {
   useEffect(() => {
     const fetchPrograms = async () => {
       try {
+        setLoading(true);
         const response = await fetch('/api/programs.controller');
         const data = await response.json();
         setPrograms(data);
-        setFeaturedProgram(data[0]); // Set the first program as featured
+        
+        // Find the first program with images to feature
+        const featured = data.find(p => p.images?.length > 0) || data[0];
+        setFeaturedProgram(featured);
+        
         setLoading(false);
       } catch (error) {
         console.error('Error fetching programs:', error);
@@ -125,7 +195,7 @@ export default function Programs() {
     fetchPrograms();
   }, []);
 
-  const destinations = ['all', ...new Set(programs.map(p => p.location_to))];
+  const destinations = ['all', ...new Set(programs.map(p => p.location_to).filter(Boolean))];
 
   const filteredPrograms = selectedDestination === 'all' 
     ? programs 
@@ -134,107 +204,90 @@ export default function Programs() {
   return (
     <Layout>
       <SEO
-        title="Travel Programs | Discover Amazing Destinations"
-        description="Explore our curated collection of travel programs and adventures across the globe."
+        title="Nos Programmes de Voyage | Découvrez des Destinations Uniques"
+        description="Explorez nos programmes de voyage soigneusement sélectionnés à travers le monde. Des expériences inoubliables vous attendent."
       />
-      <div className="main-wrapper mt-20">
-        {/* Hero Section with Featured Program */}
-        {featuredProgram && (
-          <section className="relative h-[80vh] flex items-center justify-center overflow-hidden">
-            <div className="absolute inset-0">
-              <Image
-                src={`/uploads/${featuredProgram.images[0]}`}
-                layout="fill"
-                objectFit="cover"
-                alt={featuredProgram.title}
-                className="brightness-50"
-                priority
-              />
-            </div>
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="relative z-10 text-center max-w-4xl px-4"
-            >
-              <span className="inline-block px-4 py-2 bg-orange-500 text-white rounded-full mb-4">
-                Programme à la Une
-              </span>
-              <h1 className="text-5xl md:text-7xl font-bold text-white mb-6">
-                {featuredProgram.title}
-              </h1>
-              <p className="text-xl text-gray-200 mb-8">
-                {featuredProgram.description}
-              </p>
-              {featuredProgram.images.length > 1 && (
-                <ImageGallery images={featuredProgram.images.slice(1)} />
-              )}
-              <div className="flex justify-center space-x-4">
-                <Link href={`/programs/${featuredProgram.id}`} passHref>
-                  <button className="px-8 py-4 bg-orange-500 text-white rounded-xl hover:bg-orange-600 transition-colors flex items-center space-x-2">
-                    <span>Découvrez Ce Programme
-                  </span>
-                    <Icon icon="mdi:arrow-right" className="w-5 h-5" />
-                  </button>
-                </Link>
-                <a href="#programs" className="px-8 py-4 bg-white/20 backdrop-blur-sm text-white rounded-xl hover:bg-white/30 transition-colors flex items-center space-x-2">
-                  <span>Voir Tous les Programmes</span>
-                  <Icon icon="mdi:arrow-down" className="w-5 h-5" />
-                </a>
-              </div>
-            </motion.div>
-          </section>
-        )}
 
-        {/* Programs Section */}
-        <section id="programs" className="py-20 px-4 md:px-8 bg-gray-50">
-          <div className="max-w-7xl mx-auto">
-            <motion.div
-              className="text-center mb-12"
-              initial={{ opacity: 0, y: -20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <h2 className="text-4xl font-bold text-gray-800 mb-4">
-                Programmes Disponible
-              </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+      {/* Featured Program Hero */}
+      {featuredProgram && <FeaturedProgram program={featuredProgram} />}
+
+      {/* All Programs Section */}
+      <section id="programs" className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+              Nos Programmes de Voyage
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Choisissez parmi notre sélection d &lsquo; expériences de voyage soigneusement conçues.
-              </p>
-            </motion.div>
+            </p>
+          </motion.div>
 
-            {/* Destination Filter */}
-            <div className="flex justify-center mb-12 space-x-4 overflow-x-auto pb-4">
-              {destinations.map((dest) => (
-                <button
-                  key={dest}
-                  onClick={() => setSelectedDestination(dest)}
-                  className={`px-6 py-3 rounded-full transition-all ${
-                    selectedDestination === dest
-                      ? 'bg-orange-500 text-white shadow-lg'
-                      : 'bg-white text-gray-600 hover:bg-orange-100'
-                  }`}
-                >
-                  {dest.charAt(0).toUpperCase() + dest.slice(1)}
-                </button>
-              ))}
+          {/* Destination Filter */}
+          <motion.div
+            className="flex flex-wrap justify-center gap-3 mb-12 px-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            {destinations.map((dest) => (
+              <button
+                key={dest}
+                onClick={() => setSelectedDestination(dest)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  selectedDestination === dest
+                    ? 'bg-orange-500 text-white shadow-md'
+                    : 'bg-white text-gray-600 hover:bg-gray-100 shadow-sm'
+                }`}
+              >
+                {dest === 'all' ? 'Toutes les destinations' : dest}
+              </button>
+            ))}
+          </motion.div>
+
+          {/* Programs Grid */}
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
             </div>
+          ) : (
+            <motion.div
+              className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              {filteredPrograms.map((program) => (
+                <ProgramCard key={program.id} program={program} />
+              ))}
+            </motion.div>
+          )}
 
-            {loading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"></div>
+          {!loading && filteredPrograms.length === 0 && (
+            <div className="text-center py-12">
+              <div className="bg-white p-8 rounded-xl shadow-sm max-w-md mx-auto">
+                <Icon icon="mdi:map-marker-off" className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Aucun programme trouvé</h3>
+                <p className="text-gray-600 mb-4">Aucun programme disponible pour cette destination actuellement.</p>
+                <button
+                  onClick={() => setSelectedDestination('all')}
+                  className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+                >
+                  Voir tous les programmes
+                </button>
               </div>
-            ) : (
-              <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                {filteredPrograms.map((program) => (
-                  <ProgramCard key={program.id} program={program} />
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
+            </div>
+          )}
+        </div>
+      </section>
 
-        <ContactUs />
-      </div>
+      <ContactUs />
     </Layout>
   );
 }
