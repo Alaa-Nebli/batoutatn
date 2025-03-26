@@ -162,8 +162,7 @@
         "features": [
           "Itinéraires personnalisés",
           "Hébergements sélectionnés",
-          "Activités culturelles et de détente",
-          "Promotions pour tous les budgets"
+          "Activités culturelles et de détente"
         ],
         "highlights": [
           {
@@ -209,7 +208,6 @@
         "features": [
           "Planification complète d'événements",
           "Coordination des repas et des activités",
-          "Gestion logistique des transports",
           "Hébergement et services personnalisés"
         ],
         "highlights": [
@@ -233,9 +231,8 @@
         "features": [
           "Réservation de billets d'avion",
           "Accès à des événements culturels et touristiques",
-          "Offres spéciales sur les billets",
-          "Service de billetterie pour tous types d'événements"
-        ],
+          "Offres spéciales sur les billets"
+       ],
         "highlights": [
           {
             "title": "Billets d'avion",

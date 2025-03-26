@@ -15,6 +15,14 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
+export async function getStaticProps({ locale }) {
+    return {
+      props: {
+        ...(await serverSideTranslations(locale, ['common'])),
+      },
+    }
+}
+
 const TimelineItem = ({ day, isActive, onClick, content }) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
