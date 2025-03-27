@@ -9,6 +9,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { ContactUs } from "components//Contact";
+import { title } from "process";
 
 export async function getStaticProps({ locale }) {
     return {
@@ -17,7 +18,6 @@ export async function getStaticProps({ locale }) {
       },
     }
 }
-
 
 const Banner = () => {
   const { t } = useTranslation('common');
@@ -230,7 +230,9 @@ const Banner = () => {
 };
 
 
-const UniqueFeatureCard = ({ icon, title, description, delay }) => {
+const UniqueFeatureCard = ({ icon, title,title2, description, delay }) => {
+  console.log(title, title2);
+  
     return (
       <motion.div
         className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
@@ -244,7 +246,8 @@ const UniqueFeatureCard = ({ icon, title, description, delay }) => {
             <Icon icon={icon} className="w-8 h-8 text-orange-500" />
           </div>
         </div>
-        <h3 className="text-xl font-bold mb-4 text-center text-gray-800">{title}</h3>
+        <h3 className="text-xl font-bold mb-4 text-center text-gray-800">{title} <br /> {title2} </h3>
+        
         <p className="text-gray-600 text-center leading-relaxed">{description}</p>
       </motion.div>
     );
@@ -387,17 +390,20 @@ export default function Home() {
   const uniqueFeatures = [
     {
       icon: "ri:team-fill",
-      title: t('Home.What_Makes_Us_Different_Section.Card1_Title'),
+      title:"Authenticité",
+      title2: t('Home.What_Makes_Us_Different_Section.Card1_Title2'),
       description: t('Home.What_Makes_Us_Different_Section.Card1_Text')
     },
     {
       icon: "mdi:customer-service",
       title: t('Home.What_Makes_Us_Different_Section.Card2_Title'),
+      title2 : t('Home.What_Makes_Us_Different_Section.Card2_Title2'),
       description: t('Home.What_Makes_Us_Different_Section.Card2_Text')
     },
     {
       icon: "mdi:globe",
       title: t('Home.What_Makes_Us_Different_Section.Card3_Title'),
+      title2 : t('Home.What_Makes_Us_Different_Section.Card3_Title2'),
       description: t('Home.What_Makes_Us_Different_Section.Card3_Text')
     }
   ];
@@ -530,14 +536,6 @@ export default function Home() {
                 </div>
               </section>
                             
-                <Image 
-                  src="/banner.png"
-                  layout="responsive"
-                  width={1920}
-                  height={720}
-                  alt="Japanese Shape"
-                  className={styles.japaneseShape2}
-                />
                 {/* What Makes Us Different Section */}
                 <section className="py-20 px-4 md:px-8 bg-gradient-to-b from-white to-orange-50">
                   <div className="max-w-7xl mx-auto">
@@ -563,6 +561,7 @@ export default function Home() {
                           key={index}
                           icon={feature.icon}
                           title={feature.title}
+                          title2={feature.title2}
                           description={feature.description}
                           delay={index * 0.1}
                         />

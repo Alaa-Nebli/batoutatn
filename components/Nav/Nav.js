@@ -10,12 +10,12 @@ export const Nav = () => {
     const { t } = useTranslation('common');
 
     const navigation = [
-        { name: t('nav.home'), href: "/" },
-        { name: t('nav.about'), href: "/about" },
-        { name: t('nav.our_services'), href: "/our_services" },
+        { name: "Accueil", href: "/" },
+        { name: "À Propos", href: "/about" },
+        { name: "Nos Services", href: "/our_services" },
         { name: "Nos Voyages", href: "/programs" },
         {
-            name: t('nav.contact'),
+            name: "Contactez-nous",
             href: "https://www.facebook.com/profile.php?id=100057621002945&locale=gl_ES&_rdr",
             isArrow: true,
             target: "_blank"

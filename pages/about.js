@@ -53,7 +53,7 @@ const WhoWeAre = () => {
               <Image
                 width={300}
                 height={300}
-                src="/3d-globe.avif"
+                src="/batouta.png"
                 alt="Our Team"
                 className="object-cover w-full h-full transform hover:scale-110 transition-transform duration-700"
                 loading="lazy"

@@ -100,148 +100,183 @@ const WhyChooseUsSection = () => {
   );
 };
 
-const EsteemSection = ({ t }) => {
-  const [hovered, setHovered] = useState(Array(6).fill(false));
+const EsteemSection = () => {
+  const [hovered, setHovered] = useState(Array(5).fill(false));
 
   const principles = [
-    
     { 
-      title: t('Services.wcgi.sections.Stay.title'), 
-      description: t('Services.wcgi.sections.Stay.description'), 
-      image: "/tunisia/eco-friendly-stay.webp",
-      icon: "🏡",
-      bgColor: "bg-emerald-400",
-      overlayColor: "from-emerald-400/90 to-emerald-500/90"
+      title: "Hébergements Éco-Chic", 
+      description: "Dormez dans des lieux uniques qui allient confort premium et pratiques écoresponsables. Chaque nuit chez nous soutient des initiatives locales.", 
+      image: "/hebergements-eco-chic.avif",
+      icon: "🏨",
+      bgColor: "bg-gradient-to-br from-emerald-500 to-teal-600",
+      overlayColor: "from-emerald-600/90 to-teal-700/90"
     },
     { 
-      title: t('Services.wcgi.sections.Transport.title'), 
-      description: t('Services.wcgi.sections.Transport.description'), 
-      image: "/tunisia/transports.jpg",
-      icon: "🚲",
-      bgColor: "bg-blue-400",
-      overlayColor: "from-blue-400/90 to-blue-500/90"
+      title: "Mobilité Douce", 
+      description: "Nos transports hybrides et circuits optimisés réduisent votre empreinte carbone sans compromis sur le confort. Voyagez malin !", 
+      image: "/transport-douce.jpg",
+      icon: "🚙",
+      bgColor: "bg-gradient-to-br from-blue-500 to-indigo-600",
+      overlayColor: "from-blue-600/90 to-indigo-700/90"
     },
     { 
-      title: t('Services.wcgi.sections.Experience.title'), 
-      description: t('Services.wcgi.sections.Experience.description'), 
-      image: "/tunisia/experience.jpg",
-      icon: "✨",
-      bgColor: "bg-purple-400",
-      overlayColor: "from-purple-400/90 to-purple-500/90"
+      title: "Expériences Vibrantes", 
+      description: "Rencontrez les artisans, goûtez aux saveurs locales et vivez des moments authentiques qui font battre le cœur de la Tunisie.", 
+      image: "/experience-vibrante.jpg",
+      icon: "🎭",
+      bgColor: "bg-gradient-to-br from-purple-500 to-fuchsia-600",
+      overlayColor: "from-purple-600/90 to-fuchsia-700/90"
     },
     { 
-      title: t('Services.wcgi.sections.Empower.title'), 
-      description: t('Services.wcgi.sections.Empower.description'),
-      image: "/tunisia/communities.jpg",
-      icon: "💪",
-      bgColor: "bg-red-400",
-      overlayColor: "from-red-400/90 to-red-500/90"
+      title: "Impact Local", 
+      description: "85% de vos dépenses profitent directement aux communautés. Votre voyage crée des emplois et préserve le patrimoine.", 
+      image: "/impact-locale.jpg",
+      icon: "🤝",
+      bgColor: "bg-gradient-to-br from-amber-500 to-orange-600",
+      overlayColor: "from-amber-600/90 to-orange-700/90"
     },
     { 
-      title: t('Services.wcgi.sections.Make.title'), 
-      description: t('Services.wcgi.sections.Make.description'),
-      image: "/tunisia/Difference.jpg",
-      icon: "🌟",
-      bgColor: "bg-yellow-400",
-      overlayColor: "from-yellow-400/90 to-yellow-500/90"
+      title: "Tourisme Régénérateur", 
+      description: "Nous allons au-delà du durable : chaque voyage plante des arbres et finance des projets environnementaux.", 
+      image: "/tourisme-regenerateur.avif",
+      icon: "🌿",
+      bgColor: "bg-gradient-to-br from-green-500 to-lime-600",
+      overlayColor: "from-green-600/90 to-lime-700/90"
     }
   ];
 
-  
-  
   const handleHoverStart = (index) => {
-    const newHovered = [...hovered];
-    newHovered[index] = true;
-    setHovered(newHovered);
+    setHovered(prev => {
+      const newHovered = [...prev];
+      newHovered[index] = true;
+      return newHovered;
+    });
   };
 
   const handleHoverEnd = (index) => {
-    const newHovered = [...hovered];
-    newHovered[index] = false;
-    setHovered(newHovered);
+    setHovered(prev => {
+      const newHovered = [...prev];
+      newHovered[index] = false;
+      return newHovered;
+    });
   };
 
   return (
-    <section className="py-24 bg-gray-50">
+    <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold bg-clip-text text-black">
-          { t('Services.wcgi.title')}
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-600">
+              L&apos;Art du Voyage Responsable
+            </span>
           </h2>
-          <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-pink-500 mx-auto mt-4" />
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            Découvrez comment nous réinventons le tourisme en Tunisie avec des expériences qui respectent les hommes et la nature
+          </p>
+          <motion.div 
+            initial={{ width: 0 }}
+            whileInView={{ width: "6rem" }}
+            transition={{ duration: 0.8 }}
+            className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500 mx-auto mt-6"
+          />
         </motion.div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {principles.map((principle, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
+              initial={{ opacity: 0, y: 40, rotateY: 15 }}
+              whileInView={{ opacity: 1, y: 0, rotateY: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
               className="perspective-1000"
             >
               <div
-                className="relative w-full cursor-pointer"
+                className="relative w-full cursor-pointer h-full"
                 onMouseEnter={() => handleHoverStart(index)}
                 onMouseLeave={() => handleHoverEnd(index)}
               >
                 {/* Title Overlay */}
                 <div 
-                  className={`absolute inset-0 z-10 rounded-2xl h-48 bg-gradient-to-b  ${principle.overlayColor} 
-                    flex items-center justify-center transition-opacity duration-300
+                  className={`absolute inset-0 z-10 rounded-2xl h-48 bg-gradient-to-b ${principle.overlayColor} 
+                    flex items-center justify-center transition-all duration-300
                     ${hovered[index] ? 'opacity-0' : 'opacity-100'}`}
                 >
-                  <h3 className="text-xl font-bold text-white text-center px-4">
-                    {principle.title}
-                  </h3>
+                  <div className="text-center px-4">
+                    <span className="text-4xl mb-3">{principle.icon}</span>
+                    <h3 className="text-xl font-bold text-white">{principle.title}</h3>
+                  </div>
                 </div>
 
-                <div 
+                <motion.div 
                   className="relative h-48 transition-transform duration-500 transform-gpu preserve-3d"
                   style={{
                     transform: `rotateY(${hovered[index] ? '180deg' : '0deg'})`,
                   }}
+                  whileHover={{ scale: 1.03 }}
                 >
                   {/* Front of card */}
-                  <div className={`absolute w-full h-full ${principle.bgColor} rounded-2xl shadow-lg backface-hidden`}>
+                  <div className={`absolute w-full h-full rounded-2xl shadow-xl ${principle.bgColor} backface-hidden`}>
                     <div className="h-full flex flex-col items-center justify-center p-4">
                       <span className="text-4xl mb-3">{principle.icon}</span>
+                      <h3 className="text-xl font-bold text-white text-center">{principle.title}</h3>
                     </div>
                   </div>
 
                   {/* Back of card */}
                   <div 
-                    className="absolute w-full h-full bg-white rounded-2xl shadow-lg backface-hidden"
+                    className="absolute w-full h-full bg-white rounded-2xl shadow-xl backface-hidden p-6"
                     style={{ transform: 'rotateY(180deg)' }}
                   >
-                    <div className="h-full flex items-center justify-center p-6 text-center">
-                      <p className="text-gray-700 font-medium">
+                    <div className="h-full flex flex-col justify-center">
+                      <p className="text-gray-700 font-medium text-center">
                         {principle.description}
                       </p>
+                      <motion.div
+                        initial={{ scale: 0.8 }}
+                        whileInView={{ scale: 1 }}
+                        className="mt-4 mx-auto w-8 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
+                      />
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Image below card */}
-                <div className="mt-4 relative h-32 rounded-xl overflow-hidden shadow-md">
+                <motion.div 
+                  className="mt-4 relative h-32 rounded-xl overflow-hidden shadow-lg"
+                  whileHover={{ scale: 1.05 }}
+                >
                   <Image
                     src={principle.image}
                     alt={principle.title}
                     layout="fill"
                     objectFit="cover"
-                    className="transition-transform duration-300 hover:scale-110"
+                    className="transition-transform duration-300"
                   />
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           ))}
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mt-20 text-center"
+        >
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <span className="font-bold text-emerald-600">Notre promesse :</span> Un voyage où chaque détail compte - 
+            pour vous, pour les locaux, et pour la planète.
+          </p>
+        </motion.div>
       </div>
     </section>
   );
@@ -256,25 +291,25 @@ const ServicesPage = () => {
       title: t('Home.Our_Services_section.Group_Travel.Title'),
       description: t('Home.Our_Services_section.Group_Travel.Description'),
       image: '/outgoing_travel.jpg',
-      imageAlt: 'Group Leisure Travel',
+      imageAlt: 'outgoing travel',
     },
     {
       title: t('Home.Our_Services_section.Events_Organization.Title'),
       description: t('Home.Our_Services_section.Events_Organization.Description'),
       image: '/excursions.jpg',
-      imageAlt: 'FIT Travel',
+      imageAlt: 'excursions',
     },
     {
       title: t('Home.Our_Services_section.Transport.Title'),
       description: t('Home.Our_Services_section.Transport.Description'),
       image: '/transport.png',
-      imageAlt: 'Shore Excursions',
+      imageAlt: 'transport',
     },
     {
       title: t('Home.Our_Services_section.Billetterie.Title'),
       description: t('Home.Our_Services_section.Billetterie.Description'),
       image: '/billeterie.webp',
-      imageAlt: 'MICE',
+      imageAlt: 'billeterie',
     },
   ];
 

@@ -66,17 +66,20 @@
       },
       "Billetterie": {
         "Title": "Billetterie",
-        "Description": "Réservez vos billets pour des événements, attractions et destinations en toute simplicité."
+        "Description": "Réservez dès maintenant vos billets d’avion avec Batouta Voyages et bénéficiez d’un service personnalisé pour vos déplacements professionnels et privés. Nous mettons à votre disposition une prise en charge complète de vos réservations, en nous occupant de toutes les démarches pour vos billets. Que ce soit pour des voyages d&#39;affaires réguliers ou ponctuels, nous nous engageons à vous offrir les meilleures options et à faciliter votre organisation. Contactez-nous pour une réservation rapide et un accompagnement sur mesure."
       }
     },
     "What_Makes_Us_Different_Section": {
-      "What_Makes_Us_Different_Title": "Ce Qui Nous Rend Différents",
+      "What_Makes_Us_Different_Title": "Notre Singularité",
       "What_Makes_Us_Different_Description": "Chez Batouta Voyages, nous allons au-delà du voyage ordinaire. Voici pourquoi les voyageurs nous choisissent pour rendre leurs voyages inoubliables :",
-      "Card1_Title": "Authenticité à Chaque Destination",
+      "Card1_Title": "Authenticité",
+      "Card1_Title2": "À Chaque Destination",
       "Card1_Text": "Nous nous spécialisons dans la création d'expériences immersives qui vous connectent au cœur de chaque destination. Des joyaux cachés aux perspectives culturelles, nous vous aidons à explorer comme un local.",
-      "Card2_Title": "Voyage Sans Accroc, À Chaque Fois",
-      "Card2_Text": "Avec une attention méticuleuse aux détails, nous gérons tout—pour que vous puissiez vous concentrer sur votre aventure sans stress. Des itinéraires personnalisés au support sur le terrain, votre confort est notre priorité.",
-      "Card3_Title": "Connexions Globales, Attention Locale",
+      "Card2_Title": "À Chaque Voyage,",
+      "Card2_Title2": "Une Nouvelle Émotion",
+      "Card2_Text": "Vivez des expériences uniques à chaque voyage. Nos aventures sur mesure éveillent vos sens et créent des souvenirs inoubliables. Laissez-nous gérer les détails pendant que vous savourez chaque moment.",
+      "Card3_Title": "Connexions à L'International,",
+      "Card3_Title2" : "Une Attention Locale",
       "Card3_Text": "Notre vaste réseau s'étend sur des destinations clés dans le monde entier, tandis que nos experts locaux s'assurent que chaque voyage est enrichi d'expériences authentiques et immersives."
     },
     "Button": {
@@ -162,7 +165,7 @@
         "features": [
           "Itinéraires personnalisés",
           "Hébergements sélectionnés",
-          "Activités culturelles et de détente"
+          "Harmonie Culture et Loisirs"
         ],
         "highlights": [
           {
@@ -183,8 +186,7 @@
         "Title": "Transport",
         "Description": "Pour tous vos besoins en transport terrestre, contactez-nous et profitez de notre service de location de véhicules adapté à vos exigences. Que ce soit pour un déplacement professionnel, un voyage en groupe ou une excursion privée, nous mettons à votre disposition une flotte de véhicules modernes et confortables, prêts à vous emmener où vous le souhaitez. Notre équipe se charge de tous les détails pour garantir un service fluide et sécurisé. N'hésitez pas à nous contacter pour réserver votre véhicule dès aujourd'hui !",
         "features": [
-          "Transport en avion, bus ou voiture",
-          "Réservation de billets d'avion",
+          "Transport Privé, bus ou voiture",
           "Location de voiture"
         ],
         "highlights": [
@@ -227,7 +229,7 @@
       },
       "Billetterie": {
         "Title": "Billetterie",
-        "Description": "Réservez vos billets pour des événements, attractions et destinations en toute simplicité.",
+        "Description": "Réservez dès maintenant vos billets d’avion avec Batouta Voyages et bénéficiez d’un service personnalisé pour vos déplacements professionnels et privés. Nous mettons à votre disposition une prise en charge complète de vos réservations, en nous occupant de toutes les démarches pour vos billets. Que ce soit pour des voyages d&#39;affaires réguliers ou ponctuels, nous nous engageons à vous offrir les meilleures options et à faciliter votre organisation. Contactez-nous pour une réservation rapide et un accompagnement sur mesure.",
         "features": [
           "Réservation de billets d'avion",
           "Accès à des événements culturels et touristiques",
