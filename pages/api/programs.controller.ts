@@ -1,14 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs/promises';
+import { createClient } from '@supabase/supabase-js';
+import { v4 as uuidv4 } from 'uuid';
+
+// Fetch all programs for admin
+
+
 
 interface NextApiRequestWithFiles extends NextApiRequest {
   files?: { [fieldname: string]: Express.Multer.File[] };
 }
 
-// Prevent potential memory leak warning
 export const config = {
   api: {
     bodyParser: false,
@@ -17,37 +20,293 @@ export const config = {
 
 const prisma = new PrismaClient();
 
-// Configure multer for file storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, path.join(process.cwd(), 'public/uploads'));
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL || '';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Configure multer for multiple file fields
+// Configure multer to use memory storage (files will be in memory)
 const upload = multer({
-  storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB file size limit
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 50 * 1024 * 1024  }, 
 }).fields([
   { name: 'program_images', maxCount: 10 },
   { name: 'timeline_images', maxCount: 50 }
 ]);
 
-// Helper function to remove uploaded files
-const removeUploadedFiles = async (files: Express.Multer.File[]) => {
-  for (const file of files) {
-    try {
-      await fs.unlink(file.path);
-    } catch (error) {
-      console.error('Error removing file:', error);
+// Upload file to Supabase Storage
+const uploadToSupabase = async (file: Express.Multer.File, folder: string) => {
+  const fileExt = file.originalname.split('.').pop();
+  const fileName = `${uuidv4()}.${fileExt}`;
+  const filePath = `${folder}/${fileName}`;
+
+  const { data, error } = await supabase.storage
+    .from('programs') // Replace with your bucket name
+    .upload(filePath, file.buffer, {
+      contentType: file.mimetype,
+      upsert: false,
+    });
+
+  if (error) {
+    throw error;
+  }
+
+  // Get public URL
+  const { data: { publicUrl } } = supabase.storage
+    .from('programs')
+    .getPublicUrl(filePath);
+
+    console.log(publicUrl)
+  return publicUrl;
+};
+
+
+// Delete file from Supabase Storage
+const deleteFromSupabase = async (url: string) => {
+  try {
+    const path = url.split('/').slice(4).join('/'); // Extract path from URL
+    const { error } = await supabase.storage
+      .from('programs')
+      .remove([path]);
+    
+    if (error) {
+      console.error('Error deleting file:', error);
     }
+  } catch (error) {
+    console.error('Error deleting file:', error);
   }
 };
 
-// Fetch all programs for admin
+export const createProgram = async (req: NextApiRequest, res: NextApiResponse) => {
+  // @ts-ignore
+  upload(req, res, async (err) => {
+    if (err) {
+      console.error('Error uploading files:', err);
+      return res.status(500).json({ message: 'Error uploading files', error: (err as Error).message });
+    }
+
+    try {
+      const programData = JSON.parse(req.body.programData);
+      const files = (req as NextApiRequestWithFiles).files || {};
+      const programImages = files['program_images'] || [];
+      const timelineImages = files['timeline_images'] 
+            ? Array.isArray(files['timeline_images'])
+              ? files['timeline_images'] as Express.Multer.File[] // if array (direct upload)
+              : Object.values(files['timeline_images']) as Express.Multer.File[] // if indexed (FormData)
+            : [];
+
+      // Upload program images to Supabase
+      const programImageUrls = await Promise.all(
+        programImages.map(file => uploadToSupabase(file, 'program-images'))
+      );
+
+      // Upload timeline images to Supabase
+      const timelineImageUrls = await Promise.all(
+        timelineImages.map(file => uploadToSupabase(file, 'timeline-images'))
+      );
+
+      console.log(timelineImageUrls)
+
+      // Validate fromDate
+      const fromDate = new Date(programData.fromDate);
+      if (isNaN(fromDate.getTime())) {
+        console.error('Invalid fromDate:', programData.fromDate);
+        return res.status(400).json({ message: 'Invalid date format for fromDate' });
+      }
+
+      // Calculate toDate
+      let toDate: Date;
+      if (!programData.toDate || programData.toDate.trim() === '') {
+        toDate = new Date(fromDate);
+        toDate.setDate(toDate.getDate() + programData.days);
+      } else {
+        toDate = new Date(programData.toDate);
+        if (isNaN(toDate.getTime())) {
+          console.error('Invalid toDate:', programData.toDate);
+          return res.status(400).json({ message: 'Invalid date format for toDate' });
+        }
+      }
+
+      // Create program with timeline
+      const program = await prisma.trip.create({
+        data: {
+          title: programData.title,
+          metadata: programData.metadata || null,
+          description: programData.description,
+          images: programImageUrls,
+          location_from: programData.locationFrom,
+          location_to: programData.locationTo,
+          days: programData.days,
+          price: programData.price,
+          singleAdon : programData.singleAdon || null,
+          from_date: fromDate.toISOString(),
+          to_date: toDate.toISOString(),
+          display: programData.display,
+          timeline: {
+            create: programData.timeline?.map((item: any, index: number) => ({
+              title: item.title,
+              description: item.description,
+              image: timelineImageUrls[index] || null,
+              sortOrder: item.sortOrder,
+              date: new Date(item.date)
+            })) || []
+          }, 
+          priceInclude : programData.priceInclude || null,
+          generalConditions : programData.generalConditions || null,
+
+        },
+        include: {
+          timeline: true
+        }
+      });
+
+      res.status(201).json({ 
+        message: 'Program created successfully',
+        programId: program.id
+      });
+    } catch (error) {
+      console.error('Error creating program:', error);
+      res.status(500).json({ message: 'Error creating program', error: (error as Error).message });
+    }
+  });
+};
+
+export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) => {
+  // @ts-ignore
+  upload(req, res, async (err) => {
+    if (err) {
+      console.error('Error uploading files:', err);
+      return res.status(500).json({ message: 'Error uploading files', error: (err as Error).message });
+    }
+
+    try {
+      const programData = JSON.parse(req.body.programData);
+      const { id } = req.query;
+      const files = (req as NextApiRequestWithFiles).files || {};
+      const programImages = files['program_images'] || [];
+      const timelineImages = files['timeline_images'] || [];
+
+      // Get existing program to handle image updates
+      const existingProgram = await prisma.trip.findUnique({
+        where: { id: id as string },
+        include: { timeline: true }
+      });
+
+      // Upload new program images to Supabase
+      const newProgramImageUrls = await Promise.all(
+        programImages.map(file => uploadToSupabase(file, 'program-images'))
+      );
+
+      // Upload new timeline images to Supabase
+      const newTimelineImageUrls = await Promise.all(
+        timelineImages.map(file => uploadToSupabase(file, 'timeline-images'))
+      );
+
+      // Combine new images with existing ones if not all are being replaced
+      const finalProgramImages = newProgramImageUrls.length > 0 
+        ? newProgramImageUrls 
+        : existingProgram?.images || [];
+
+      // Update program with timeline
+      const program = await prisma.trip.update({
+        where: { id: id as string },
+        data: {
+          title: programData.title,
+          metadata: programData.metadata || null,
+          description: programData.description,
+          images: finalProgramImages,
+          location_from: programData.location_from,
+          location_to: programData.location_to,
+          days: programData.days,
+          price: programData.price,
+          singleAdon : programData.singleAdon || null,
+          from_date: new Date(programData.from_date),
+          to_date: new Date(programData.to_date),
+          display: programData.display,
+          timeline: {
+            deleteMany: {},
+            create: programData.timeline?.map((item: any, index: number) => ({
+              title: item.title,
+              description: item.description,
+              image: newTimelineImageUrls[index] || item.image || null,
+              sortOrder: item.sortOrder,
+              date: new Date(item.date)
+            })) || []
+          }, 
+          priceInclude : programData.priceInclude || null,
+          generalConditions : programData.generalConditions || null,
+        },
+        include: {
+          timeline: true
+        }
+      });
+
+      // Clean up old images that were replaced
+      if (existingProgram) {
+        if (newProgramImageUrls.length > 0 && existingProgram.images) {
+          // @ts-ignore
+          for (const oldImage of existingProgram.images) {
+            await deleteFromSupabase(oldImage);
+          }
+        }
+        
+        if (newTimelineImageUrls.length > 0) {
+          for (const timelineItem of existingProgram.timeline) {
+            if (timelineItem.image) {
+              await deleteFromSupabase(timelineItem.image);
+            }
+          }
+        }
+      }
+
+      res.status(200).json({ 
+        message: 'Program updated successfully',
+        programId: program.id
+      });
+    } catch (error) {
+      console.error('Error updating program:', error);
+      res.status(500).json({ message: 'Error updating program', error: (error as Error).message });
+    }
+  });
+};
+
+export const deleteProgram = async (req: NextApiRequest, res: NextApiResponse) => {
+  try {
+    const { id } = req.query;
+
+    const program = await prisma.trip.findUnique({
+      where: { id: id as string },
+      include: { timeline: true }
+    });
+
+    if (program) {
+      // Delete all associated images from Supabase
+      if (program.images) {
+        for (const imageUrl of (program.images as string[])) {
+          await deleteFromSupabase(imageUrl);
+        }
+      }
+
+      // Delete timeline images
+      for (const timelineItem of program.timeline) {
+        if (timelineItem.image) {
+          await deleteFromSupabase(timelineItem.image);
+        }
+      }
+
+      // Delete the program record
+      await prisma.trip.delete({
+        where: { id: id as string },
+      });
+    }
+
+    res.status(200).json({ message: 'Program deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting program:', error);
+    res.status(500).json({ message: 'Error deleting program', error: (error as Error).message });
+  }
+};
+
 // Fetch corrections for timeline sorting and creation
 export const fetchAllPrograms = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -94,204 +353,7 @@ export const fetchProgramById = async (req: NextApiRequest, res: NextApiResponse
   }
 };
 
-export const createProgram = async (req: NextApiRequest, res: NextApiResponse) => {
-  // @ts-ignore
-  upload(req, res, async (err) => {
-    if (err) {
-      console.error('Error uploading files:', err);
-      return res.status(500).json({ message: 'Error uploading files', error: (err as Error).message });
-    }
-
-    try {
-      const programData = JSON.parse(req.body.programData);
-      const programImages = (req as NextApiRequest & { files: { [fieldname: string]: Express.Multer.File[] } }).files['program_images'] || [];
-      const timelineImages = (req as NextApiRequest & { files: { [fieldname: string]: Express.Multer.File[] } }).files['timeline_images'] || [];
-
-      // Log the input data for debugging
-      console.log('fromDate:', programData.fromDate);
-      console.log('days:', programData.days);
-
-      // Validate fromDate
-      const fromDate = new Date(programData.fromDate);
-      if (isNaN(fromDate.getTime())) {
-        console.error('Invalid fromDate:', programData.fromDate);
-        return res.status(400).json({ message: 'Invalid date format for fromDate' });
-      }
-
-      // Calculate toDate if it's empty
-      let toDate: Date;
-      if (!programData.toDate || programData.toDate.trim() === '') {
-        // Calculate toDate by adding days to fromDate
-        toDate = new Date(fromDate);
-        toDate.setDate(toDate.getDate() + programData.days);
-      } else {
-        // Use the provided toDate
-        toDate = new Date(programData.toDate);
-        if (isNaN(toDate.getTime())) {
-          console.error('Invalid toDate:', programData.toDate);
-          return res.status(400).json({ message: 'Invalid date format for toDate' });
-        }
-      }
-
-      // Log the calculated toDate for debugging
-      console.log('Calculated toDate:', toDate);
-
-      // Save program images paths
-      const imageUrls = programImages.map(file => file.filename);
-
-      // Ensure the dates are in ISO 8601 format (YYYY-MM-DDTHH:mm:ssZ)
-      const formattedFromDate = fromDate.toISOString();
-      const formattedToDate = toDate.toISOString();
-
-      // Create program with timeline
-      const program = await prisma.trip.create({
-        data: {
-          title: programData.title,
-          metadata: programData.metadata || null,
-          description: programData.description,
-          images: imageUrls,
-          location_from: programData.locationFrom,
-          location_to: programData.locationTo,
-          days: programData.days,
-          price: programData.price,
-          from_date: formattedFromDate,
-          to_date: formattedToDate,
-          display: programData.display,
-          timeline: {
-            create: programData.timeline?.map((item: { title: string; description: string; sortOrder: number; date: string }, index: number) => ({
-              title: item.title,
-              description: item.description,
-              image: timelineImages[index]?.filename || null,
-              sortOrder: item.sortOrder,
-              date: new Date(item.date)
-            })) || []
-          }
-        },
-        include: {
-          timeline: true
-        }
-      });
-
-      res.status(201).json({ 
-        message: 'Program created successfully',
-        programId: program.id
-      });
-    } catch (error) {
-      // Clean up uploaded files if database operation fails
-      const files = (req as NextApiRequest & { files: { [fieldname: string]: Express.Multer.File[] } }).files;
-      if (files) {
-        const allFiles = [
-          ...(files['program_images'] || []),
-          ...(files['timeline_images'] || [])
-        ];
-        await removeUploadedFiles(allFiles);
-      }
-      console.error('Error creating program:', error);
-      res.status(500).json({ message: 'Error creating program', error: (error as Error).message });
-    }
-  });
-};
-
-// Update Program
-export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) => {
-  // @ts-ignore
-  upload(req, res, async (err) => {
-    if (err) {
-      console.error('Error uploading files:', err);
-      return res.status(500).json({ message: 'Error uploading files', error: (err as Error).message });
-    }
-
-    try {
-      const programData = JSON.parse(req.body.programData);
-      const { id } = req.query;
-      const programImages = (req as NextApiRequest & { files: { [fieldname: string]: Express.Multer.File[] } }).files['program_images'] || [];
-      const timelineImages = (req as NextApiRequest & { files: { [fieldname: string]: Express.Multer.File[] } }).files['timeline_images'] || [];
-
-      // Save program images paths
-      const imageUrls = programImages.map(file => file.filename);
-
-      // Update program with timeline
-      const program = await prisma.trip.update({
-        where: { id: id as string },
-        data: {
-          title: programData.title,
-          metadata: programData.metadata || null,
-          description: programData.description,
-          images: imageUrls.length > 0 ? imageUrls : undefined,
-          location_from: programData.location_from,
-          location_to: programData.location_to,
-          days: programData.days,
-          price: programData.price,
-          from_date: new Date(programData.from_date),
-          to_date: new Date(programData.to_date),
-          display: programData.display,
-          timeline: {
-            // Delete existing timeline and recreate
-            deleteMany: {},
-            create: programData.timeline?.map((item: { title: string; description: string; sortOrder: number; date: string }, index: number) => ({
-              title: item.title,
-              description: item.description,
-              image: timelineImages[index]?.filename || null,
-              sortOrder: item.sortOrder, // Corrected from sort_order to sortOrder
-              date: new Date(item.date)
-            })) || []
-          }
-        },
-        include: {
-          timeline: true
-        }
-      });
-
-    } catch (error) {
-      const files = (req as NextApiRequestWithFiles).files;
-      if (files) {
-        const allFiles = [
-          ...(files['program_images'] || []),
-          ...(files['timeline_images'] || [])
-        ];
-        await removeUploadedFiles(allFiles);
-      }
-
-      console.error('Error updating program:', error);
-      res.status(500).json({ message: 'Error updating program', error: (error as Error).message });
-    }
-  });
-};
-
-// Delete Program
-export const deleteProgram = async (req: NextApiRequest, res: NextApiResponse) => {
-  try {
-    const { id } = req.query;
-
-    const program = await prisma.trip.findUnique({
-      where: { id: id as string },
-    });
-
-    if (program) {
-      const images = program.images as string[];
-      for (const imageUrl of images) {
-        const imagePath = path.join(process.cwd(), 'public/uploads', imageUrl);
-        try {
-          await fs.unlink(imagePath);
-        } catch (error) {
-          console.warn(`Could not delete image ${imagePath}:`, error);
-        }
-      }
-
-      await prisma.trip.delete({
-        where: { id: id as string },
-      });
-    }
-
-    res.status(200).json({ message: 'Program deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting program:', error);
-    res.status(500).json({ message: 'Error deleting program', error: (error as Error).message });
-  }
-};
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  
   try {
     switch (req.method) {
       case 'POST':
@@ -308,8 +370,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(405).end(`Method ${req.method} Not Allowed`);
     }
   } finally {
-    // Ensure Prisma client is disconnected after each request
-    // await prisma.$disconnect();
-    console.log("Done")
+    console.log("Done");
   }
 }

@@ -34,6 +34,7 @@ model Trip {
   location_to  String
   days         Int
   price        Float
+  singleAdon   Int
   from_date    DateTime
   to_date      DateTime
   display      Boolean     @default(true)
@@ -41,6 +42,8 @@ model Trip {
   updatedAt    DateTime    @updatedAt
   timeline     TripTimeline[]
   featured     Featured[]
+  priceInclude String
+  generalConditions String
 }
 
 model TripTimeline {

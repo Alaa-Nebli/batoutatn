@@ -7,7 +7,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import Image from 'next/image';
 import { format, addDays } from 'date-fns';
 
-// Define types for better type safety
 interface TimelineItem {
   title: string;
   description: string;
@@ -23,17 +22,20 @@ interface FormData {
   locationTo: string;
   days: string;
   price: string;
+  singleAdon: string; 
   fromDate: string;
   toDate: string;
   timeline: TimelineItem[];
   display: boolean;
+  priceInclude: string; 
+  generalConditions: string; 
 }
+
 
 export default function ProgramCreate() {
   const { data: session, status } = useSession();
   const router = useRouter();
   
-  // Initial state with type annotation
   const [formData, setFormData] = useState<FormData>({
     title: '',
     metadata: '',
@@ -42,22 +44,25 @@ export default function ProgramCreate() {
     locationTo: '',
     days: '',
     price: '',
+    singleAdon: '', // ✅ new
     fromDate: '',
     toDate: '',
     timeline: [],
     display: true,
+    priceInclude: '', // ✅ new
+    generalConditions: '', // ✅ new
   });
+  
 
-  // Use more specific type for images
   const [images, setImages] = useState<File[]>([]);
-  const [timelineImages, setTimelineImages] = useState<{[key: number]: File}>({});
+  const [timelineImages, setTimelineImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Generate timeline when days and fromDate change
   useEffect(() => {
     if (formData.fromDate && formData.days) {
       const days = parseInt(formData.days);
       const startDate = new Date(formData.fromDate);
+      const endDate = addDays(startDate, days - 1);
       
       const generatedTimeline = Array.from({ length: days }, (_, index) => {
         const currentDate = addDays(startDate, index);
@@ -71,31 +76,34 @@ export default function ProgramCreate() {
 
       setFormData(prev => ({
         ...prev,
-        timeline: generatedTimeline
+        timeline: generatedTimeline,
+        toDate: format(endDate, 'yyyy-MM-dd')
       }));
       
-      // Reset timeline images
-      setTimelineImages({});
+      setTimelineImages([]);
     }
   }, [formData.fromDate, formData.days]);
 
-  // Authentication check
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/admin');
     }
   }, [status, router]);
 
-  // Handle input changes with type safety
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    
+    if (name === 'toDate') {
+      toast.error('End date is automatically calculated from start date and duration');
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   }, []);
 
-  // Handle timeline changes with type safety
   const handleTimelineChange = useCallback((index: number, field: keyof TimelineItem, value: string) => {
     setFormData(prev => {
       const newTimeline = [...prev.timeline];
@@ -110,14 +118,12 @@ export default function ProgramCreate() {
     });
   }, []);
 
-  // Improved image upload handler
   const handleImageUpload = useCallback((
     e: React.ChangeEvent<HTMLInputElement>, 
     isTimelineImage = false, 
     timelineIndex?: number
   ) => {
     try {
-      // Null check for files
       const files = e.target.files ? Array.from(e.target.files) : [];
       
       if (files.length === 0) {
@@ -125,15 +131,12 @@ export default function ProgramCreate() {
         return;
       }
 
-      // Validate files
       const validFiles = files.filter(file => {
-        // Check image type
         if (!file.type.startsWith('image/')) {
           toast.error(`File ${file.name} is not an image`);
           return false;
         }
         
-        // Check file size
         if (file.size > 5 * 1024 * 1024) {
           toast.error(`File ${file.name} is too large (max 5MB)`);
           return false;
@@ -145,7 +148,6 @@ export default function ProgramCreate() {
       if (validFiles.length === 0) return;
 
       if (isTimelineImage && timelineIndex !== undefined) {
-        // Timeline image upload
         if (validFiles.length > 1) {
           toast.error('Only one image allowed per timeline day');
           return;
@@ -154,10 +156,12 @@ export default function ProgramCreate() {
         const file = validFiles[0];
         const objectUrl = URL.createObjectURL(file);
 
-        setTimelineImages(prev => ({
-          ...prev,
-          [timelineIndex]: file
-        }));
+        // Update timeline images array
+        setTimelineImages(prev => {
+          const newTimelineImages = [...prev];
+          newTimelineImages[timelineIndex] = file;
+          return newTimelineImages;
+        });
         
         setFormData(prev => {
           const newTimeline = [...prev.timeline];
@@ -171,9 +175,7 @@ export default function ProgramCreate() {
           };
         });
       } else {
-        // Main program images upload
         setImages(prev => {
-          // Filter out duplicates
           const newFiles = validFiles.filter(
             file => !prev.some(existing => existing.name === file.name)
           );
@@ -186,7 +188,6 @@ export default function ProgramCreate() {
         });
       }
 
-      // Reset file input
       e.target.value = '';
     } catch (error) {
       console.error('Error handling image upload:', error);
@@ -194,25 +195,21 @@ export default function ProgramCreate() {
     }
   }, []);
 
-  // Remove image handler
   const removeImage = useCallback((
     index: number, 
     isTimelineImage = false, 
     timelineIndex?: number
   ) => {
     if (isTimelineImage && timelineIndex !== undefined) {
-      // Remove timeline image
       setTimelineImages(prev => {
-        const newTimelineImages = { ...prev };
-        delete newTimelineImages[timelineIndex];
+        const newTimelineImages = [...prev];
+        newTimelineImages[timelineIndex] = undefined as unknown as File;
         return newTimelineImages;
       });
       
-      // Clear image in timeline
       setFormData(prev => {
         const newTimeline = [...prev.timeline];
         if (newTimeline[timelineIndex]) {
-          // Revoke previous object URL if exists
           if (newTimeline[timelineIndex].image) {
             URL.revokeObjectURL(newTimeline[timelineIndex].image);
           }
@@ -228,8 +225,6 @@ export default function ProgramCreate() {
         };
       });
     } else {
-      // Remove main program image
-      // Revoke object URL if it exists
       const imageToRemove = images[index];
       if (imageToRemove) {
         const objectUrl = URL.createObjectURL(imageToRemove);
@@ -240,13 +235,22 @@ export default function ProgramCreate() {
     }
   }, [images]);
 
-  // Validate form (placeholder implementation)
   const validateForm = useCallback(() => {
-    // Add your validation logic here
+    if (!formData.title || !formData.description || !formData.locationFrom || !formData.locationTo) {
+      toast.error('Please fill in all required fields.');
+      return false;
+    }
+    if (parseInt(formData.days) <= 0) {
+      toast.error('Number of days must be greater than 0.');
+      return false;
+    }
+    if (!formData.fromDate) {
+      toast.error('Please select a start date.');
+      return false;
+    }
     return true;
-  }, []);
+  }, [formData]);
 
-  // Submit handler
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -259,36 +263,38 @@ export default function ProgramCreate() {
     try {
       const formDataMultipart = new FormData();
       
-      // Prepare program data
       const programData = {
         ...formData,
         location_from: formData.locationFrom,
         location_to: formData.locationTo,
         days: parseInt(formData.days),
         price: parseFloat(formData.price),
+        singleAdon: parseInt(formData.singleAdon) || 0, // ✅ added
+        priceInclude: formData.priceInclude,            // ✅ added
+        generalConditions: formData.generalConditions,  // ✅ added
         timeline: formData.timeline.map((item, index) => ({
           title: item.title,
           description: item.description,
-          image: '', // Remove local object URLs
+          image: '',
           sortOrder: index + 1,
           date: item.date
         }))
       };
+      
 
-      // Append data to FormData
       formDataMultipart.append('programData', JSON.stringify(programData));
       
-      // Append main program images
       images.forEach((file) => {
         formDataMultipart.append('program_images', file);
       });
       
-      // Append timeline images
-      Object.entries(timelineImages).forEach(([index, file]) => {
-        formDataMultipart.append('timeline_images', file);
+      timelineImages.forEach((file) => {
+        if (file) {
+          formDataMultipart.append('timeline_images', file);
+        }
       });
+      
 
-      // Submit to API
       const response = await fetch('/api/programs.controller', {
         method: 'POST',
         body: formDataMultipart,
@@ -328,16 +334,13 @@ export default function ProgramCreate() {
     }
   }, [formData, images, timelineImages, router, validateForm]);
 
-  // Cleanup object URLs on unmount
   useEffect(() => {
     return () => {
-      // Clean up main program images
       images.forEach(file => {
         const objectUrl = URL.createObjectURL(file);
         URL.revokeObjectURL(objectUrl);
       });
 
-      // Clean up timeline images
       formData.timeline.forEach(item => {
         if (item.image) {
           URL.revokeObjectURL(item.image);
@@ -346,7 +349,6 @@ export default function ProgramCreate() {
     };
   }, [images, formData.timeline]);
 
-  // Loading state
   if (status === 'loading') {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -355,7 +357,6 @@ export default function ProgramCreate() {
     );
   }
   
-  // Render the form (rest of the component remains the same as in your original code)
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <Toaster position="top-right" reverseOrder={false} />
@@ -367,63 +368,55 @@ export default function ProgramCreate() {
             Create New Program
           </h1>
         </div>
-        
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          {/* Main Program Details Section */}
+      <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Left Column */}
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Program Title</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Program Title*</label>
                 <input
                   type="text"
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-300"
-                  placeholder="Enter program title"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   required
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Metadata</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Description*</label>
                 <textarea
-                  name="metadata"
-                  value={formData.metadata}
+                  name="description"
+                  value={formData.description}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-300"
-                  placeholder="Additional program information"
-                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  rows={4}
                   required
                 />
               </div>
             </div>
             
-            {/* Right Column */}
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">From Location</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">From Location*</label>
                   <input
                     type="text"
                     name="locationFrom"
                     value={formData.locationFrom}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-300"
-                    placeholder="Start location"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">To Location</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">To Location*</label>
                   <input
                     type="text"
                     name="locationTo"
                     value={formData.locationTo}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-300"
-                    placeholder="End location"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     required
                   />
                 </div>
@@ -431,20 +424,19 @@ export default function ProgramCreate() {
               
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Days</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Days*</label>
                   <input
                     type="number"
                     name="days"
                     value={formData.days}
                     onChange={handleInputChange}
                     min="1"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-300"
-                    placeholder="Number of days"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Price</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Price*</label>
                   <input
                     type="number"
                     name="price"
@@ -452,88 +444,99 @@ export default function ProgramCreate() {
                     onChange={handleInputChange}
                     min="0"
                     step="0.01"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-300"
-                    placeholder="Program price"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Single Add-on (€)</label>
+                  <input
+                    type="number"
+                    name="singleAdon"
+                    value={formData.singleAdon}
+                    onChange={handleInputChange}
+                    min="0"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">From Date*</label>
                   <input
                     type="date"
                     name="fromDate"
                     value={formData.fromDate}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-300"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     required
                   />
                 </div>
               </div>
-            </div>
-          </div>
-          <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-              <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition duration-300"
-                  placeholder="Additional program information"
-                  rows={3}
-                  required
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+                <input
+                  type="date"
+                  name="toDate"
+                  value={formData.toDate}
+                  readOnly
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
                 />
               </div>
-          {/* Main Program Images Section */}
-          <div className="mt-8">
-                      <h2 className="text-xl font-semibold text-gray-800 mb-4">Program Images</h2>
-                      <div className="flex flex-wrap gap-4">
-                        {images.map((image, index) => (
-                          <div key={image.name} className="relative">
-                            <Image
-                              src={URL.createObjectURL(image)}
-                              alt={`Program image ${index + 1}`}
-                              width={100}
-                              height={100}
-                              className="w-24 h-24 object-cover rounded-lg"
-                              // Add onLoadingComplete to release object URL
-                              onLoadingComplete={(img) => {
-                                // Trigger URL revocation after image is loaded
-                                URL.revokeObjectURL(img.src);
-                              }}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index)}
-                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                            >
-                              <Icon icon="mdi:close" className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
-                        <label className="cursor-pointer">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            className="hidden"
-                            multiple
-                          />
-                          <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center hover:bg-gray-100">
-                            <Icon icon="mdi:plus" className="w-8 h-8 text-gray-400" />
-                          </div>
-                        </label>
-                      </div>
-                    </div>
+            </div>
+          </div>
 
-          {/* Timeline Section */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Metadata</label>
+            <textarea
+              name="metadata"
+              value={formData.metadata}
+              onChange={handleInputChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              rows={3}
+            />
+          </div>
+
+          <div className="mt-8">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Program Images</h2>
+            <div className="flex flex-wrap gap-4">
+              {images.map((image, index) => (
+                <div key={index} className="relative">
+                  <Image
+                    src={URL.createObjectURL(image)}
+                    alt={`Program image ${index + 1}`}
+                    width={100}
+                    height={100}
+                    className="w-24 h-24 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeImage(index)}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                  >
+                    <Icon icon="mdi:close" className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              <label className="cursor-pointer">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  multiple
+                />
+                <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center hover:bg-gray-100">
+                  <Icon icon="mdi:plus" className="w-8 h-8 text-gray-400" />
+                </div>
+              </label>
+            </div>
+          </div>
+
           <div className="mt-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Program Timeline</h2>
             <div className="space-y-4">
               {formData.timeline.map((item, index) => (
-                <div 
-                  key={index} 
-                  className="bg-gray-50 p-4 rounded-lg border border-gray-200 hover:shadow-sm transition duration-300"
-                >
+                <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                   <div className="flex justify-between items-center mb-3">
                     <h3 className="font-medium text-gray-700">Day {index + 1} - {item.date}</h3>
                   </div>
@@ -543,20 +546,17 @@ export default function ProgramCreate() {
                       type="text"
                       value={item.title}
                       onChange={(e) => handleTimelineChange(index, 'title', e.target.value)}
-                      placeholder="Timeline Item Title"
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       required
                     />
                     <textarea
                       value={item.description}
                       onChange={(e) => handleTimelineChange(index, 'description', e.target.value)}
-                      placeholder="Describe the day's activities..."
                       rows={3}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       required
                     />
                     
-                    {/* Image Upload for Timeline */}
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Day Image</label>
                       <div className="flex items-center space-x-4">
@@ -596,22 +596,58 @@ export default function ProgramCreate() {
               ))}
             </div>
           </div>
+          <div className="col-span-3">
+            <label className="block text-sm font-medium text-gray-700 mb-2">What’s included in the price</label>
+            <textarea
+              name="priceInclude"
+              value={formData.priceInclude}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+          <div className="col-span-3">
+            <label className="block text-sm font-medium text-gray-700 mb-2">General Conditions</label>
+            <textarea
+              name="generalConditions"
+              value={formData.generalConditions}
+              onChange={handleInputChange}
+              rows={3}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            />
+          </div>
+          <div className="flex items-center">
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.display}
+                onChange={(e) => setFormData(prev => ({ ...prev, display: e.target.checked }))}
+                className="sr-only peer"
+              />
+              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              <span className="ms-3 text-sm font-medium text-gray-700">Display on website</span>
+            </label>
+          </div>
 
-          {/* Submit Section */}
           <div className="pt-6 border-t flex justify-end space-x-4">
             <button
               type="button"
               onClick={() => router.push('/admin/dashboard')}
-              className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg focus:outline-none"
+              className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg focus:outline-none hover:bg-gray-300"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-500 text-white rounded-lg focus:outline-none"
+              className="px-6 py-2 bg-blue-500 text-white rounded-lg focus:outline-none hover:bg-blue-600 disabled:opacity-50"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Creating...' : 'Create Program'}
+              {isSubmitting ? (
+                <span className="flex items-center">
+                  <Icon icon="mdi:loading" className="animate-spin mr-2" />
+                  Creating...
+                </span>
+              ) : 'Create Program'}
             </button>
           </div>
         </form>

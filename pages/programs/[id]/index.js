@@ -69,7 +69,7 @@ const TimelineItem = ({ day, isActive, onClick, content }) => (
         {content.image && (
           <div className="relative aspect-video md:aspect-[3/2] rounded-xl overflow-hidden shadow-lg">
             <Image
-              src={`/uploads/${content.image}`}
+              src={content.image}
               alt={content.title}
               fill
               className="object-cover transition-transform duration-300 hover:scale-105"
@@ -82,6 +82,29 @@ const TimelineItem = ({ day, isActive, onClick, content }) => (
     </motion.div>
   </motion.div>
 );
+
+const DropdownSection = ({ title, content }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mb-8 border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full px-6 py-4 flex items-center justify-between bg-white text-gray-800 hover:bg-gray-50 font-semibold text-lg"
+      >
+        <span>{title}</span>
+        <motion.div animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.3 }}>
+          <Icon icon="mdi:chevron-down" className="w-6 h-6" />
+        </motion.div>
+      </button>
+      {open && (
+        <div className="px-6 py-4 text-gray-600 leading-relaxed whitespace-pre-line">
+          {content}
+        </div>
+      )}
+    </div>
+  );
+};
+
 
 const ProgramHighlights = ({ highlights }) => (
   <div className="grid md:grid-cols-3 gap-6">
@@ -120,7 +143,7 @@ const ImageCarousel = ({ images }) => {
           <SwiperSlide key={idx}>
             <div className="relative h-full w-full">
               <Image
-                src={`/uploads/${image}`}
+                src={image}
                 alt={`Slide ${idx + 1}`}
                 fill
                 className="object-cover"
@@ -183,14 +206,29 @@ const ProgramHeaderCard = ({ program }) => {
           </div>
         </div>
       </div>
-      
+
+
       <div className="mt-auto border-t border-gray-200 pt-4">
-        <p className="text-sm text-gray-500 mb-2">À partir de</p>
+        <p className="text-sm text-gray-500 mb-2">Supplément single :  </p>
+        <div className="flex items-end justify-between">
+          <div className="flex items-end space-x-2">
+            <span className="text-3xl font-bold text-orange-500">{program.singleAdon || '...'}</span>
+            <span className="text-lg pb-1 text-gray-600">TND</span>
+            
+          </div>
+          
+      
+        </div>
+      </div>
+      <div className="mt-auto border-t border-gray-200 pt-4">
+        <p className="text-sm text-gray-500 mb-2">À</p>
         <div className="flex items-end justify-between">
           <div className="flex items-end space-x-2">
             <span className="text-3xl font-bold text-orange-500">{program.price || '...'}</span>
             <span className="text-lg pb-1 text-gray-600">TND</span>
+            
           </div>
+          
           <button className="px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors">
             Réserver
           </button>
@@ -343,7 +381,7 @@ export default function ProgramDetails() {
       <SEO
         title={`${program.title} | Expérience de Voyage`}
         description={program.description.substring(0, 160)}
-        image={`/uploads/${program.images[0]}`}
+        image={program.images[0]}
       />
 
       {/* Hero Section - Split Layout */}
@@ -412,6 +450,13 @@ export default function ProgramDetails() {
             ))}
           </div>
         </section>
+        
+        {/* Price Includes & General Conditions */}
+<section className="mb-20">
+  <DropdownSection title="Ce prix comprend & ne comprend pas" content={program.priceInclude} />
+  <DropdownSection title="Conditions générales du voyage" content={program.generalConditions} />
+</section>
+
 
         {/* Gallery Section */}
         <section>
@@ -436,7 +481,7 @@ export default function ProgramDetails() {
                 className="relative aspect-square rounded-xl overflow-hidden group"
               >
                 <Image
-                  src={`/uploads/${image}`}
+                  src={image}
                   alt={`Gallery image ${idx + 1}`}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
@@ -453,15 +498,18 @@ export default function ProgramDetails() {
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg p-4 z-50">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <div>
-            <p className="text-gray-600 text-sm">À partir de</p>
+            <p className="text-gray-600 text-sm">À</p>
             <p className="font-bold text-orange-500 text-xl">
               {Math.round(program.price)} TND
             </p>
+           
           </div>
+         
           <button className="bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
             Réserver
           </button>
         </div>
+        
       </div>
 
       <ContactUs />

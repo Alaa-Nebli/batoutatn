@@ -31,7 +31,7 @@ const ProgramCard = ({ program }) => {
     >
       <div className="relative aspect-video w-full overflow-hidden">
         <Image
-          src={program.images?.[0] ? `/uploads/${program.images[0]}` : '/placeholder.jpg'}
+          src={program.images ? program.images[0] : '/placeholder.jpg'}
           alt={program.title}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -90,7 +90,7 @@ const FeaturedProgram = ({ program }) => {
     <section className="relative mt-24 h-[80vh] min-h-[500px] flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
         <Image
-          src={`/uploads/${program.images[0]}`}
+          src={program.images[0]}
           fill
           alt={program.title}
           className="object-cover brightness-75"
@@ -153,7 +153,7 @@ const FeaturedProgram = ({ program }) => {
               transition={{ delay: 0.5 + index * 0.1 }}
             >
               <Image
-                src={`/uploads/${image}`}
+                src={image}
                 alt={`Preview ${index + 1}`}
                 fill
                 className="object-cover hover:scale-110 transition-transform duration-500"

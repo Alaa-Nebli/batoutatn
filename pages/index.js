@@ -99,7 +99,7 @@ const Banner = () => {
   const displayBanners = featuredItems.length > 0 
     ? featuredItems.map(item => ({
         id: item.id,
-        imageUrl: `/uploads/${item.image}`,
+        imageUrl: item.image,
         title: item.trip?.name || "",
         description: item.trip?.description || "",
         alt: item.trip?.name || "Featured destination",
