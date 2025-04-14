@@ -9,7 +9,6 @@ import { useState, useEffect, useRef } from 'react';
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { ContactUs } from "components//Contact";
-import { title } from "process";
 
 export async function getStaticProps({ locale }) {
     return {
