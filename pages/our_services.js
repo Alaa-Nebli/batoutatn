@@ -58,43 +58,43 @@ const WhyChooseUsSection = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-pink-600 mb-4">
-            {t('Services.WhyChooseUs.title')}
+          <h2 className="text-5xl font-bold ">
+          <span className='color-black'>  {t('Services.WhyChooseUs.title')} </span> 
+          <span className='bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-pink-600 mb-4'> {t('Services.WhyChooseUs.title2')} </span>
+
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-pink-500 mx-auto" />
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {reasonsToChoose.map((reason, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="relative group"
-            >
-              <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
-                <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${reason.gradient} flex items-center justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300`}>
-                  <Icon icon={reason.icon} className="text-3xl text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{reason.title}</h3>
-                <p className="text-gray-600 mb-6">{reason.description}</p>
-                <ul className="space-y-3">
-
-                    {
-                    reason.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center gap-2 text-gray-700">
-                        <Icon icon="mdi:check-circle" className="text-green-500" />
-                        <span>{feature}</span>
-                      </li>
-                    ))
-                  }
-                </ul>
-              </div>
-            </motion.div>
-          ))}
+  {reasonsToChoose.map((reason, index) => (
+    <motion.div
+      key={index}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1 }}
+      className="relative group h-full flex flex-col"
+    >
+      <div className="bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 flex flex-col h-full">
+        <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${reason.gradient} flex items-center justify-center mb-6 transform group-hover:scale-110 transition-transform duration-300`}>
+          <Icon icon={reason.icon} className="text-3xl text-white" />
         </div>
+        <h3 className="text-xl font-bold text-gray-900 mb-4">{reason.title}</h3>
+        <p className="text-gray-600 mb-6">{reason.description}</p>
+        <ul className="space-y-3 mt-auto">
+          {reason.features.map((feature, idx) => (
+            <li key={idx} className="flex items-center gap-2 text-gray-700">
+              <Icon icon="mdi:check-circle" className="text-green-500" />
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </motion.div>
+  ))}
+</div>
+
       </div>
     </section>
   );
@@ -122,7 +122,7 @@ const EsteemSection = () => {
     },
     { 
       title: "Expériences Vibrantes", 
-      description: "Rencontrez les artisans, goûtez aux saveurs locales et vivez des moments authentiques qui font battre le cœur de la Tunisie.", 
+      description: "Rencontrez les artisans, goûtez aux saveurs locales et vivez des moments authentiques.", 
       image: "/experience-vibrante.jpg",
       icon: "🎭",
       bgColor: "bg-gradient-to-br from-purple-500 to-fuchsia-600",
@@ -130,15 +130,15 @@ const EsteemSection = () => {
     },
     { 
       title: "Impact Local", 
-      description: "85% de vos dépenses profitent directement aux communautés. Votre voyage crée des emplois et préserve le patrimoine.", 
+      description: "À travers vos voyages, vous contribuez au bien être d'autres peuples.", 
       image: "/impact-locale.jpg",
       icon: "🤝",
       bgColor: "bg-gradient-to-br from-amber-500 to-orange-600",
       overlayColor: "from-amber-600/90 to-orange-700/90"
     },
     { 
-      title: "Tourisme Régénérateur", 
-      description: "Nous allons au-delà du durable : chaque voyage plante des arbres et finance des projets environnementaux.", 
+      title: "Nature & Impact Positif", 
+      description: "Partez à la découverte de la nature : chaque voyage vous plonge au cœur de paysages préservés tout en soutenant des projets environnementaux.", 
       image: "/tourisme-regenerateur.avif",
       icon: "🌿",
       bgColor: "bg-gradient-to-br from-green-500 to-lime-600",
@@ -177,7 +177,7 @@ const EsteemSection = () => {
               L&apos;Art du Voyage Responsable
             </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto font-bold">
             Découvrez comment nous réinventons le tourisme en Tunisie avec des expériences qui respectent les hommes et la nature
           </p>
           <motion.div 
@@ -272,8 +272,8 @@ const EsteemSection = () => {
           transition={{ delay: 0.4 }}
           className="mt-20 text-center"
         >
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            <span className="font-bold text-emerald-600">Notre promesse :</span> Un voyage où chaque détail compte - 
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto font-bold">
+            <span className="font-bold text-2xl text-emerald-600">Notre promesse :<br/> </span> Un voyage où chaque détail compte 
             pour vous, pour les locaux, et pour la planète.
           </p>
         </motion.div>
@@ -285,6 +285,7 @@ const EsteemSection = () => {
 const ServicesPage = () => {
   const { t } = useTranslation('common');
   const servicesSectionRef = useRef(null);
+  const [expandedIndex, setExpandedIndex] = useState(null);
 
   const services = [
     {
@@ -317,7 +318,6 @@ const ServicesPage = () => {
     <Layout className="bg-gradient-to-b from-white to-orange-50">
       <div className="main-wrapper pt-20 relative z-10">
         <div id="our-services" className="mt-5" />
-        {/* Services Section */}
         <section ref={servicesSectionRef} className="py-20">
           <div className="max-w-7xl mx-auto px-4">
             <motion.div
@@ -330,64 +330,76 @@ const ServicesPage = () => {
               <h2 className="text-4xl font-bold mb-4">
                 {t('Home.Our_Services_section.Our_Services_title')}
               </h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
+              <div className="w-48 m-4 h-1 bg-gradient-to-r from-orange-500 to-pink-500 mx-auto" />
+              <p className="text-gray-600 max-w-4xl mx-auto font-bold">
                 {t('Home.Our_Services_section.Our_Services_Description')}
               </p>
             </motion.div>
 
-            {services.map((service, index) => (
-              <motion.div
-                key={index}
-                className={`flex flex-col ${
-                  index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
-                } items-center gap-8 mb-20`}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.1 }}
-                transition={{ duration: 0.5, delay: index * 0.2 }}
-              >
-                {/* Image Container */}
-                <div className="w-full md:w-1/2 relative overflow-hidden rounded-2xl shadow-lg">
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-full h-full"
-                  >
-                    <Image
-                      src={service.image}
-                      alt={service.imageAlt}
-                      layout="responsive"
-                      width={600}
-                      height={400}
-                      objectFit="cover"
-                      className="rounded-2xl"
-                    />
-                  </motion.div>
-                </div>
+            {services.map((service, index) => {
+              const isExpanded = expandedIndex === index;
+              const shortDescription = service.description.slice(0, 150);
 
-                {/* Text Content */}
-                <div className="w-full md:w-1/2">
-                  <motion.h3
-                    className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-500"
-                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: false, amount: 0.1 }}
-                    transition={{ duration: 0.5, delay: index * 0.2 + 0.2 }}
-                  >
-                    {service.title}
-                  </motion.h3>
-                  <motion.p
-                    className="text-gray-600 text-lg"
-                    initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: false, amount: 0.1 }}
-                    transition={{ duration: 0.5, delay: index * 0.2 + 0.3 }}
-                  >
-                    {service.description}
-                  </motion.p>
-                </div>
-              </motion.div>
-            ))}
+              return (
+                <motion.div
+                  key={index}
+                  className={`flex flex-col ${
+                    index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
+                  } items-center gap-8 mb-20`}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false, amount: 0.1 }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                >
+                  <div className="w-full md:w-1/2 relative overflow-hidden rounded-2xl shadow-lg">
+                    <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.3 }}
+                      className="w-full h-full"
+                    >
+                      <Image
+                        src={service.image}
+                        alt={service.imageAlt}
+                        layout="responsive"
+                        width={600}
+                        height={400}
+                        objectFit="cover"
+                        className="rounded-2xl"
+                      />
+                    </motion.div>
+                  </div>
+
+                  <div className="w-full md:w-1/2">
+                    <motion.h3
+                      className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-500"
+                      initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: false, amount: 0.1 }}
+                      transition={{ duration: 0.5, delay: index * 0.2 + 0.2 }}
+                    >
+                      {service.title}
+                    </motion.h3>
+                    <motion.p
+                      className="text-gray-600 text-xl md:text-xl leading-relaxed"
+                      initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: false, amount: 0.1 }}
+                      transition={{ duration: 0.5, delay: index * 0.2 + 0.3 }}
+                    >
+                      {isExpanded ? service.description : `${shortDescription}...`}
+                    </motion.p>
+                    <button
+                      className="mt-2 text-orange-500 hover:underline font-semibold"
+                      onClick={() =>
+                        setExpandedIndex(isExpanded ? null : index)
+                      }
+                    >
+                      {isExpanded ? 'Voir moins' : 'Voir plus'}
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </section>
 
@@ -398,5 +410,6 @@ const ServicesPage = () => {
     </Layout>
   );
 };
+
 
 export default ServicesPage;

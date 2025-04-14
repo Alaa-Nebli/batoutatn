@@ -128,7 +128,7 @@ const ProgramCard = React.memo(({ program }) => (
   >
     <div className="relative h-72 w-full overflow-hidden rounded-t-2xl">
       <Image
-        src={program.images?.[0] ? `/uploads/${program.images[0]}` : '/placeholder.jpg'}
+        src={program.images ? program.images[0] : '/placeholder.jpg'}
         alt={program.title}
         fill
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -410,7 +410,7 @@ const ServiceDetails = ({ serviceId }) => {
           className="mb-20 max-w-5xl mx-auto"
         >
           <motion.div 
-            className="bg-gradient-to-r from-orange-500 to-pink-500 p-1 rounded-full mb-12 mx-auto w-32"
+            className="bg-gradient-to-r from-orange-500 to-pink-500 p-1 rounded-full mb-12 mx-auto w-64"
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
             transition={{ duration: 0.8 }}
@@ -630,10 +630,10 @@ const ServiceDetails = ({ serviceId }) => {
               transition={{ duration: 0.6, delay: 0.4 }}
               viewport={{ once: true }}
             >
-              <button className="px-8 py-3 bg-white text-orange-500 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center mx-auto hover:bg-gray-100">
+              <Link href={"#contact"} className="px-8 py-3 w-56 bg-white text-orange-500 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center mx-auto hover:bg-gray-100">
                 <span>Contactez-nous</span>
                 <Icon icon="mdi:arrow-right" className="w-6 h-6 ml-2" />
-              </button>
+              </Link>
             </motion.div>
           </div>
         </motion.section>

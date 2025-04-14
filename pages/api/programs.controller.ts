@@ -4,10 +4,6 @@ import multer from 'multer';
 import { createClient } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
 
-// Fetch all programs for admin
-
-
-
 interface NextApiRequestWithFiles extends NextApiRequest {
   files?: { [fieldname: string]: Express.Multer.File[] };
 }
@@ -20,28 +16,25 @@ export const config = {
 
 const prisma = new PrismaClient();
 
-// Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL || '';
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Configure multer to use memory storage (files will be in memory)
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 50 * 1024 * 1024  }, 
+  limits: { fileSize: 50 * 1024 * 1024 },
 }).fields([
   { name: 'program_images', maxCount: 10 },
   { name: 'timeline_images', maxCount: 50 }
 ]);
 
-// Upload file to Supabase Storage
 const uploadToSupabase = async (file: Express.Multer.File, folder: string) => {
   const fileExt = file.originalname.split('.').pop();
   const fileName = `${uuidv4()}.${fileExt}`;
   const filePath = `${folder}/${fileName}`;
 
   const { data, error } = await supabase.storage
-    .from('programs') // Replace with your bucket name
+    .from('programs')
     .upload(filePath, file.buffer, {
       contentType: file.mimetype,
       upsert: false,
@@ -51,20 +44,17 @@ const uploadToSupabase = async (file: Express.Multer.File, folder: string) => {
     throw error;
   }
 
-  // Get public URL
   const { data: { publicUrl } } = supabase.storage
     .from('programs')
     .getPublicUrl(filePath);
 
-    console.log(publicUrl)
+  console.log(publicUrl)
   return publicUrl;
 };
 
-
-// Delete file from Supabase Storage
 const deleteFromSupabase = async (url: string) => {
   try {
-    const path = url.split('/').slice(4).join('/'); // Extract path from URL
+    const path = url.split('/').slice(4).join('/');
     const { error } = await supabase.storage
       .from('programs')
       .remove([path]);
@@ -91,30 +81,26 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
       const programImages = files['program_images'] || [];
       const timelineImages = files['timeline_images'] 
             ? Array.isArray(files['timeline_images'])
-              ? files['timeline_images'] as Express.Multer.File[] // if array (direct upload)
-              : Object.values(files['timeline_images']) as Express.Multer.File[] // if indexed (FormData)
+              ? files['timeline_images'] as Express.Multer.File[]
+              : Object.values(files['timeline_images']) as Express.Multer.File[]
             : [];
 
-      // Upload program images to Supabase
       const programImageUrls = await Promise.all(
         programImages.map(file => uploadToSupabase(file, 'program-images'))
       );
 
-      // Upload timeline images to Supabase
       const timelineImageUrls = await Promise.all(
         timelineImages.map(file => uploadToSupabase(file, 'timeline-images'))
       );
 
       console.log(timelineImageUrls)
 
-      // Validate fromDate
       const fromDate = new Date(programData.fromDate);
       if (isNaN(fromDate.getTime())) {
         console.error('Invalid fromDate:', programData.fromDate);
         return res.status(400).json({ message: 'Invalid date format for fromDate' });
       }
 
-      // Calculate toDate
       let toDate: Date;
       if (!programData.toDate || programData.toDate.trim() === '') {
         toDate = new Date(fromDate);
@@ -127,12 +113,11 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
         }
       }
 
-      // Create program with timeline
       const program = await prisma.trip.create({
         data: {
           title: programData.title,
           metadata: programData.metadata || null,
-          description: programData.description,
+          description: programData.description, // HTML is stored here
           images: programImageUrls,
           location_from: programData.locationFrom,
           location_to: programData.locationTo,
@@ -145,15 +130,14 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
           timeline: {
             create: programData.timeline?.map((item: any, index: number) => ({
               title: item.title,
-              description: item.description,
+              description: item.description, // HTML stored here
               image: timelineImageUrls[index] || null,
               sortOrder: item.sortOrder,
               date: new Date(item.date)
             })) || []
-          }, 
-          priceInclude : programData.priceInclude || null,
-          generalConditions : programData.generalConditions || null,
-
+          },
+          priceInclude : programData.priceInclude || null,     // HTML
+          generalConditions : programData.generalConditions || null,  // HTML
         },
         include: {
           timeline: true
@@ -171,6 +155,7 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
   });
 };
 
+
 export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) => {
   // @ts-ignore
   upload(req, res, async (err) => {
@@ -185,6 +170,15 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
       const files = (req as NextApiRequestWithFiles).files || {};
       const programImages = files['program_images'] || [];
       const timelineImages = files['timeline_images'] || [];
+
+      // Parse and validate dates
+      const fromDate = new Date(programData.fromDate);
+      const toDate = new Date(programData.toDate);
+
+      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+        console.error('Invalid date(s):', programData.fromDate, programData.toDate);
+        return res.status(400).json({ message: 'Invalid date format for fromDate or toDate' });
+      }
 
       // Get existing program to handle image updates
       const existingProgram = await prisma.trip.findUnique({
@@ -220,8 +214,8 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
           days: programData.days,
           price: programData.price,
           singleAdon : programData.singleAdon || null,
-          from_date: new Date(programData.from_date),
-          to_date: new Date(programData.to_date),
+          from_date: fromDate,
+          to_date: toDate,
           display: programData.display,
           timeline: {
             deleteMany: {},
@@ -244,8 +238,7 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
       // Clean up old images that were replaced
       if (existingProgram) {
         if (newProgramImageUrls.length > 0 && existingProgram.images) {
-          // @ts-ignore
-          for (const oldImage of existingProgram.images) {
+          for (const oldImage of (existingProgram.images as string[])) {
             await deleteFromSupabase(oldImage);
           }
         }
@@ -269,6 +262,7 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
     }
   });
 };
+
 
 export const deleteProgram = async (req: NextApiRequest, res: NextApiResponse) => {
   try {

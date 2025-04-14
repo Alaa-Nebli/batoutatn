@@ -16,18 +16,16 @@ export const Header = () => {
         >
             <SectionContainer className="header--container wrap wrap-px flex justify-between items-center">
                 <div className="header-logo--container">
-                    <h1 className="logo mb-0">
                         <Link href="/">
                             <Image
                                 src="/Batouta_Logo.png"
                                 alt="logo"
-                                className="h-20 w-auto"
+                                className="h-16 w-auto"
                                 height="700"
                                 width="700"
                                 priority
                             />
                         </Link>
-                    </h1>
                 </div>
                 <SectionContainer className="flex items-center">
                     <Nav />

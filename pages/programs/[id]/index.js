@@ -10,11 +10,9 @@ import { useRouter } from 'next/router';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-
 
 const TimelineItem = ({ day, isActive, onClick, content }) => (
   <motion.div
@@ -33,7 +31,7 @@ const TimelineItem = ({ day, isActive, onClick, content }) => (
         <span className={`text-2xl font-bold ${isActive ? 'text-white' : 'text-orange-500'}`}>
           Jour {day}
         </span>
-        <h3 className="text-lg font-semibold text-left">{content.title}</h3>
+        <span className="text-2xl font-bold text-left">{content.title}</span>
       </div>
       <motion.div
         animate={{ rotate: isActive ? 180 : 0 }}
@@ -50,21 +48,12 @@ const TimelineItem = ({ day, isActive, onClick, content }) => (
       className="overflow-hidden"
     >
       <div className="p-6 grid md:grid-cols-2 gap-8">
+        {/* Notice we use dangerouslySetInnerHTML for the description */}
         <div className="space-y-4">
-          <p className="text-gray-600 leading-relaxed">{content.description}</p>
-          {content.highlights && (
-            <div className="space-y-3">
-              <h4 className="font-semibold text-gray-800 text-lg">Points forts :</h4>
-              <ul className="space-y-3">
-                {content.highlights.map((highlight, idx) => (
-                  <li key={idx} className="flex items-start space-x-3">
-                    <Icon icon="mdi:check-circle" className="w-5 h-5 text-emerald-500 mt-1 flex-shrink-0" />
-                    <span className="text-gray-600">{highlight}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          <div
+            className="text-gray-600 leading-relaxed"
+            dangerouslySetInnerHTML={{ __html: content.description }}
+          />
         </div>
         {content.image && (
           <div className="relative aspect-video md:aspect-[3/2] rounded-xl overflow-hidden shadow-lg">
@@ -98,35 +87,13 @@ const DropdownSection = ({ title, content }) => {
       </button>
       {open && (
         <div className="px-6 py-4 text-gray-600 leading-relaxed whitespace-pre-line">
-          {content}
+          {/* Render HTML */}
+          <div dangerouslySetInnerHTML={{ __html: content }} />
         </div>
       )}
     </div>
   );
 };
-
-
-const ProgramHighlights = ({ highlights }) => (
-  <div className="grid md:grid-cols-3 gap-6">
-    {highlights.map((highlight, idx) => (
-      <motion.div
-        key={idx}
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "0px 0px -50px 0px" }}
-        transition={{ delay: idx * 0.1, duration: 0.5 }}
-        whileHover={{ y: -5 }}
-        className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100"
-      >
-        <div className="w-14 h-14 rounded-full bg-orange-50 flex items-center justify-center mb-4">
-          <Icon icon={highlight.icon} className="w-7 h-7 text-orange-500" />
-        </div>
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">{highlight.title}</h3>
-        <p className="text-gray-600">{highlight.description}</p>
-      </motion.div>
-    ))}
-  </div>
-);
 
 const ImageCarousel = ({ images }) => {
   return (
@@ -160,7 +127,6 @@ const ImageCarousel = ({ images }) => {
 };
 
 const ProgramHeaderCard = ({ program }) => {
-  
   const formatDate = (dateString) => {
     const options = { day: 'numeric', month: 'long', year: 'numeric' };
     return new Date(dateString).toLocaleDateString('fr-FR', options);
@@ -184,7 +150,6 @@ const ProgramHeaderCard = ({ program }) => {
           <div>
             <p className="font-semibold text-gray-800 text-4xl mb-5">Destination</p>
             <p className="text-gray-600 text-lg">{program.location_from} → {program.location_to}</p>
-
           </div>
         </div>
         
@@ -201,32 +166,34 @@ const ProgramHeaderCard = ({ program }) => {
         <div className="flex items-start space-x-3">
           <Icon icon="mdi:clock-outline" className="w-5 h-5 mt-1 text-orange-500 flex-shrink-0" />
           <div>
-            <p className="font-semibold text-gray-800 text-4xl mb-5"> Durée</p>
+            <p className="font-semibold text-gray-800 text-4xl mb-5">Durée</p>
             <p className="text-gray-600 text-lg">{program.days} jours</p>
           </div>
         </div>
       </div>
 
+      <div className="mt-auto border-t border-gray-200 pt-4">
+        <p className="text-sm text-gray-500 mb-2">À</p>
+        <div className="flex items-end justify-between">
+          <div className="flex items-end space-x-2">
+            <span className="text-3xl font-bold text-orange-500">
+              {program.price ? program.price.toLocaleString('de-DE') : '...'}
+            </span>
+            <span className="text-lg pb-1 text-gray-600">TND</span>
+            <span className="text-lg pb-1 text-gray-600"> / Personne en chambre double</span>
+          </div>
+        </div>
+      </div>
 
       <div className="mt-auto border-t border-gray-200 pt-4">
         <p className="text-sm text-gray-500 mb-2">Supplément single :  </p>
         <div className="flex items-end justify-between">
           <div className="flex items-end space-x-2">
-            <span className="text-3xl font-bold text-orange-500">{program.singleAdon || '...'}</span>
+            <span className="text-3xl font-bold text-orange-500">
+              {program.singleAdon ? program.singleAdon.toLocaleString('de-DE') : '...'}
+            </span>
             <span className="text-lg pb-1 text-gray-600">TND</span>
-            
-          </div>
-          
-      
-        </div>
-      </div>
-      <div className="mt-auto border-t border-gray-200 pt-4">
-        <p className="text-sm text-gray-500 mb-2">À</p>
-        <div className="flex items-end justify-between">
-          <div className="flex items-end space-x-2">
-            <span className="text-3xl font-bold text-orange-500">{program.price || '...'}</span>
-            <span className="text-lg pb-1 text-gray-600">TND</span>
-            
+            <span className="text-lg pb-1 text-gray-600"> / Personne</span>
           </div>
           
           <button className="px-6 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors">
@@ -238,63 +205,17 @@ const ProgramHeaderCard = ({ program }) => {
   );
 };
 
-const DescriptionSection = ({ description }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const maxLength = 300;
-
-  if (!description) return null;
-
-  return (
-    <section className="bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-8"
-        >
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">Description du voyage</h2>
-          <div className="bg-white p-6 rounded-xl shadow-sm">
-            <p className="text-gray-600 leading-relaxed">
-              {isExpanded ? description : `${description.substring(0, maxLength)}${description.length > maxLength ? '...' : ''}`}
-            </p>
-            {description.length > maxLength && (
-              <button
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="text-orange-500 hover:text-orange-600 mt-4 flex items-center text-sm font-medium"
-              >
-                {isExpanded ? (
-                  <>
-                    <span>Voir moins</span>
-                    <Icon icon="mdi:chevron-up" className="ml-1 w-5 h-5" />
-                  </>
-                ) : (
-                  <>
-                    <span>Voir plus</span>
-                    <Icon icon="mdi:chevron-down" className="ml-1 w-5 h-5" />
-                  </>
-                )}
-              </button>
-            )}
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-};
-
 export default function ProgramDetails() {
   const router = useRouter();
   const { id } = router.query;
   const [program, setProgram] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTimelineDay, setActiveTimelineDay] = useState(0);
+  const [activeTimelineDay, setActiveTimelineDay] = useState(null);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProgramDetails = async () => {
       if (!id) return;
-  
       try {
         const response = await fetch(`/api/programs.controller?id=${id}`);
         if (!response.ok) throw new Error('Programme non trouvé');
@@ -342,7 +263,7 @@ export default function ProgramDetails() {
               <Icon icon="mdi:alert-circle-outline" className="w-16 h-16 mx-auto" />
             </motion.div>
             <h2 className="text-3xl font-bold text-gray-800">Programme non trouvé</h2>
-            <p className="text-gray-600">Le programme que vous recherchez n &lsquo; existe pas ou a été supprimé.</p>
+            <p className="text-gray-600">Le programme que vous recherchez n’existe pas ou a été supprimé.</p>
             <Link href="/programs">
               <motion.button 
                 whileHover={{ scale: 1.02 }}
@@ -358,30 +279,16 @@ export default function ProgramDetails() {
     );
   }
 
-  const highlights = [
-    {
-      icon: "mdi:map-marker-radius",
-      title: "Destination",
-      description: `${program.location_from} à ${program.location_to}`,
-    },
-    {
-      icon: "mdi:calendar-clock",
-      title: "Durée",
-      description: `${program.days} jours d'aventure`,
-    },
-    {
-      icon: "mdi:star-outline",
-      title: "Expérience",
-      description: "Voyage culturel immersif",
-    },
-  ];
-
   return (
     <Layout>
       <SEO
         title={`${program.title} | Expérience de Voyage`}
-        description={program.description.substring(0, 160)}
-        image={program.images[0]}
+        description={
+          program.description 
+            ? program.description.replace(/<[^>]+>/g, '').substring(0, 160) 
+            : "Programme"
+        }
+        image={program.images && program.images[0]}
       />
 
       {/* Hero Section - Split Layout */}
@@ -394,7 +301,7 @@ export default function ProgramDetails() {
               animate={{ opacity: 1, x: 0 }}
               className="h-[400px] md:h-[500px]"
             >
-              <ImageCarousel images={program.images} />
+              <ImageCarousel images={program.images || []} />
             </motion.div>
             
             {/* Right Column - Program Header Card */}
@@ -409,24 +316,28 @@ export default function ProgramDetails() {
       </section>
 
       {/* Full-width Description Section */}
-      <DescriptionSection description={program.description} />
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
-        {/* Highlights Section */}
-        <section className="mb-20">
+      <section className="bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "0px 0px -50px 0px" }}
-            className="text-center mb-12"
+            viewport={{ once: true }}
+            className="mb-8"
           >
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3">Pourquoi choisir ce voyage ?</h2>
-            <p className="text-lg text-gray-600">Une expérience unique conçue pour vous</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">Aperçu du séjour</h2>
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              {/* Render the description as HTML */}
+              <div 
+                className="text-gray-600 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: program.description }}
+              />
+            </div>
           </motion.div>
-          <ProgramHighlights highlights={highlights} />
-        </section>
+        </div>
+      </section>
 
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 py-12 md:py-16">
         {/* Detailed Timeline */}
         <section className="mb-20">
           <motion.div
@@ -452,11 +363,16 @@ export default function ProgramDetails() {
         </section>
         
         {/* Price Includes & General Conditions */}
-<section className="mb-20">
-  <DropdownSection title="Ce prix comprend & ne comprend pas" content={program.priceInclude} />
-  <DropdownSection title="Conditions générales du voyage" content={program.generalConditions} />
-</section>
-
+        <section className="mb-20">
+          <DropdownSection 
+            title="Ce prix comprend & ne comprend pas" 
+            content={program.priceInclude || ''} 
+          />
+          <DropdownSection 
+            title="Conditions générales du voyage" 
+            content={program.generalConditions || ''} 
+          />
+        </section>
 
         {/* Gallery Section */}
         <section>
@@ -471,7 +387,7 @@ export default function ProgramDetails() {
           </motion.div>
           
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {program.images.slice(0, 6).map((image, idx) => (
+            {(program.images || []).slice(0, 6).map((image, idx) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -502,14 +418,12 @@ export default function ProgramDetails() {
             <p className="font-bold text-orange-500 text-xl">
               {Math.round(program.price)} TND
             </p>
-           
           </div>
          
           <button className="bg-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-600 transition-colors">
             Réserver
           </button>
         </div>
-        
       </div>
 
       <ContactUs />

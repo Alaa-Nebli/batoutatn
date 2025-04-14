@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { Icon } from '@iconify/react';
@@ -27,10 +28,14 @@ interface FormData {
   toDate: string;
   timeline: TimelineItem[];
   display: boolean;
-  priceInclude: string; 
-  generalConditions: string; 
+  priceInclude: string;
+  generalConditions: string;
 }
 
+// Dynamically load ReactQuill (for Next.js):
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+// Import the Quill stylesheet:
+import 'react-quill/dist/quill.snow.css';
 
 export default function ProgramCreate() {
   const { data: session, status } = useSession();
@@ -44,16 +49,15 @@ export default function ProgramCreate() {
     locationTo: '',
     days: '',
     price: '',
-    singleAdon: '', // ✅ new
+    singleAdon: '',
     fromDate: '',
     toDate: '',
     timeline: [],
     display: true,
-    priceInclude: '', // ✅ new
-    generalConditions: '', // ✅ new
+    priceInclude: '',
+    generalConditions: '',
   });
   
-
   const [images, setImages] = useState<File[]>([]);
   const [timelineImages, setTimelineImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,26 +65,28 @@ export default function ProgramCreate() {
   useEffect(() => {
     if (formData.fromDate && formData.days) {
       const days = parseInt(formData.days);
-      const startDate = new Date(formData.fromDate);
-      const endDate = addDays(startDate, days - 1);
-      
-      const generatedTimeline = Array.from({ length: days }, (_, index) => {
-        const currentDate = addDays(startDate, index);
-        return {
-          title: `Day ${index + 1}`,
-          description: '',
-          date: format(currentDate, 'yyyy-MM-dd'),
-          image: ''
-        };
-      });
+      if (!isNaN(days) && days > 0) {
+        const startDate = new Date(formData.fromDate);
+        const endDate = addDays(startDate, days - 1);
+        
+        const generatedTimeline = Array.from({ length: days }, (_, index) => {
+          const currentDate = addDays(startDate, index);
+          return {
+            title: `Day ${index + 1}`,
+            description: '', // now HTML from ReactQuill
+            date: format(currentDate, 'yyyy-MM-dd'),
+            image: ''
+          };
+        });
 
-      setFormData(prev => ({
-        ...prev,
-        timeline: generatedTimeline,
-        toDate: format(endDate, 'yyyy-MM-dd')
-      }));
-      
-      setTimelineImages([]);
+        setFormData(prev => ({
+          ...prev,
+          timeline: generatedTimeline,
+          toDate: format(endDate, 'yyyy-MM-dd')
+        }));
+        
+        setTimelineImages([]);
+      }
     }
   }, [formData.fromDate, formData.days]);
 
@@ -90,26 +96,53 @@ export default function ProgramCreate() {
     }
   }, [status, router]);
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleSimpleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    
     if (name === 'toDate') {
       toast.error('End date is automatically calculated from start date and duration');
       return;
     }
-
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-  }, []);
+  };
 
-  const handleTimelineChange = useCallback((index: number, field: keyof TimelineItem, value: string) => {
+  // Handle ReactQuill for these big text fields
+  const handleDescriptionChange = (value: string) => {
+    // value is HTML
+    setFormData(prev => ({ ...prev, description: value }));
+  };
+
+  const handlePriceIncludeChange = (value: string) => {
+    setFormData(prev => ({ ...prev, priceInclude: value }));
+  };
+
+  const handleGeneralConditionsChange = (value: string) => {
+    setFormData(prev => ({ ...prev, generalConditions: value }));
+  };
+
+  // For timeline day description changes
+  const handleTimelineDescriptionChange = useCallback((index: number, value: string) => {
     setFormData(prev => {
       const newTimeline = [...prev.timeline];
       newTimeline[index] = {
         ...newTimeline[index],
-        [field]: value
+        description: value
+      };
+      return {
+        ...prev,
+        timeline: newTimeline
+      };
+    });
+  }, []);
+
+  const handleTimelineTitleChange = useCallback((index: number, value: string) => {
+    setFormData(prev => {
+      const newTimeline = [...prev.timeline];
+      newTimeline[index] = {
+        ...newTimeline[index],
+        title: value
       };
       return {
         ...prev,
@@ -213,7 +246,6 @@ export default function ProgramCreate() {
           if (newTimeline[timelineIndex].image) {
             URL.revokeObjectURL(newTimeline[timelineIndex].image);
           }
-          
           newTimeline[timelineIndex] = {
             ...newTimeline[timelineIndex],
             image: ''
@@ -230,7 +262,6 @@ export default function ProgramCreate() {
         const objectUrl = URL.createObjectURL(imageToRemove);
         URL.revokeObjectURL(objectUrl);
       }
-      
       setImages(prev => prev.filter((_, i) => i !== index));
     }
   }, [images]);
@@ -269,18 +300,17 @@ export default function ProgramCreate() {
         location_to: formData.locationTo,
         days: parseInt(formData.days),
         price: parseFloat(formData.price),
-        singleAdon: parseInt(formData.singleAdon) || 0, // ✅ added
-        priceInclude: formData.priceInclude,            // ✅ added
-        generalConditions: formData.generalConditions,  // ✅ added
+        singleAdon: parseInt(formData.singleAdon) || 0,
+        priceInclude: formData.priceInclude,
+        generalConditions: formData.generalConditions,
         timeline: formData.timeline.map((item, index) => ({
           title: item.title,
-          description: item.description,
+          description: item.description, // HTML from ReactQuill
           image: '',
           sortOrder: index + 1,
           date: item.date
         }))
       };
-      
 
       formDataMultipart.append('programData', JSON.stringify(programData));
       
@@ -293,7 +323,6 @@ export default function ProgramCreate() {
           formDataMultipart.append('timeline_images', file);
         }
       });
-      
 
       const response = await fetch('/api/programs.controller', {
         method: 'POST',
@@ -368,7 +397,8 @@ export default function ProgramCreate() {
             Create New Program
           </h1>
         </div>
-      <form onSubmit={handleSubmit} className="p-8 space-y-6">
+
+        <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
@@ -377,7 +407,7 @@ export default function ProgramCreate() {
                   type="text"
                   name="title"
                   value={formData.title}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleSimpleInputChange(e as unknown as React.ChangeEvent<HTMLTextAreaElement>)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   required
                 />
@@ -385,13 +415,14 @@ export default function ProgramCreate() {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Description*</label>
-                <textarea
-                  name="description"
+                {/*
+                  Replace <textarea> with <ReactQuill>:
+                */}
+                <ReactQuill
+                  theme="snow"
                   value={formData.description}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                  rows={4}
-                  required
+                  onChange={handleDescriptionChange}
+                  className="bg-white"
                 />
               </div>
             </div>
@@ -404,7 +435,7 @@ export default function ProgramCreate() {
                     type="text"
                     name="locationFrom"
                     value={formData.locationFrom}
-                    onChange={handleInputChange}
+                    onChange={handleSimpleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     required
                   />
@@ -415,7 +446,7 @@ export default function ProgramCreate() {
                     type="text"
                     name="locationTo"
                     value={formData.locationTo}
-                    onChange={handleInputChange}
+                    onChange={handleSimpleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     required
                   />
@@ -429,7 +460,7 @@ export default function ProgramCreate() {
                     type="number"
                     name="days"
                     value={formData.days}
-                    onChange={handleInputChange}
+                    onChange={handleSimpleInputChange}
                     min="1"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     required
@@ -441,7 +472,7 @@ export default function ProgramCreate() {
                     type="number"
                     name="price"
                     value={formData.price}
-                    onChange={handleInputChange}
+                    onChange={handleSimpleInputChange}
                     min="0"
                     step="0.01"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -454,7 +485,7 @@ export default function ProgramCreate() {
                     type="number"
                     name="singleAdon"
                     value={formData.singleAdon}
-                    onChange={handleInputChange}
+                    onChange={handleSimpleInputChange}
                     min="0"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                   />
@@ -465,7 +496,7 @@ export default function ProgramCreate() {
                     type="date"
                     name="fromDate"
                     value={formData.fromDate}
-                    onChange={handleInputChange}
+                    onChange={handleSimpleInputChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     required
                   />
@@ -490,12 +521,13 @@ export default function ProgramCreate() {
             <textarea
               name="metadata"
               value={formData.metadata}
-              onChange={handleInputChange}
+              onChange={handleSimpleInputChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
               rows={3}
             />
           </div>
 
+          {/* Program Images */}
           <div className="mt-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Program Images</h2>
             <div className="flex flex-wrap gap-4">
@@ -521,7 +553,7 @@ export default function ProgramCreate() {
                 <input
                   type="file"
                   accept="image/*"
-                  onChange={handleImageUpload}
+                  onChange={(e) => handleImageUpload(e, false)}
                   className="hidden"
                   multiple
                 />
@@ -532,6 +564,7 @@ export default function ProgramCreate() {
             </div>
           </div>
 
+          {/* Program Timeline */}
           <div className="mt-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Program Timeline</h2>
             <div className="space-y-4">
@@ -545,18 +578,18 @@ export default function ProgramCreate() {
                     <input
                       type="text"
                       value={item.title}
-                      onChange={(e) => handleTimelineChange(index, 'title', e.target.value)}
+                      onChange={(e) => handleTimelineTitleChange(index, e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       required
                     />
-                    <textarea
+                    {/* Use ReactQuill for day description */}
+                    <ReactQuill
+                      theme="snow"
                       value={item.description}
-                      onChange={(e) => handleTimelineChange(index, 'description', e.target.value)}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      required
+                      onChange={(value) => handleTimelineDescriptionChange(index, value)}
+                      className="bg-white"
                     />
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">Day Image</label>
                       <div className="flex items-center space-x-4">
@@ -596,26 +629,30 @@ export default function ProgramCreate() {
               ))}
             </div>
           </div>
+
+          {/* Price Includes (HTML) */}
           <div className="col-span-3">
             <label className="block text-sm font-medium text-gray-700 mb-2">What’s included in the price</label>
-            <textarea
-              name="priceInclude"
+            <ReactQuill
+              theme="snow"
               value={formData.priceInclude}
-              onChange={handleInputChange}
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              onChange={handlePriceIncludeChange}
+              className="bg-white"
             />
           </div>
+
+          {/* General Conditions (HTML) */}
           <div className="col-span-3">
             <label className="block text-sm font-medium text-gray-700 mb-2">General Conditions</label>
-            <textarea
-              name="generalConditions"
+            <ReactQuill
+              theme="snow"
               value={formData.generalConditions}
-              onChange={handleInputChange}
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              onChange={handleGeneralConditionsChange}
+              className="bg-white"
             />
           </div>
+
+          {/* Display Switch */}
           <div className="flex items-center">
             <label className="inline-flex items-center cursor-pointer">
               <input
@@ -629,6 +666,7 @@ export default function ProgramCreate() {
             </label>
           </div>
 
+          {/* Buttons */}
           <div className="pt-6 border-t flex justify-end space-x-4">
             <button
               type="button"

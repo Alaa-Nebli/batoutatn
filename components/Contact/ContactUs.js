@@ -59,8 +59,8 @@ const ContactSection = () => {
     {
       icon: 'mdi:email-outline',
       label: "Email",
-      value: 'contact@batouta.com',
-      href: 'mailto:contact@batouta.com'
+      value: 'batouta.info@gmail.com',
+      href: 'mailto:batouta.info@gmail.com'
     },
     {
       icon: 'mdi:map-marker',

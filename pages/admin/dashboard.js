@@ -55,7 +55,7 @@ export default function Dashboard() {
           method: 'DELETE'
         });
         if (response.ok) {
-          fetchPrograms();
+          fetchPrograms(); // refresh the list
         }
       } catch (error) {
         console.error('Error deleting program:', error);
@@ -70,7 +70,7 @@ export default function Dashboard() {
           method: 'DELETE'
         });
         if (response.ok) {
-          fetchFeatured();
+          fetchFeatured(); // refresh the list
         }
       } catch (error) {
         console.error('Error deleting featured item:', error);
@@ -85,27 +85,42 @@ export default function Dashboard() {
       return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {items.map((item) => (
-            <div key={item._id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+            <div
+              key={item.id}
+              className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6"
+            >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-semibold">{item.title}</h3>
                 <div className="flex gap-2">
+                  {/* DELETE button */}
                   <button
                     onClick={() => handleDeleteProgram(item.id)}
                     className="p-2 hover:bg-gray-100 rounded-full"
                   >
                     <Icon icon="mdi:trash" className="w-5 h-5 text-red-500" />
                   </button>
+                  {/* MODIFY button */}
+                  <button
+                    onClick={() => router.push(`/admin/trips/${item.id}`)}
+                    className="p-2 hover:bg-gray-100 rounded-full"
+                  >
+                    <Icon icon="mdi:pencil" className="w-5 h-5 text-blue-600" />
+                  </button>
                 </div>
               </div>
-              <p className="text-sm text-gray-600">{item.description}</p>
+              <p className="text-sm text-gray-600 line-clamp-3">
+                {item.description?.replace(/<[^>]+>/g, '')}
+              </p>
               {item.price && (
                 <p className="mt-2 font-semibold">${item.price}</p>
               )}
-              {item.duration && (
-                <p className="text-sm">{item.duration} days</p>
+              {item.days && (
+                <p className="text-sm">{item.days} days</p>
               )}
               <Link href={`/programs/${item.id}`}>
-                View Program
+                <span className="text-blue-500 hover:underline block mt-2 text-sm">
+                  View Program
+                </span>
               </Link>
             </div>
           ))}
@@ -132,16 +147,18 @@ export default function Dashboard() {
                   <Image 
                     src={`/uploads/${item.image}`} 
                     alt={item.trip?.title || 'Featured banner'}
-                    layout="fill"
-                    objectFit="cover"
+                    fill
+                    style={{ objectFit: 'cover' }}
                     className="rounded-lg"
                   />
                 </div>
               )}
-              <p className="text-sm text-gray-600">{item.cta}</p>
+              <p className="text-sm text-gray-600 line-clamp-3">{item.cta}</p>
               {item.trip && (
                 <Link href={`/programs/${item.trip.id}`}>
-                  View Associated Program
+                  <span className="text-blue-500 hover:underline block mt-2 text-sm">
+                    View Associated Program
+                  </span>
                 </Link>
               )}
             </div>
@@ -187,21 +204,31 @@ export default function Dashboard() {
       </div>
 
       <div className="space-y-6">
+        {/* Tabs */}
         <div className="flex gap-4">
           <button
             onClick={() => setActiveTab('programs')}
-            className={`px-4 py-2 rounded-lg ${activeTab === 'programs' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === 'programs'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200'
+            }`}
           >
             Programs
           </button>
           <button
             onClick={() => setActiveTab('featured')}
-            className={`px-4 py-2 rounded-lg ${activeTab === 'featured' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === 'featured'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200'
+            }`}
           >
             Featured
           </button>
         </div>
 
+        {/* Content */}
         {renderContent()}
       </div>
     </div>

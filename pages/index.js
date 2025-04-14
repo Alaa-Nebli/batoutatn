@@ -18,7 +18,6 @@ export async function getStaticProps({ locale }) {
       },
     }
 }
-
 const Banner = () => {
   const { t } = useTranslation('common');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -31,44 +30,38 @@ const Banner = () => {
     {
       id: 1,
       imageUrl: '/tunisia/japan.webp',
-      alt: "Japan",
+      alt: 'Japan',
     },
     {
       id: 2,
       imageUrl: '/tunisia/nepal_places.jpg',
       alt: t('Home.banner.slide2.alt'),
-
     },
     {
       id: 3,
       imageUrl: '/tunisia/thailand-chaing-mai.jpg',
       alt: t('Home.banner.slide3.alt'),
-
     },
     {
       id: 4,
       imageUrl: '/tunisia/suisse.jpg',
-      // title: t('Home.banner.slide4.title'),
-      // description: t('Home.banner.slide4.description'),
       alt: t('Home.banner.slide4.alt'),
     },
     {
       id: 5,
       imageUrl: '/tunisia/thailand_1.jpg',
       alt: t('Home.banner.slide5.alt'),
-   
     },
     {
       id: 6,
       imageUrl: '/tunisia/africa_south.webp',
       alt: t('Home.banner.slide6.alt'),
-
     },
     {
       id: 7,
       imageUrl: '/tunisia/safari.png',
       alt: t('Home.banner.slide7.alt'),
-    }
+    },
   ];
 
   // Fetch featured items from the API
@@ -77,11 +70,13 @@ const Banner = () => {
       try {
         setLoading(true);
         const response = await fetch('/api/featured');
-        
+
         if (!response.ok) {
-          throw new Error(`Failed to fetch featured items: ${response.status} ${response.statusText}`);
+          throw new Error(
+            `Failed to fetch featured items: ${response.status} ${response.statusText}`
+          );
         }
-        
+
         const data = await response.json();
         setFeaturedItems(data);
         setLoading(false);
@@ -96,33 +91,36 @@ const Banner = () => {
   }, []);
 
   // Determine which banners to display
-  const displayBanners = featuredItems.length > 0 
-    ? featuredItems.map(item => ({
+  const displayBanners = featuredItems.length > 0
+    ? featuredItems.map((item) => ({
         id: item.id,
         imageUrl: item.image,
-        title: item.trip?.name || "",
-        description: item.trip?.description || "",
-        alt: item.trip?.name || "Featured destination",
-        cta: item.cta || "Explore Destination",
-        tripId: item.tripId
+        title: item.trip?.name || '',
+        description: item.trip?.description || '',
+        alt: item.trip?.name || 'Featured destination',
+        cta: item.cta || 'Explore Destination',
+        tripId: item.tripId,
       }))
     : defaultBanners;
 
   const handlePrev = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + displayBanners.length) % displayBanners.length);
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + displayBanners.length) % displayBanners.length
+    );
   };
 
   const handleNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % displayBanners.length);
   };
 
+  // Auto-rotate slides every 4 seconds
   useEffect(() => {
     const interval = setInterval(() => {
       handleNext();
     }, 4000);
 
     return () => clearInterval(interval);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayBanners.length]);
 
   if (loading) {
@@ -159,29 +157,30 @@ const Banner = () => {
               src={banner.imageUrl}
               alt={banner.alt}
               layout="fill"
-              objectFit="cover"
-              objectPosition="center 10%" 
+              objectFit="fill"
+              objectPosition="center 20%"
               priority
               className="w-full h-full object-cover"
             />
-            
-            {/* Content overlay for featured items */}
-            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-4">
-              <div className="max-w-4xl mx-auto  backdrop-blur-sm p-6 rounded-lg">
-                <h2 className="text-3xl md:text-5xl font-bold text-white mb-4">{banner.title}</h2>
-                
-                {banner.tripId && (
-                  <Link href={`/programs/${banner.tripId}`} passHref legacyBehavior>
-                    <a className="inline-block px-6 py-3 bg-white text-black font-medium text-lg rounded-full hover:bg-gray-100 transition-colors duration-300 shadow-lg transform hover:scale-105 active:scale-100">
-                      {banner.cta}
-                    </a>
-                  </Link>
-                )}
-              </div>
-            </div>
+
           </div>
         ))}
       </div>
+
+      {/* Beautiful CTA button (shown only if there is a tripId) */}
+      {displayBanners[currentIndex]?.tripId && (
+        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-30">
+          <Link
+            href={`/programs/${displayBanners[currentIndex].tripId}`}
+            passHref
+            legacyBehavior
+          >
+            <a className="inline-block px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold text-lg rounded-full shadow-xl transition-transform transform hover:-translate-y-1 active:translate-y-0">
+              {displayBanners[currentIndex].cta}
+            </a>
+          </Link>
+        </div>
+      )}
 
       {/* Carousel indicator dots */}
       <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-30 flex space-x-2">
@@ -216,7 +215,7 @@ const Banner = () => {
       </div>
 
       {/* Improved scroll indicator */}
-      <motion.div
+      {/* <motion.div
         className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30"
         animate={{ y: [0, 10, 0] }}
         transition={{ duration: 1.5, repeat: Infinity }}
@@ -224,10 +223,11 @@ const Banner = () => {
         <div className="backdrop-blur-sm bg-white/20 p-2 rounded-full">
           <Icon icon="mdi:arrow-down-circle" className="w-8 h-8 md:w-12 md:h-12 text-white" />
         </div>
-      </motion.div>
+      </motion.div> */}
     </section>
   );
 };
+
 
 
 const UniqueFeatureCard = ({ icon, title,title2, description, delay }) => {
@@ -347,6 +347,7 @@ export default function Home() {
 
     return () => clearInterval(interval);
   }, []);
+
     useEffect(() => {
       const timer = setTimeout(() => {
           setShowLoading(false);
@@ -374,7 +375,7 @@ export default function Home() {
       id : "transport", 
       title: t('Home.Our_Services_section.Transport.Title'),
       description: t('Home.Our_Services_section.Transport.Description'),
-      image: '/transport.png',
+      image: '/transport1.jpg',
       imageAlt: 'Shore Excursions'
     },
     {
@@ -386,7 +387,6 @@ export default function Home() {
     }
   ];
 
-  
   const uniqueFeatures = [
     {
       icon: "ri:team-fill",
@@ -407,6 +407,7 @@ export default function Home() {
       description: t('Home.What_Makes_Us_Different_Section.Card3_Text')
     }
   ];
+
     return (
       
         <Layout className="bg-white">
@@ -455,7 +456,7 @@ export default function Home() {
                          viewport={{ once: false, amount: 0.2 }}
                          transition={{ duration: 0.8 }} 
                     >
-                        <Image src={"/batouta_team.png"} width={150} height={150} alt="Batouta Team" layout="responsive" />
+                        <Image src={"/batouta_team.png"} width={500} height={500} alt="Batouta Team" layout="responsive" />
                     </motion.div>
                 </section>
 

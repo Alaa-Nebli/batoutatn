@@ -10,6 +10,11 @@ import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { ContactUs } from "components/Contact";
 
+// Helper function to strip HTML tags and get plain text:
+function stripHtml(htmlString = '') {
+  return htmlString.replace(/<[^>]+>/g, '');
+}
+
 export async function getStaticProps({ locale }) {
   return {
     props: {
@@ -19,7 +24,9 @@ export async function getStaticProps({ locale }) {
 }
 
 const ProgramCard = ({ program }) => {
-  
+  // Strip out HTML for listing snippet:
+  const snippet = stripHtml(program.description || '');
+
   return (
     <motion.div
       className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300"
@@ -31,7 +38,7 @@ const ProgramCard = ({ program }) => {
     >
       <div className="relative aspect-video w-full overflow-hidden">
         <Image
-          src={program.images ? program.images[0] : '/placeholder.jpg'}
+          src={program.images?.[0] || '/placeholder.jpg'}
           alt={program.title}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -42,24 +49,32 @@ const ProgramCard = ({ program }) => {
           <div className="absolute bottom-4 left-4 right-4">
             <div className="flex items-center space-x-2 text-white mb-2">
               <Icon icon="mdi:map-marker" className="w-5 h-5 text-orange-300" />
-              <span className="text-sm font-medium">{program.location_from} → {program.location_to}</span>
+              <span className="text-sm font-medium">
+                {program.location_from} → {program.location_to}
+              </span>
             </div>
             <div className="flex items-center space-x-2 text-white">
               <Icon icon="mdi:calendar" className="w-5 h-5 text-orange-300" />
               <span className="text-sm font-medium">
-                {new Date(program.from_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} - {new Date(program.to_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                {new Date(program.from_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                {' - '}
+                {new Date(program.to_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
               </span>
             </div>
           </div>
         </div>
       </div>
+
       <div className="p-6">
         <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors">
           {program.title}
         </h3>
+
+        {/* Display plain text snippet with line clamp */}
         <p className="text-gray-600 mb-4 line-clamp-3 text-sm">
-          {program.description}
+          {snippet}
         </p>
+
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center text-gray-600 text-sm">
@@ -85,12 +100,14 @@ const ProgramCard = ({ program }) => {
 };
 
 const FeaturedProgram = ({ program }) => {
- 
+  // Also strip HTML for the hero text snippet:
+  const snippet = stripHtml(program.description || '');
+
   return (
-    <section className="relative mt-24 h-[80vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+    <section className="relative mt-24 h-[90vh] min-h-[500px] flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
         <Image
-          src={program.images[0]}
+          src={program.images?.[0] || '/placeholder.jpg'}
           fill
           alt={program.title}
           className="object-cover brightness-75"
@@ -115,12 +132,12 @@ const FeaturedProgram = ({ program }) => {
           Programme à la Une
         </motion.span>
         
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
           {program.title}
         </h1>
         
         <p className="text-lg md:text-xl text-gray-200 mb-8 max-w-3xl mx-auto line-clamp-3">
-          {program.description}
+          {snippet}
         </p>
         
         <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -144,7 +161,7 @@ const FeaturedProgram = ({ program }) => {
         </div>
         
         <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
-          {program.images.slice(1, 5).map((image, index) => (
+          {program.images?.slice(1, 5).map((image, index) => (
             <motion.div
               key={index}
               className="relative aspect-square rounded-lg overflow-hidden shadow-lg"
@@ -182,8 +199,8 @@ export default function Programs() {
         const data = await response.json();
         setPrograms(data);
         
-        // Find the first program with images to feature
-        const featured = data.find(p => p.images?.length > 0) || data[0];
+        // Find the first program with images to feature:
+        const featured = data.find((p) => p.images?.length > 0) || data[0];
         setFeaturedProgram(featured);
         
         setLoading(false);
@@ -195,11 +212,14 @@ export default function Programs() {
     fetchPrograms();
   }, []);
 
-  const destinations = ['all', ...new Set(programs.map(p => p.location_to).filter(Boolean))];
+  const destinations = [
+    'all',
+    ...new Set(programs.map((p) => p.location_to).filter(Boolean)),
+  ];
 
-  const filteredPrograms = selectedDestination === 'all' 
-    ? programs 
-    : programs.filter(p => p.location_to === selectedDestination);
+  const filteredPrograms = selectedDestination === 'all'
+    ? programs
+    : programs.filter((p) => p.location_to === selectedDestination);
 
   return (
     <Layout>
@@ -225,7 +245,7 @@ export default function Programs() {
               Nos Programmes de Voyage
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Choisissez parmi notre sélection d &lsquo; expériences de voyage soigneusement conçues.
+              Choisissez parmi notre sélection d’expériences de voyage soigneusement conçues.
             </p>
           </motion.div>
 

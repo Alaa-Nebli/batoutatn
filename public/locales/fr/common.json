@@ -44,14 +44,14 @@
       }
     },
     "Aboutus_section": {
-      "aboutus_title_1": "Qui Est",
-      "aboutus_title_Highlighted": "Batouta",
-      "aboutus_title_2": "Voyages ?",
+      "aboutus_title_1": "Qui Sommes",
+      "aboutus_title_Highlighted": "Nous",
+      "aboutus_title_2": "?",
       "about_us_content": "Depuis sa création en 1995, Batouta Voyages s'est engagée à offrir des expériences de voyage uniques et enrichissantes. Initialement fondée pour répondre aux besoins des voyageurs japonais, notre agence a rapidement diversifié son offre afin d'accueillir des clients du monde entier, en provenance d'Europe, d'Amérique, du Moyen-Orient, ainsi que de notre marché local en Tunisie."
     },
     "Our_Services_section": {
       "Our_Services_title": "Nos Services",
-      "Our_Services_Description": "Chez Batouta Voyages, nous nous consacrons à offrir des expériences de voyage exceptionnelles adaptées aux besoins variés de nos clients. Notre gamme complète de services comprend :",
+      "Our_Services_Description": "À Batouta Voyages, nous nous consacrons à offrir des expériences de voyages exceptionnels adaptés aux différents désirs et goûts de nos voyageurs. Notre gamme de services comprend :",
       "Group_Travel": {
         "Title": "Voyages à l’étranger",
         "Description": "Vivez une expérience de voyage unique et inédite avec Batouta Voyages, où chaque aventure devient une découverte non seulement d’une nouvelle destination, mais aussi de vous-même. Voyager, c’est s’évader, explorer et se réinventer à travers des cultures et des paysages exceptionnels. Choisissez parmi nos destinations fascinantes et laissez-nous vous guider dans une aventure inoubliable. Enrichis par quarante ans d’expérience du Japon, nous vous offrons un voyage au cœur de la culture nipponne, mais nous vous invitons également à explorer d’autres lieux tout aussi captivants, comme l’Ouzbékistan, le Sri Lanka, la Namibie, l’Iran ou la Chine... Quelle que soit votre destination, Batouta Voyages transforme votre voyage en une expérience enrichissante, différente et sur mesure. Embarquez avec nous pour découvrir le monde d'une manière nouvelle et exceptionnelle !"
@@ -70,7 +70,7 @@
       }
     },
     "What_Makes_Us_Different_Section": {
-      "What_Makes_Us_Different_Title": "Notre Singularité",
+      "What_Makes_Us_Different_Title": "L’empreinte qui nous définit",
       "What_Makes_Us_Different_Description": "Chez Batouta Voyages, nous allons au-delà du voyage ordinaire. Voici pourquoi les voyageurs nous choisissent pour rendre leurs voyages inoubliables :",
       "Card1_Title": "Authenticité",
       "Card1_Title2": "À Chaque Destination",
@@ -110,7 +110,7 @@
       },
       "features": {
         "feature1": {
-          "title": "vision international",
+          "title": "Vision Internationale",
           "description": "Attention méticuleuse aux détails dans chaque voyage"
         },
         "feature2": {
@@ -252,7 +252,8 @@
       }
     },
     "WhyChooseUs": {
-      "title": "Pourquoi Nous Choisir",
+      "title": "Pourquoi Choisir",
+      "title2" : "Batouta Voyages",
       "reasons": {
         "Personalized_Experiences": {
           "title": "Expériences Personnalisées",

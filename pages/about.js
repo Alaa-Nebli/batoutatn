@@ -8,14 +8,18 @@ import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import Contact from 'components/Contact/ContactUs';
 
-// Enhanced WhoWeAre Component
+
+
 const WhoWeAre = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
   const { t } = useTranslation('common');
 
   return (
-    <section ref={ref} className="py-24 md:py-32 px-4 md:px-6 bg-white relative overflow-hidden">
+    <section
+      ref={ref}
+      className="py-24 md:py-32 px-4 md:px-6 bg-white relative overflow-hidden"
+    >
       {/* Background patterns */}
       <div className="absolute inset-0 pointer-events-none opacity-5">
         <div className="absolute top-0 left-0 w-64 h-64">
@@ -42,7 +46,7 @@ const WhoWeAre = () => {
           transition={{ duration: 0.8 }}
           className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
         >
-          {/* Image Section */}
+          {/* Video Section */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
@@ -50,14 +54,15 @@ const WhoWeAre = () => {
             className="relative order-1 lg:order-2"
           >
             <div className="relative rounded-3xl overflow-hidden aspect-square max-w-md mx-auto shadow-2xl">
-              <Image
-                width={300}
-                height={300}
-                src="/batouta.png"
-                alt="Our Team"
+              <video
+                autoPlay
+                loop
+                playsInline
                 className="object-cover w-full h-full transform hover:scale-110 transition-transform duration-700"
-                loading="lazy"
-              />
+              >
+                <source src="/tripsvideo.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
             </div>
 
             {/* Stats overlay */}
@@ -148,6 +153,7 @@ const WhoWeAre = () => {
     </section>
   );
 };
+
 
 const History = () => {
   const { t } = useTranslation('common');
@@ -269,7 +275,7 @@ const OurValues = () => {
   ];
 
   return (
-    <section ref={ref} className="py-16 px-4 bg-gray-50">
+    <section ref={ref} className="px-4 mb-5">
       <div className="max-w-6xl mx-auto text-center">
         <motion.h2
           className="text-4xl md:text-5xl font-bold text-gray-800 mb-12"
@@ -278,6 +284,8 @@ const OurValues = () => {
           transition={{ duration: 0.8 }}
         >
           {t('AboutUs.OurValues.title', 'Our Values')}
+          <div className="w-48 m-4 h-1 bg-gradient-to-r from-orange-500 to-pink-500 mx-auto" />
+
         </motion.h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
