@@ -144,27 +144,33 @@ const Banner = () => {
       <div className="absolute inset-0 bg-black/30 z-10"></div>
 
       {/* Carousel slides */}
-      <div className="absolute inset-0 flex">
-        {displayBanners.map((banner, index) => (
-          <div
-            key={banner.id}
-            className={`w-full h-full flex-shrink-0 transition-opacity duration-500 ${
-              index === currentIndex ? 'opacity-100' : 'opacity-0'
-            }`}
-          >
-            <Image
-              src={banner.imageUrl}
-              alt={banner.alt}
-              layout="fill"
-              objectFit="fill"
-              objectPosition="center 20%"
-              priority
-              className="w-full h-full object-cover"
-            />
-
-          </div>
-        ))}
+      <section
+  className="relative overflow-hidden"
+  // Shift down by header height, and shrink height so it's still "full screen" minus the nav
+  style={{ marginTop: '100px' }}
+>
+  <div className="absolute inset-0 flex">
+    {displayBanners.map((banner, index) => (
+      <div
+        key={banner.id}
+        className={`w-full h-full flex-shrink-0 transition-opacity duration-500 ${
+          index === currentIndex ? 'opacity-100' : 'opacity-0'
+        }`}
+      >
+        <Image
+          src={banner.imageUrl}
+          alt={banner.alt}
+          layout="fill"
+          objectFit="fill"
+          objectPosition="center"
+          priority
+          className="w-full h-full"
+        />
       </div>
+    ))}
+  </div>
+</section>
+
 
       {/* Beautiful CTA button (shown only if there is a tripId) */}
       {displayBanners[currentIndex]?.tripId && (
