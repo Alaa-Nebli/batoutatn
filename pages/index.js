@@ -147,7 +147,7 @@ const Banner = () => {
       <section
   className="relative overflow-hidden"
   // Shift down by header height, and shrink height so it's still "full screen" minus the nav
-  style={{ marginTop: '100px' }}
+  style={{ marginTop: '80px', height: 'calc(100vh - 80px)' }}
 >
   <div className="absolute inset-0 flex">
     {displayBanners.map((banner, index) => (
@@ -161,7 +161,7 @@ const Banner = () => {
           src={banner.imageUrl}
           alt={banner.alt}
           layout="fill"
-          objectFit="fill"
+          objectFit="cover"
           objectPosition="center"
           priority
           className="w-full h-full"
