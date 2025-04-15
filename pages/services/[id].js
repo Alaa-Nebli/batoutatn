@@ -116,70 +116,84 @@ export const getStaticProps = async ({ locale, params }) => ({
   },
 });
 
-// Card Components
-const ProgramCard = React.memo(({ program }) => (
-  <motion.div
-    className="bg-white rounded-2xl shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-500 h-full flex flex-col border border-gray-100 transform hover:-translate-y-2 will-change-transform"
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-    transition={{ duration: 0.4, type: "spring", damping: 10 }}
-    whileHover={{ scale: 1.02 }}
-  >
-    <div className="relative h-72 w-full overflow-hidden rounded-t-2xl">
-      <Image
-        src={program.images ? program.images[0] : '/placeholder.jpg'}
-        alt={program.title}
-        fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        className="object-cover transition-transform duration-700 group-hover:scale-110"
-        priority={false}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
-        <div className="absolute bottom-4 left-4 right-4">
-          <div className="flex items-center space-x-2 text-white mb-2">
-            <Icon icon="mdi:map-marker" className="w-5 h-5" />
-            <span className="text-sm">{program.location_from} → {program.location_to}</span>
-          </div>
-          <div className="flex items-center space-x-2 text-white">
-            <Icon icon="mdi:calendar" className="w-5 h-5" />
-            <span className="text-sm">
-              {new Date(program.from_date).toLocaleDateString()} - {new Date(program.to_date).toLocaleDateString()}
-            </span>
+function stripHtml(htmlString = '') {
+  return htmlString.replace(/<[^>]+>/g, '');
+}
+
+const ProgramCard = ({ program }) => {
+  // Strip out HTML for listing snippet:
+  const snippet = stripHtml(program.description || '');
+
+  return (
+    <motion.div
+      className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.4 }}
+      whileHover={{ y: -5 }}
+    >
+      <div className="relative aspect-video w-full overflow-hidden">
+        <Image
+          src={program.images?.[0] || '/placeholder.jpg'}
+          alt={program.title}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          priority={program.featured}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
+          <div className="absolute bottom-4 left-4 right-4">
+            <div className="flex items-center space-x-2 text-white mb-2">
+              <Icon icon="mdi:map-marker" className="w-5 h-5 text-orange-300" />
+              <span className="text-sm font-medium">
+                {program.location_from} → {program.location_to}
+              </span>
+            </div>
+            <div className="flex items-center space-x-2 text-white">
+              <Icon icon="mdi:calendar" className="w-5 h-5 text-orange-300" />
+              <span className="text-sm font-medium">
+                {new Date(program.from_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
+                {' - '}
+                {new Date(program.to_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-    <div className="p-6 flex-grow flex flex-col">
-      <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors line-clamp-2">
-        {program.title}
-      </h3>
-      <p className="text-gray-600 mb-4 line-clamp-3 flex-grow">
-        {program.description}
-      </p>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-auto">
-        <div className="flex flex-wrap gap-4">
-          <div className="flex items-center text-gray-600">
-            <Icon icon="mdi:clock-outline" className="w-5 h-5 mr-1" />
-            <span>{program.days} Jours</span>
+
+      <div className="p-6">
+        <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors">
+          {program.title}
+        </h3>
+
+        {/* Display plain text snippet with line clamp */}
+        <p className="text-gray-600 mb-4 line-clamp-3 text-sm">
+          {snippet}
+        </p>
+
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex flex-wrap gap-4">
+            <div className="flex items-center text-gray-600 text-sm">
+              <Icon icon="mdi:clock-outline" className="w-4 h-4 mr-1.5" />
+              <span>{program.days} Jours</span>
+            </div>
+            <div className="flex items-center text-orange-500 font-semibold">
+              <span>{program.price} TND</span>
+            </div>
           </div>
-          <div className="flex items-center text-orange-500 font-semibold">
-            <Icon icon="mdi:currency-usd" className="w-5 h-5 mr-1" />
-            <span>{program.price} TND</span>
-          </div>
+          <Link 
+            href={`/programs/${program.id}`} 
+            className="px-4 py-2 bg-orange-500 text-white rounded-lg flex items-center space-x-2 hover:bg-orange-600 transition-colors text-sm group"
+          >
+            <span>Détails</span>
+            <Icon icon="mdi:arrow-right" className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
-        <Link 
-          href={`/programs/${program.id}`} 
-          className="px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-lg flex items-center space-x-2 transition-all group w-full sm:w-auto justify-center shadow-md hover:shadow-lg"
-          passHref
-        >
-          <span>Details</span>
-          <Icon icon="mdi:arrow-right" className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-        </Link>
       </div>
-    </div>
-  </motion.div>
-));
+    </motion.div>
+  );
+};
 
 const ExcursionCard = React.memo(({ excursion }) => (
   <motion.div
