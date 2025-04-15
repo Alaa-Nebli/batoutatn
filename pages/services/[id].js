@@ -64,7 +64,7 @@ const useServiceData = (t) => {
       // title: t('Services.ServiceCards.Group_Travel.Title'),
       title: '',
       description: t('Services.ServiceCards.Group_Travel.Description'),
-      image: '/outgoing.webp',
+      image: '/voyage.jpg',
       imageAlt: 'Voyages en Groupe',
       features: t('Services.ServiceCards.Group_Travel.features', { returnObjects: true }),
       highlights: t('Services.ServiceCards.Group_Travel.highlights', { returnObjects: true }),
@@ -364,7 +364,7 @@ const ServiceDetails = ({ serviceId }) => {
       </Head>
 
       {/* Hero Section with Parallax Effect */}
-      <section className="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+      <section className="relative mt-20 h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
         <motion.div 
           className="absolute inset-0 bg-black/30 z-10"
           initial={{ opacity: 0 }}
@@ -376,26 +376,11 @@ const ServiceDetails = ({ serviceId }) => {
           alt={serviceData.imageAlt}
           fill
           priority
-          className="object-cover z-0"
+          className="object-fill z-0"
           sizes="120vw"
         />
 
-        <motion.div 
-          className="relative z-20 text-center px-4"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-        >
-          <motion.h1 
-            className="text-4xl md:text-6xl font-bold text-white mb-6"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
-          >
-            {serviceData.title}
-          </motion.h1>
 
-        </motion.div>
 
       </section>
       

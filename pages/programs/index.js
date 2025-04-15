@@ -82,7 +82,6 @@ const ProgramCard = ({ program }) => {
               <span>{program.days} Jours</span>
             </div>
             <div className="flex items-center text-orange-500 font-semibold">
-              <Icon icon="mdi:currency-usd" className="w-4 h-4 mr-1.5" />
               <span>{program.price} TND</span>
             </div>
           </div>
@@ -141,16 +140,17 @@ const FeaturedProgram = ({ program }) => {
         </p>
         
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Link href={`/programs/${program.id}`} passHref>
-            <motion.button 
-              className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2 font-medium"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <span>Découvrir ce programme</span>
-              <Icon icon="mdi:arrow-right" className="w-5 h-5" />
-            </motion.button>
-          </Link>
+        <Link href={`/programs/${program.id}`} passHref>
+  <motion.a
+    className="px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center space-x-2 font-medium"
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+  >
+    <span>Découvrir ce programme</span>
+    <Icon icon="mdi:arrow-right" className="w-5 h-5" />
+  </motion.a>
+</Link>
+
           <a 
             href="#programs" 
             className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-colors flex items-center justify-center space-x-2 font-medium"

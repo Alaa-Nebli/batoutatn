@@ -141,7 +141,6 @@ const Banner = () => {
   return (
     <section className="relative h-screen overflow-hidden">
       {/* Subtle global overlay */}
-      <div className="absolute inset-0 bg-black/30 z-10"></div>
 
       {/* Carousel slides */}
       <section
@@ -232,8 +231,6 @@ const Banner = () => {
     </section>
   );
 };
-
-
 
 const UniqueFeatureCard = ({ icon, title,title2, description, delay }) => {
   console.log(title, title2);
@@ -387,7 +384,7 @@ export default function Home() {
       id : "ticketing",
       title: t('Home.Our_Services_section.Billetterie.Title'),
       description: t('Home.Our_Services_section.Billetterie.Description'),
-      image: '/billeterie.webp',
+      image: '/billeterie.png',
       imageAlt: 'MICE'
     }
   ];
@@ -425,13 +422,7 @@ export default function Home() {
                 <Banner />
                 {/* About Section */}
                 <section className={styles.aboutSection} ref={aboutSectionRef}>
-                    <Image
-                        src="/japanise_shape1.svg"
-                        width={100}
-                        height={50}
-                        alt="Japanese Shape"
-                        className={styles.japaneseShape} 
-                    />                
+                             
                     <motion.div
                         className={styles.textContainer}
                         initial={{ opacity: 0, x: -50 }}
@@ -460,8 +451,14 @@ export default function Home() {
                          whileInView={{ opacity: 1, x: 0 }} 
                          viewport={{ once: false, amount: 0.2 }}
                          transition={{ duration: 0.8 }} 
-                    >
-                        <Image src={"/batouta_team.png"} width={500} height={500} alt="Batouta Team" layout="responsive" />
+                                          >
+                      <Image
+                        src="/Batouta_team.png"
+                        width={800} // was 500
+                        height={800} // was 500
+                        alt="Batouta Team"
+                        layout="responsive"
+                      />
                     </motion.div>
                 </section>
 

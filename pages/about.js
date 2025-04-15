@@ -60,7 +60,7 @@ const WhoWeAre = () => {
                 playsInline
                 className="object-cover w-full h-full transform hover:scale-110 transition-transform duration-700"
               >
-                <source src="/tripsvideo.mp4" type="video/mp4" />
+                <source src="https://bnlpzibmwmoragheykpt.supabase.co/storage/v1/object/public/programs//cdfa0de5-b243-4103-a163-9a0943873794.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
