@@ -335,7 +335,7 @@ export default function Home() {
     '/tunisia/thailand.png',
     '/tunisia/suisse.jpg',
     '/tunisia/japan_city.jpg',
-    '/tunisia/japan.webp',
+    '/tunisia/Japan.webp',
     '/tunisia/japan_1.jpg',
   ]);
 
