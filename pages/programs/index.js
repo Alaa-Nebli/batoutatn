@@ -29,7 +29,7 @@ const ProgramCard = ({ program }) => {
 
   return (
     <motion.div
-      className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300"
+      className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col h-full"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-100px" }}
@@ -65,17 +65,22 @@ const ProgramCard = ({ program }) => {
         </div>
       </div>
 
-      <div className="p-6">
+      <div className="p-6 flex flex-col flex-grow">
         <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors">
           {program.title}
         </h3>
 
         {/* Display plain text snippet with line clamp */}
-        <p className="text-gray-600 mb-4 line-clamp-3 text-sm">
-          {snippet}
-        </p>
+        <div className="mb-4 max-h-[72px] overflow-hidden relative">
+            <p className="text-gray-600 text-sm line-clamp-3">
+              {snippet}
+            </p>
+            {/* Fade effect for truncated text */}
+            <div className="absolute inset-x-0 bottom-0 h-4 bg-gradient-to-t from-white to-transparent"></div>
+          </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mt-auto">
           <div className="flex flex-wrap gap-4">
             <div className="flex items-center text-gray-600 text-sm">
               <Icon icon="mdi:clock-outline" className="w-4 h-4 mr-1.5" />

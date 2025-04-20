@@ -21,9 +21,9 @@ function App({ Component, pageProps: { session, ...pageProps } }) {
         return () => clearTimeout(timer);
     }, []);
 
-    if (isLoading) {
-        return <LoadingScreen />;
-    }
+    // if (isLoading) {
+    //     return <LoadingScreen />;
+    // }
 
     return (
         <SessionProvider session={session}>

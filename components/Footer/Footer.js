@@ -17,25 +17,25 @@ export const Footer = () => {
     
     const FOOTER_LINKS = [
         {
-            title: t('footer.explore'),
+            title: "Explorer",
             items: [
-                { label: t('footer.about_us'), href: "/about#who-we-are" },
-                { label: t('footer.our_services'), href: "/services#our-services" },
-                { label: t('footer.our_history'), href: "/about#History" },
-                { label: t('footer.our_values'), href: "/about#our-values" },
+                { label: "À propos de nous", href: "/about#who-we-are" },
+                { label: "Nos services", href: "/services#our-services" },
+                { label: "Notre histoire", href: "/about#History" },
+                { label: "Nos valeurs", href: "/about#our-values" },
             ]
         },
         {
-            title: t('footer.connect_with_us'),
+            title: "Connectez-vous avec nous",
             items: [
                 { 
-                    label: t('footer.facebook'), 
+                    label: "Facebook", 
                     href: "https://www.facebook.com/profile.php?id=100057621002945&locale=gl_ES&_rdr", 
                     isExternal: true,
                     icon: "mdi:facebook"
                 },
                 { 
-                    label: t('footer.instagram'), 
+                    label: "Instagram", 
                     href: "https://www.instagram.com/batoutavoyages_events/?hl=fr", 
                     isExternal: true,
                     icon: "mdi:instagram"
@@ -43,12 +43,12 @@ export const Footer = () => {
             ]
         },
         {
-            title: t('footer.sitemap'),
+            title: "Plan du site",
             items: [
-                { label: t('footer.home'), href: "/" },
-                { label: t('footer.our_services'), href: "/services" },
-                { label: t('footer.contact_us'), href: "#contact" },
-                { label: t('footer.general_conditions'), href: "/general_condition" }
+                { label: "Acceuil", href: "/" },
+                { label: "Nos Services", href: "/services" },
+                { label: "Contact", href: "#contact" },
+                { label: "Condition Général", href: "/general_condition" }
             ]
         }
     ];
@@ -99,9 +99,7 @@ export const Footer = () => {
                                         priority
                                     />
                                 </Link>
-                                <p className="text-base text-gray-700">
-                                    {t('footer.description')}
-                                </p>
+                                
                                 <div className="flex gap-4">
                                     <a href="#" className="p-2 rounded-full bg-gray-100 hover:bg-orange-200 transition">
                                         <Icon icon="mdi:facebook" className="text-orange-600" />
@@ -143,7 +141,7 @@ export const Footer = () => {
                                 © {currentYear} Batouta voyages. All rights reserved.
                             </p>
                             <p className="text-sm text-gray-700">
-                                {t('footer.designed_by')} 
+                                Designed and developed by{" "}
                                 <a
                                     className="ml-1 text-orange-600 transition-colors duration-300 hover:underline"
                                     href="https://neuratech-solutions.com/"

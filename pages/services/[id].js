@@ -10,6 +10,7 @@ import Head from 'next/head';
 import { ContactUs } from 'components/Contact';
 import Image from 'next/image';
 import Link from 'next/link';
+import {ReservationForm} from 'components/ReservationForm';
 
 // Constants for excursions data
 const EXCURSIONS = {
@@ -424,7 +425,7 @@ const ServiceDetails = ({ serviceId }) => {
             className="mb-20"
           >
             <div className="prose prose-lg max-w-4xl mx-auto text-gray-700">              
-              <p >{serviceData.description}</p>
+              <p className='text-xl' >{serviceData.description}</p>
             </div>
           </motion.section>
           
@@ -518,6 +519,19 @@ const ServiceDetails = ({ serviceId }) => {
             </motion.section>
           )}
         </AnimatePresence>
+
+        {serviceId === 'ticketing' && (
+        <section className="container mx-auto px-4 py-12">
+          <h2 className="text-3xl font-bold text-center mb-8">
+            Réservez Votre Voyage
+          </h2>
+          <p className="max-w-2xl mx-auto text-center text-gray-700 mb-6">
+            Remplissez les détails ci-dessous pour nous envoyer votre demande de réservation.
+          </p>
+          <ReservationForm />
+        </section>
+      )}
+
 
         {serviceId === 'excursions' && (
           <motion.section
