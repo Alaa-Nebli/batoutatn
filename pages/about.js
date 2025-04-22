@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-undef */
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Icon } from '@iconify/react';
@@ -7,8 +8,7 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import Contact from 'components/Contact/ContactUs';
-
-
+import Link from 'next/link';
 
 const WhoWeAre = () => {
   const ref = useRef(null);
@@ -132,14 +132,19 @@ const WhoWeAre = () => {
               animate={isInView ? { opacity: 1 } : { opacity: 0 }}
               transition={{ delay: 0.8 }}
             >
+              <Link href="/our_services" passHref>
               <motion.button
+        
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="px-6 py-3 bg-orange-500 text-white rounded-full font-semibold hover:bg-orange-600 transition-colors"
               >
                 {t('AboutUs.WhoWeAre.buttons.services')}
               </motion.button>
+              </Link>
+              
               <motion.button
+                onClick={() => window.scrollTo({ top: document.getElementById('contact').offsetTop, behavior: 'smooth' })}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="px-6 py-3 border-2 border-gray-800 text-gray-800 rounded-full font-semibold hover:bg-gray-800 hover:text-white transition-colors"

@@ -30,6 +30,7 @@ interface FormData {
   display: boolean;
   priceInclude: string;
   generalConditions: string;
+  phone: string;
 }
 
 // Dynamically load ReactQuill (for Next.js):
@@ -56,6 +57,7 @@ export default function ProgramCreate() {
     display: true,
     priceInclude: '',
     generalConditions: '',
+    phone: ''
   });
   
   const [images, setImages] = useState<File[]>([]);
@@ -517,6 +519,17 @@ export default function ProgramCreate() {
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
+            <textarea
+              name="phone"
+              value={formData.phone}
+              onChange={handleSimpleInputChange}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              rows={3}
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Metadata</label>
             <textarea
               name="metadata"
@@ -526,7 +539,7 @@ export default function ProgramCreate() {
               rows={3}
             />
           </div>
-
+          
           {/* Program Images */}
           <div className="mt-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Program Images</h2>

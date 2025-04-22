@@ -27,6 +27,13 @@ const ProgramCard = ({ program }) => {
   // Strip out HTML for listing snippet:
   const snippet = stripHtml(program.description || '');
 
+  const formatDate = (date, options = {}) =>
+    new Date(date).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      ...options,
+    });
   return (
     <motion.div
       className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300 flex flex-col h-full"
@@ -69,6 +76,10 @@ const ProgramCard = ({ program }) => {
         <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors">
           {program.title}
         </h3>
+        <h4 className="text-xl md:text-xl font-bold text-gray-800 mb-4">
+  Du {formatDate(program.from_date, { year: undefined })} au {formatDate(program.to_date)}
+</h4>
+
 
         {/* Display plain text snippet with line clamp */}
         <div className="mb-4 max-h-[72px] overflow-hidden relative">

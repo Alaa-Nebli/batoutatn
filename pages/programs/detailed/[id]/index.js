@@ -6,11 +6,13 @@ import { ContactUs } from "components/Contact";
 import { useRouter } from 'next/router';
 
 const ProgramHeaderCard = ({ program }) => {
-  const formatDate = (dateString) => {
-    const options = { day: 'numeric', month: 'long', year: 'numeric' };
-    const date = new Date(dateString);
-    return isNaN(date) ? '' : date.toLocaleDateString('fr-FR', options);
-  };
+  const formatDate = (date, options = {}) =>
+    new Date(date).toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      ...options,
+    });
 
   return (
     <article
@@ -23,6 +25,9 @@ const ProgramHeaderCard = ({ program }) => {
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 pt-6 leading-tight">
           {program.title}
         </h1>
+        <h4 className="text-2xl md:text-2xl font-bold text-gray-800 mb-4">
+  Du {formatDate(program.from_date, { year: undefined })} au {formatDate(program.to_date)}
+</h4>
       </div>
 
       <div className="grid md:grid-cols-2 gap-8">
@@ -64,7 +69,7 @@ const ProgramHeaderCard = ({ program }) => {
             Durée
           </h2>
           <p className="text-gray-700 text-lg select-text font-medium">{program.days} jours</p>
-        </section>
+        </section>       
 
         <section aria-label="Tarification" className="mb-4">
           <div className="bg-orange-50 p-4 rounded-lg border border-orange-100">
@@ -89,6 +94,19 @@ const ProgramHeaderCard = ({ program }) => {
               </div>
             )}
           </div>
+           
+        </section>
+
+        
+        <section aria-labelledby="duration-label" className="mb-6">
+        <a
+                        href="tel:+21671030303"
+                        aria-label="Appelez votre conseiller"
+                        className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:scale-[1.03] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-600"
+                      >
+                        Appelez votre conseiller
+                        <span className="hidden md:inline ml-2">+216 {program.phone}</span>
+              </a>
         </section>
       </div>
     </article>

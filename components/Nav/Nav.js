@@ -16,9 +16,7 @@ export const Nav = () => {
         { name: "Nos Voyages", href: "/programs" },
         {
             name: "Contactez-nous",
-            href: "https://www.facebook.com/profile.php?id=100057621002945&locale=gl_ES&_rdr",
-            isArrow: true,
-            target: "_blank"
+            href: "#contact"
         },
     ];
 

@@ -20,8 +20,8 @@ export const Footer = () => {
             title: "Explorer",
             items: [
                 { label: "À propos de nous", href: "/about#who-we-are" },
-                { label: "Nos services", href: "/services#our-services" },
-                { label: "Notre histoire", href: "/about#History" },
+                { label: "Nos services", href: "/our_services" },
+                { label: "Notre histoire", href: "/about#history" },
                 { label: "Nos valeurs", href: "/about#our-values" },
             ]
         },
@@ -46,9 +46,9 @@ export const Footer = () => {
             title: "Plan du site",
             items: [
                 { label: "Acceuil", href: "/" },
-                { label: "Nos Services", href: "/services" },
+                { label: "Nos Services", href: "/our_services" },
                 { label: "Contact", href: "#contact" },
-                { label: "Condition Général", href: "/general_condition" }
+                { label: "Conditions Générales", href: "/general_condition" }
             ]
         }
     ];

@@ -44,6 +44,7 @@ model Trip {
   featured     Featured[]
   priceInclude String
   generalConditions String
+  phone String
 }
 
 model TripTimeline {

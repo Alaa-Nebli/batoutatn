@@ -46,8 +46,8 @@ const ContactSection = () => {
     {
       icon: 'ic:baseline-whatsapp',
       label: "WhatsApp",
-      value: "+216 71 802 881",
-      href: 'https://wa.me/21671802881',
+      value: "+216 94 849 694",
+      href: 'https://wa.me/21694849694',
       isWhatsApp: true
     },
     {

@@ -12,7 +12,6 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
 import { Layout } from 'components/Layout';
 import SEO from 'components/SEO/SEO';
-import { ContactUs } from 'components/Contact';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -56,9 +55,16 @@ const TimelineItem = ({ day, content, isActive, onClick }) => (
             isActive ? 'text-white' : 'text-orange-500'
           }`}
         >
-          Jour {day}
+          Jour {day}
         </span>
-        <span className="text-2xl font-bold text-left">{content.title}</span>
+        <div className="flex flex-col items-start">
+          <span className="text-2xl font-bold text-left">{content.title}</span>
+          {!isActive && (
+            <span className="text-sm text-gray-500 mt-1">
+              Cliquer pour voir les détails
+            </span>
+          )}
+        </div>
       </div>
       <motion.div animate={{ rotate: isActive ? 180 : 0 }} transition={{ duration: 0.3 }}>
         <Icon icon="mdi:chevron-down" className="w-6 h-6" />
@@ -92,6 +98,7 @@ const TimelineItem = ({ day, content, isActive, onClick }) => (
     </motion.div>
   </motion.div>
 );
+
 
 /* -------------------------------------------------- */
 /*  Image carousel (screen)                           */
@@ -174,12 +181,14 @@ const ScreenHeader = ({ program }) => {
 /*  Header card (screen)                              */
 /* -------------------------------------------------- */
 const ProgramHeaderCard = ({ program }) => {
-  const formatDate = date =>
+  const formatDate = (date, options = {}) =>
     new Date(date).toLocaleDateString('fr-FR', {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
+      ...options,
     });
+  
 
   return (
     <motion.div
@@ -189,6 +198,9 @@ const ProgramHeaderCard = ({ program }) => {
       className="bg-white rounded-2xl p-6 shadow-lg h-full flex flex-col"
     >
       <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">{program.title}</h1>
+      <h4 className="text-2xl md:text-2xl font-bold text-gray-800 mb-4">
+  Du {formatDate(program.from_date, { year: undefined })} au {formatDate(program.to_date)}
+</h4>
 
       <br />
       <div className="space-y-4 mb-6">
@@ -216,13 +228,13 @@ const ProgramHeaderCard = ({ program }) => {
           <Icon icon="mdi:clock-outline" className="w-5 h-5 mt-1 text-orange-500 flex-shrink-0" />
           <div>
             <p className="font-semibold text-gray-800 text-4xl mb-5">Durée</p>
-            <p className="text-gray-600 text-lg">{program.days} jours</p>
+            <p className="text-gray-600 text-lg">{program.days} Jours</p>
           </div>
         </div>
       </div>
 
       <div className="mt-auto border-t border-gray-200 pt-4">
-        <p className="text-sm text-gray-500 mb-2">À</p>
+        <p className="text-sm text-gray-500 mb-2">Prix</p>
         <div className="flex items-end justify-between">
           <div className="flex items-end space-x-2">
             <span className="text-3xl font-bold text-orange-500">
@@ -260,12 +272,12 @@ const ProgramHeaderCard = ({ program }) => {
            {/* Call button */}
            <a
             href="tel:+21671030303"
-            aria-label="Appeler un conseiller"
+            aria-label="Appelez votre conseiller"
             className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:scale-[1.03] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-600"
           >
             <Icon icon="mdi:phone" className="w-5 h-5 mr-2" />
-            Appeler un conseiller
-            <span className="hidden md:inline ml-2">+216 71 03 03 03</span>
+            Appelez votre conseiller
+            <span className="hidden md:inline ml-2">+216 {program.phone}</span>
           </a>
           </div>
       </div>
@@ -406,7 +418,7 @@ const ActionButtons = ({ onPrint, onShare, onDownloadPDF, onDownloadText }) => (
       className="px-5 py-3 bg-orange-500 text-white rounded-lg shadow-lg hover:bg-orange-600 flex items-center"
     >
       <Icon icon="mdi:file-pdf-box" className="w-5 h-5 mr-2" />
-      PDF
+      Télécharger <br /> Le Programme
     </button>
 
     <button
@@ -610,9 +622,22 @@ export default function ProgramPage() {
         </div>
       </section>
 
-      <section className="screen-only">
-        <ContactUs />
-      </section>
+      <section className="screen-only flex justify-center items-center py-12">
+  {/* Call Section */}
+  <a
+    href={`tel:+216${program.phone}`}
+    aria-label="Appelez votre conseiller"
+    className="text-center flex flex-col items-center group"
+  >
+    <h3 className="text-2xl md:text-3xl font-bold text-orange-600 group-hover:underline">
+      Appelez votre conseiller
+    </h3>
+    <p className="text-lg font-bol text-gray-700 mt-2 group-hover:text-orange-700">
+      +216 {program.phone}
+    </p>
+  </a>
+</section>
+
 
       {/* ---------- PRINT -------------------------------------- */}
       <PrintLayer program={program} />

@@ -136,6 +136,7 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
               date: new Date(item.date)
             })) || []
           },
+          phone: programData.phone || null,
           priceInclude : programData.priceInclude || null,     // HTML
           generalConditions : programData.generalConditions || null,  // HTML
         },
@@ -227,6 +228,7 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
               date: new Date(item.date)
             })) || []
           }, 
+          phone: programData.phone || null,
           priceInclude : programData.priceInclude || null,
           generalConditions : programData.generalConditions || null,
         },

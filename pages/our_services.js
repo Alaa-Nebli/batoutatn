@@ -123,7 +123,7 @@ const EsteemSection = () => {
     { 
       title: "Expériences Vibrantes", 
       description: "Rencontrez les artisans, goûtez aux saveurs locales et vivez des moments authentiques.", 
-      image: "/experience-vibrante.jpg",
+      image: "/artisan.jpg",
       icon: "🎭",
       bgColor: "bg-gradient-to-br from-purple-500 to-fuchsia-600",
       overlayColor: "from-purple-600/90 to-fuchsia-700/90"
