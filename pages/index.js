@@ -1,3 +1,239 @@
+// import { Layout } from "components//Layout";
+// import SEO from "components//SEO/SEO";
+// import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+// import { useTranslation } from 'next-i18next';
+// import Image from 'next/image';
+// import { motion } from 'framer-motion';
+// import styles from 'components//About/AboutSection.module.css'; // Ensure you have the CSS file
+// import { useState, useEffect, useRef } from 'react';
+// import Link from "next/link";
+// import { Icon } from "@iconify/react";
+// import { ContactUs } from "components//Contact";
+
+// export async function getStaticProps({ locale }) {
+//     return {
+//       props: {
+//         ...(await serverSideTranslations(locale, ['common'])),
+//       },
+//     }
+// }
+// const Banner = () => {
+//   const { t } = useTranslation('common');
+//   const [currentIndex, setCurrentIndex] = useState(0);
+//   const [featuredItems, setFeaturedItems] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState(null);
+
+//   // Default banners to use as fallback
+//   const defaultBanners = [
+//     {
+//       id: 1,
+//       imageUrl: '/tunisia/japan.webp',
+//       alt: 'Japan',
+//     },
+//     {
+//       id: 2,
+//       imageUrl: '/tunisia/nepal_places.jpg',
+//       alt: t('Home.banner.slide2.alt'),
+//     },
+//     {
+//       id: 3,
+//       imageUrl: '/tunisia/thailand-chaing-mai.jpg',
+//       alt: t('Home.banner.slide3.alt'),
+//     },
+//     {
+//       id: 4,
+//       imageUrl: '/tunisia/suisse.jpg',
+//       alt: t('Home.banner.slide4.alt'),
+//     },
+//     {
+//       id: 5,
+//       imageUrl: '/tunisia/thailand_1.jpg',
+//       alt: t('Home.banner.slide5.alt'),
+//     },
+//     {
+//       id: 6,
+//       imageUrl: '/tunisia/africa_south.webp',
+//       alt: t('Home.banner.slide6.alt'),
+//     },
+//     {
+//       id: 7,
+//       imageUrl: '/tunisia/safari.png',
+//       alt: t('Home.banner.slide7.alt'),
+//     },
+//   ];
+
+//   // Fetch featured items from the API
+//   useEffect(() => {
+//     const fetchFeaturedItems = async () => {
+//       try {
+//         setLoading(true);
+//         const response = await fetch('/api/featured');
+
+//         if (!response.ok) {
+//           throw new Error(
+//             `Failed to fetch featured items: ${response.status} ${response.statusText}`
+//           );
+//         }
+
+//         const data = await response.json();
+//         setFeaturedItems(data);
+//         setLoading(false);
+//       } catch (err) {
+//         console.error('Error fetching featured items:', err);
+//         setError(err);
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchFeaturedItems();
+//   }, []);
+
+//   // Determine which banners to display
+//   const displayBanners = featuredItems.length > 0
+//     ? featuredItems.map((item) => ({
+//         id: item.id,
+//         imageUrl: item.image,
+//         title: item.trip?.name || '',
+//         description: item.trip?.description || '',
+//         alt: item.trip?.name || 'Featured destination',
+//         cta: item.cta || 'Explore Destination',
+//         tripId: item.tripId,
+//       }))
+//     : defaultBanners;
+
+//   const handlePrev = () => {
+//     setCurrentIndex(
+//       (prevIndex) => (prevIndex - 1 + displayBanners.length) % displayBanners.length
+//     );
+//   };
+
+//   const handleNext = () => {
+//     setCurrentIndex((prevIndex) => (prevIndex + 1) % displayBanners.length);
+//   };
+
+//   // Auto-rotate slides every 4 seconds
+//   useEffect(() => {
+//     const interval = setInterval(() => {
+//       handleNext();
+//     }, 4000);
+
+//     return () => clearInterval(interval);
+//     // eslint-disable-next-line react-hooks/exhaustive-deps
+//   }, [displayBanners.length]);
+
+//   if (loading) {
+//     return (
+//       <section className="relative h-screen flex items-center justify-center bg-gray-100">
+//         <div className="text-center">
+//           <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+//           <p className="mt-4 text-gray-600">Loading amazing destinations...</p>
+//         </div>
+//       </section>
+//     );
+//   }
+
+//   if (error) {
+//     console.warn('Falling back to default banners due to API error');
+//     // We'll silently fall back to default banners if there's an error
+//   }
+
+//   return (
+//     <section className="relative h-screen overflow-hidden">
+//       {/* Subtle global overlay */}
+
+//       {/* Carousel slides */}
+//       <section
+//   className="relative overflow-hidden"
+//   // Shift down by header height, and shrink height so it's still "full screen" minus the nav
+//   style={{ marginTop: '80px', height: 'calc(100vh - 80px)' }}
+// >
+//   <div className="absolute inset-0 flex">
+//     {displayBanners.map((banner, index) => (
+//       <div
+//         key={banner.id}
+//         className={`w-full h-full flex-shrink-0 transition-opacity duration-500 ${
+//           index === currentIndex ? 'opacity-100' : 'opacity-0'
+//         }`}
+//       >
+//         <Image
+//           src={banner.imageUrl}
+//           alt={banner.alt}
+//           layout="fill"
+//           objectFit="cover"
+//           objectPosition="center"
+//           priority
+//           className="w-full h-full"
+//         />
+//       </div>
+//     ))}
+//   </div>
+// </section>
+
+
+//       {/* Beautiful CTA button (shown only if there is a tripId) */}
+//       {displayBanners[currentIndex]?.tripId && (
+//         <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-30">
+//           <Link
+//             href={`/programs/${displayBanners[currentIndex].tripId}`}
+//             passHref
+//             legacyBehavior
+//           >
+//             <a className="inline-block px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold text-lg rounded-full shadow-xl transition-transform transform hover:-translate-y-1 active:translate-y-0">
+//               {displayBanners[currentIndex].cta}
+//             </a>
+//           </Link>
+//         </div>
+//       )}
+
+//       {/* Carousel indicator dots */}
+//       <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-30 flex space-x-2">
+//         {displayBanners.map((_, index) => (
+//           <button
+//             key={index}
+//             onClick={() => setCurrentIndex(index)}
+//             className={`w-3 h-3 rounded-full transition-all duration-300 ${
+//               index === currentIndex ? 'bg-white scale-125' : 'bg-white/50'
+//             }`}
+//             aria-label={`Go to slide ${index + 1}`}
+//           />
+//         ))}
+//       </div>
+
+//       {/* Improved carousel controls */}
+//       <div className="absolute top-1/2 transform -translate-y-1/2 w-full flex justify-between px-4 md:px-6 z-30">
+//         <button
+//           className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors duration-300"
+//           onClick={handlePrev}
+//           aria-label="Previous slide"
+//         >
+//           <Icon icon="lucide:chevron-left" className="w-6 h-6 text-gray-800" />
+//         </button>
+//         <button
+//           className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors duration-300"
+//           onClick={handleNext}
+//           aria-label="Next slide"
+//         >
+//           <Icon icon="lucide:chevron-right" className="w-6 h-6 text-gray-800" />
+//         </button>
+//       </div>
+
+//       {/* Improved scroll indicator */}
+//       {/* <motion.div
+//         className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30"
+//         animate={{ y: [0, 10, 0] }}
+//         transition={{ duration: 1.5, repeat: Infinity }}
+//       >
+//         <div className="backdrop-blur-sm bg-white/20 p-2 rounded-full">
+//           <Icon icon="mdi:arrow-down-circle" className="w-8 h-8 md:w-12 md:h-12 text-white" />
+//         </div>
+//       </motion.div> */}
+//     </section>
+//   );
+// };
+
+import React, { useCallback, useEffect, useState, useRef } from 'react';
+
 import { Layout } from "components//Layout";
 import SEO from "components//SEO/SEO";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -5,10 +241,11 @@ import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import styles from 'components//About/AboutSection.module.css'; // Ensure you have the CSS file
-import { useState, useEffect, useRef } from 'react';
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { ContactUs } from "components//Contact";
+import { useScroll, useTransform } from 'framer-motion';
+import Typewriter from 'typewriter-effect';
 
 export async function getStaticProps({ locale }) {
     return {
@@ -17,220 +254,186 @@ export async function getStaticProps({ locale }) {
       },
     }
 }
+
+
+// Create a singleton video instance outside the component
+let globalVideo = null;
+
+const createVideo = () => {
+  if (!globalVideo) {
+    const video = document.createElement('video');
+    video.id = 'banner-video';
+    video.autoplay = true;
+    video.muted = false;
+    video.loop = true;
+    video.playsInline = true;
+    video.classList.add('w-full', 'h-full', 'object-cover');
+    video.style.objectPosition = 'center 65%';
+
+    const source = document.createElement('source');
+    source.src = 'https://bnlpzibmwmoragheykpt.supabase.co/storage/v1/object/public/programs//cdfa0de5-b243-4103-a163-9a0943873794.mp4';
+    source.type = 'video/mp4';
+    video.appendChild(source);
+
+    globalVideo = video;
+  }
+  return globalVideo;
+};
+
 const Banner = () => {
-  const { t } = useTranslation('common');
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [featuredItems, setFeaturedItems] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 500], [0, 150]);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [videoError, setVideoError] = useState(false);
+  const videoRef = React.useRef(null);
 
-  // Default banners to use as fallback
-  const defaultBanners = [
-    {
-      id: 1,
-      imageUrl: '/tunisia/japan.webp',
-      alt: 'Japan',
-    },
-    {
-      id: 2,
-      imageUrl: '/tunisia/nepal_places.jpg',
-      alt: t('Home.banner.slide2.alt'),
-    },
-    {
-      id: 3,
-      imageUrl: '/tunisia/thailand-chaing-mai.jpg',
-      alt: t('Home.banner.slide3.alt'),
-    },
-    {
-      id: 4,
-      imageUrl: '/tunisia/suisse.jpg',
-      alt: t('Home.banner.slide4.alt'),
-    },
-    {
-      id: 5,
-      imageUrl: '/tunisia/thailand_1.jpg',
-      alt: t('Home.banner.slide5.alt'),
-    },
-    {
-      id: 6,
-      imageUrl: '/tunisia/africa_south.webp',
-      alt: t('Home.banner.slide6.alt'),
-    },
-    {
-      id: 7,
-      imageUrl: '/tunisia/safari.png',
-      alt: t('Home.banner.slide7.alt'),
-    },
-  ];
-
-  // Fetch featured items from the API
-  useEffect(() => {
-    const fetchFeaturedItems = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch('/api/featured');
-
-        if (!response.ok) {
-          throw new Error(
-            `Failed to fetch featured items: ${response.status} ${response.statusText}`
-          );
-        }
-
-        const data = await response.json();
-        setFeaturedItems(data);
-        setLoading(false);
-      } catch (err) {
-        console.error('Error fetching featured items:', err);
-        setError(err);
-        setLoading(false);
-      }
-    };
-
-    fetchFeaturedItems();
+  const handleVideoLoad = useCallback(() => {
+    setIsVideoLoaded(true);
   }, []);
 
-  // Determine which banners to display
-  const displayBanners = featuredItems.length > 0
-    ? featuredItems.map((item) => ({
-        id: item.id,
-        imageUrl: item.image,
-        title: item.trip?.name || '',
-        description: item.trip?.description || '',
-        alt: item.trip?.name || 'Featured destination',
-        cta: item.cta || 'Explore Destination',
-        tripId: item.tripId,
-      }))
-    : defaultBanners;
+  const handleVideoError = useCallback(() => {
+    setVideoError(true);
+  }, []);
 
-  const handlePrev = () => {
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + displayBanners.length) % displayBanners.length
-    );
-  };
+  const handleVideoPlay = useCallback(() => {
+    setIsVideoPlaying(true);
+  }, []);
 
-  const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % displayBanners.length);
-  };
-
-  // Auto-rotate slides every 4 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
-      handleNext();
-    }, 4000);
+    // Get or create the singleton video instance
+    const video = createVideo();
+    videoRef.current = video;
 
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [displayBanners.length]);
+    // Set up event listeners only if they haven't been set before
+    if (!video.hasAttribute('data-initialized')) {
+      video.onloadeddata = handleVideoLoad;
+      video.onplay = handleVideoPlay;
+      video.onerror = handleVideoError;
+      video.setAttribute('data-initialized', 'true');
+    }
 
-  if (loading) {
-    return (
-      <section className="relative h-screen flex items-center justify-center bg-gray-100">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-          <p className="mt-4 text-gray-600">Loading amazing destinations...</p>
-        </div>
-      </section>
-    );
-  }
+    const container = document.getElementById('video-container');
+    if (container && !container.contains(video)) {
+      container.appendChild(video);
+      
+      // Only load and play if not already playing
+      if (video.paused) {
+        video.load();
+        video.play().catch(console.error);
+      }
+    }
 
-  if (error) {
-    console.warn('Falling back to default banners due to API error');
-    // We'll silently fall back to default banners if there's an error
-  }
+    // Update state based on current video state
+    setIsVideoLoaded(video.readyState >= 2);
+    setIsVideoPlaying(!video.paused);
+    setVideoError(video.error !== null);
+
+    return () => {
+      // Don't remove the video on unmount, just move it to a temporary container
+      if (container && container.contains(video)) {
+        const tempContainer = document.createElement('div');
+        tempContainer.style.display = 'none';
+        document.body.appendChild(tempContainer);
+        tempContainer.appendChild(video);
+      }
+    };
+  }, [handleVideoLoad, handleVideoPlay, handleVideoError]);
+
 
   return (
     <section className="relative h-screen overflow-hidden">
-      {/* Subtle global overlay */}
+      <Image
+        src="/tunisia/Discover_Tunisia_Banner.webp"
+        alt="Video Poster"
+        layout="fill"
+        objectFit="cover"
+        priority
+        className={`transition-opacity duration-500 ${isVideoPlaying ? 'opacity-0' : 'opacity-100'}`}
+      />
 
-      {/* Carousel slides */}
-      <section
-  className="relative overflow-hidden"
-  // Shift down by header height, and shrink height so it's still "full screen" minus the nav
-  style={{ marginTop: '80px', height: 'calc(100vh - 80px)' }}
->
-  <div className="absolute inset-0 flex">
-    {displayBanners.map((banner, index) => (
       <div
-        key={banner.id}
-        className={`w-full h-full flex-shrink-0 transition-opacity duration-500 ${
-          index === currentIndex ? 'opacity-100' : 'opacity-0'
+        id="video-container"
+        className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${
+          isVideoPlaying ? 'opacity-100' : 'opacity-0'
         }`}
-      >
-        <Image
-          src={banner.imageUrl}
-          alt={banner.alt}
-          layout="fill"
-          objectFit="cover"
-          objectPosition="center"
-          priority
-          className="w-full h-full"
-        />
+      />
+
+<div className="relative z-10 flex flex-col items-center justify-center h-full w-full text-center">
+  <motion.div
+    initial={{ opacity: 0, y: 50 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 1, ease: 'easeOut' }}
+    style={{ y }}
+  >
+    <motion.div
+      className="mb-8"
+      animate={{ rotate: [0, 5, -5, 0] }}
+      transition={{ duration: 5, repeat: Infinity }}
+    >
+      <Icon
+        icon="game-icons:torii-gate"
+        className="w-16 h-16 md:w-24 md:h-24 text-orange-500"
+      />
+    </motion.div>
+
+
+      {/* <div className="text-white">
+        <h1 className="text-4xl md:text-6xl font-bold">Bienvenue </h1>
+        <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto">
+          A Batouta Voyages
+        </p>
       </div>
-    ))}
-  </div>
-</section>
-
-
-      {/* Beautiful CTA button (shown only if there is a tripId) */}
-      {displayBanners[currentIndex]?.tripId && (
-        <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-30">
-          <Link
-            href={`/programs/${displayBanners[currentIndex].tripId}`}
-            passHref
-            legacyBehavior
+     */}
+    <motion.div
+      className="flex gap-4 justify-center mt-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.8 }}
+    >
+    
+        {/* <Link href={pageContent.primaryButton.href}>
+          <motion.button
+            whileHover={{ scale: 1.05, backgroundColor: '#2563eb' }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-4 bg-orange-500 text-white rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-orange-500/50"
           >
-            <a className="inline-block px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold text-lg rounded-full shadow-xl transition-transform transform hover:-translate-y-1 active:translate-y-0">
-              {displayBanners[currentIndex].cta}
-            </a>
-          </Link>
-        </div>
-      )}
+            {pageContent.primaryButton.text}
+          </motion.button>
+        </Link> */}
+      
+      
+        {/* <Link href={pageContent.secondaryButton.href}>
+          <motion.button
+            whileHover={{ scale: 1.05, backgroundColor: '#1e40af' }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-full font-semibold transition-all duration-300 hover:bg-white hover:text-gray-900"
+          >
+            {pageContent.secondaryButton.text}
+          </motion.button>
+        </Link> */}
+      
+    </motion.div>
+  </motion.div>
 
-      {/* Carousel indicator dots */}
-      <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-30 flex space-x-2">
-        {displayBanners.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-300 ${
-              index === currentIndex ? 'bg-white scale-125' : 'bg-white/50'
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
+  <motion.div
+    className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+    animate={{ y: [0, 10, 0], opacity: [1, 0.5, 1] }}
+    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+  >
+    <div className="text-white flex flex-col items-center gap-2">
+      <p className="text-sm font-light tracking-widest uppercase">
+        Scroll
+      </p>
+      <Icon icon="mdi:arrow-down-circle" className="w-8 h-8 md:w-12 md:h-12" />
+    </div>
+  </motion.div>
+</div>
 
-      {/* Improved carousel controls */}
-      <div className="absolute top-1/2 transform -translate-y-1/2 w-full flex justify-between px-4 md:px-6 z-30">
-        <button
-          className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors duration-300"
-          onClick={handlePrev}
-          aria-label="Previous slide"
-        >
-          <Icon icon="lucide:chevron-left" className="w-6 h-6 text-gray-800" />
-        </button>
-        <button
-          className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors duration-300"
-          onClick={handleNext}
-          aria-label="Next slide"
-        >
-          <Icon icon="lucide:chevron-right" className="w-6 h-6 text-gray-800" />
-        </button>
-      </div>
-
-      {/* Improved scroll indicator */}
-      {/* <motion.div
-        className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30"
-        animate={{ y: [0, 10, 0] }}
-        transition={{ duration: 1.5, repeat: Infinity }}
-      >
-        <div className="backdrop-blur-sm bg-white/20 p-2 rounded-full">
-          <Icon icon="mdi:arrow-down-circle" className="w-8 h-8 md:w-12 md:h-12 text-white" />
-        </div>
-      </motion.div> */}
     </section>
   );
 };
+
 
 const UniqueFeatureCard = ({ icon, title,title2, description, delay }) => {
   console.log(title, title2);
