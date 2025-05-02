@@ -259,30 +259,11 @@ export async function getStaticProps({ locale }) {
 // Create a singleton video instance outside the component
 let globalVideo = null;
 
-const createVideo = () => {
-  if (!globalVideo) {
-    const video = document.createElement('video');
-    video.id = 'banner-video';
-    video.autoplay = true;
-    video.muted = false;
-    video.loop = true;
-    video.playsInline = true;
-    video.classList.add('w-full', 'h-full', 'object-cover');
-    video.style.objectPosition = 'center 65%';
-
-    const source = document.createElement('source');
-    source.src = 'https://bnlpzibmwmoragheykpt.supabase.co/storage/v1/object/public/programs//cdfa0de5-b243-4103-a163-9a0943873794.mp4';
-    source.type = 'video/mp4';
-    video.appendChild(source);
-
-    globalVideo = video;
-  }
-  return globalVideo;
-};
 
 const Banner = () => {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
+
   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [videoError, setVideoError] = useState(false);
@@ -300,12 +281,25 @@ const Banner = () => {
     setIsVideoPlaying(true);
   }, []);
 
+  // Function to create or reuse a singleton video
+  const createVideo = () => {
+    const existing = document.getElementById('singleton-video');
+    if (existing) return existing;
+
+    const video = document.createElement('video');
+    video.id = 'singleton-video';
+    video.src = 'https://bnlpzibmwmoragheykpt.supabase.co/storage/v1/object/public/programs//cdfa0de5-b243-4103-a163-9a0943873794.mp4'; // Replace with your actual video path
+    video.loop = true;
+    video.muted = false;
+    video.playsInline = true;
+    video.className = 'w-full h-full object-cover absolute inset-0';
+    return video;
+  };
+
   useEffect(() => {
-    // Get or create the singleton video instance
     const video = createVideo();
     videoRef.current = video;
 
-    // Set up event listeners only if they haven't been set before
     if (!video.hasAttribute('data-initialized')) {
       video.onloadeddata = handleVideoLoad;
       video.onplay = handleVideoPlay;
@@ -316,30 +310,26 @@ const Banner = () => {
     const container = document.getElementById('video-container');
     if (container && !container.contains(video)) {
       container.appendChild(video);
-      
-      // Only load and play if not already playing
+
       if (video.paused) {
         video.load();
         video.play().catch(console.error);
       }
     }
 
-    // Update state based on current video state
     setIsVideoLoaded(video.readyState >= 2);
     setIsVideoPlaying(!video.paused);
     setVideoError(video.error !== null);
 
     return () => {
-      // Don't remove the video on unmount, just move it to a temporary container
-      if (container && container.contains(video)) {
-        const tempContainer = document.createElement('div');
-        tempContainer.style.display = 'none';
-        document.body.appendChild(tempContainer);
-        tempContainer.appendChild(video);
+      if (videoRef.current) {
+        videoRef.current.pause();
+        videoRef.current.src = '';
+        videoRef.current.load();
+        videoRef.current.remove();
       }
     };
   }, [handleVideoLoad, handleVideoPlay, handleVideoError]);
-
 
   return (
     <section className="relative h-screen overflow-hidden">
@@ -359,80 +349,42 @@ const Banner = () => {
         }`}
       />
 
-<div className="relative z-10 flex flex-col items-center justify-center h-full w-full text-center">
-  <motion.div
-    initial={{ opacity: 0, y: 50 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 1, ease: 'easeOut' }}
-    style={{ y }}
-  >
-    <motion.div
-      className="mb-8"
-      animate={{ rotate: [0, 5, -5, 0] }}
-      transition={{ duration: 5, repeat: Infinity }}
-    >
-      <Icon
-        icon="game-icons:torii-gate"
-        className="w-16 h-16 md:w-24 md:h-24 text-orange-500"
-      />
-    </motion.div>
+      <div className="relative z-10 flex flex-col items-center justify-center h-full w-full text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: 'easeOut' }}
+          style={{ y }}
+        >
+          <motion.div
+            className="mb-8"
+            animate={{ rotate: [0, 5, -5, 0] }}
+            transition={{ duration: 5, repeat: Infinity }}
+          >
+            <Icon
+              icon="game-icons:torii-gate"
+              className="w-16 h-16 md:w-24 md:h-24 text-orange-500"
+            />
+          </motion.div>
+        </motion.div>
 
-
-      {/* <div className="text-white">
-        <h1 className="text-4xl md:text-6xl font-bold">Bienvenue </h1>
-        <p className="mt-4 text-lg md:text-xl max-w-2xl mx-auto">
-          A Batouta Voyages
-        </p>
+        <motion.div
+          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+          animate={{ y: [0, 10, 0], opacity: [1, 0.5, 1] }}
+          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <div className="text-white flex flex-col items-center gap-2">
+            <p className="text-sm font-light tracking-widest uppercase">
+              Scroll
+            </p>
+            <Icon icon="mdi:arrow-down-circle" className="w-8 h-8 md:w-12 md:h-12" />
+          </div>
+        </motion.div>
       </div>
-     */}
-    <motion.div
-      className="flex gap-4 justify-center mt-8"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.8 }}
-    >
-    
-        {/* <Link href={pageContent.primaryButton.href}>
-          <motion.button
-            whileHover={{ scale: 1.05, backgroundColor: '#2563eb' }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-orange-500 text-white rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-orange-500/50"
-          >
-            {pageContent.primaryButton.text}
-          </motion.button>
-        </Link> */}
-      
-      
-        {/* <Link href={pageContent.secondaryButton.href}>
-          <motion.button
-            whileHover={{ scale: 1.05, backgroundColor: '#1e40af' }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-full font-semibold transition-all duration-300 hover:bg-white hover:text-gray-900"
-          >
-            {pageContent.secondaryButton.text}
-          </motion.button>
-        </Link> */}
-      
-    </motion.div>
-  </motion.div>
-
-  <motion.div
-    className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-    animate={{ y: [0, 10, 0], opacity: [1, 0.5, 1] }}
-    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-  >
-    <div className="text-white flex flex-col items-center gap-2">
-      <p className="text-sm font-light tracking-widest uppercase">
-        Scroll
-      </p>
-      <Icon icon="mdi:arrow-down-circle" className="w-8 h-8 md:w-12 md:h-12" />
-    </div>
-  </motion.div>
-</div>
-
     </section>
   );
 };
+
 
 
 const UniqueFeatureCard = ({ icon, title,title2, description, delay }) => {

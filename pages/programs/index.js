@@ -213,20 +213,27 @@ export default function Programs() {
         setLoading(true);
         const response = await fetch('/api/programs.controller');
         const data = await response.json();
-        setPrograms(data);
-        
-        // Find the first program with images to feature:
-        const featured = data.find((p) => p.images?.length > 0) || data[0];
+  
+        // Ensure data is an array, fallback to empty array
+        const programsArray = Array.isArray(data) ? data : [];
+  
+        setPrograms(programsArray);
+  
+        // Pick a featured program with images, fallback to first if any
+        const featured = programsArray.find((p) => p.images?.length > 0) || programsArray[0] || null;
         setFeaturedProgram(featured);
-        
+  
         setLoading(false);
       } catch (error) {
         console.error('Error fetching programs:', error);
+        setPrograms([]); // Ensure no .map crash
+        setFeaturedProgram(null);
         setLoading(false);
       }
     };
     fetchPrograms();
   }, []);
+  
 
   const destinations = [
     'all',
@@ -306,7 +313,7 @@ export default function Programs() {
           )}
 
           {!loading && filteredPrograms.length === 0 && (
-            <div className="text-center py-12">
+            <div className="text-center py-30">
               <div className="bg-white p-8 rounded-xl shadow-sm max-w-md mx-auto">
                 <Icon icon="mdi:map-marker-off" className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-800 mb-2">Aucun programme trouvé</h3>
