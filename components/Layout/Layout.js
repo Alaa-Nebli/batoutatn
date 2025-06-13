@@ -6,6 +6,7 @@ import { Icon } from "@iconify/react";
 import { useState } from 'react';
 import { Header } from "components//Header";
 import { Footer } from "components//Footer";
+import GoogleAnalytics from '../analytics';
 
 const adminNavigation = [
     { name: "Se connecter", href: '/admin/', icon: 'material-symbols:login' },
@@ -25,6 +26,8 @@ export const Layout = ({ children, className = "" }) => {
     if (!isAdminRoute) {
         return (
             <main className={`main relative overflow-hidden ${className}`}>
+                <GoogleAnalytics />
+
                 <Header />
                 {children}
                 <Footer />
