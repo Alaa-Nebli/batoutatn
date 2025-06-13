@@ -23,7 +23,7 @@ interface FormData {
   locationTo: string;
   days: string;
   price: string;
-  singleAdon: string; 
+  singleAdon: string;
   fromDate: string;
   toDate: string;
   timeline: TimelineItem[];
@@ -64,6 +64,13 @@ export default function ProgramCreate() {
   const [timelineImages, setTimelineImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Utility function to strip HTML and check for non-empty content
+  const stripHtml = (html: string): string => {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+  };
+
   useEffect(() => {
     if (formData.fromDate && formData.days) {
       const days = parseInt(formData.days);
@@ -75,7 +82,7 @@ export default function ProgramCreate() {
           const currentDate = addDays(startDate, index);
           return {
             title: `Day ${index + 1}`,
-            description: '', // now HTML from ReactQuill
+            description: '',
             date: format(currentDate, 'yyyy-MM-dd'),
             image: ''
           };
@@ -110,9 +117,7 @@ export default function ProgramCreate() {
     }));
   };
 
-  // Handle ReactQuill for these big text fields
   const handleDescriptionChange = (value: string) => {
-    // value is HTML
     setFormData(prev => ({ ...prev, description: value }));
   };
 
@@ -124,7 +129,6 @@ export default function ProgramCreate() {
     setFormData(prev => ({ ...prev, generalConditions: value }));
   };
 
-  // For timeline day description changes
   const handleTimelineDescriptionChange = useCallback((index: number, value: string) => {
     setFormData(prev => {
       const newTimeline = [...prev.timeline];
@@ -191,7 +195,6 @@ export default function ProgramCreate() {
         const file = validFiles[0];
         const objectUrl = URL.createObjectURL(file);
 
-        // Update timeline images array
         setTimelineImages(prev => {
           const newTimelineImages = [...prev];
           newTimelineImages[timelineIndex] = file;
@@ -269,6 +272,7 @@ export default function ProgramCreate() {
   }, [images]);
 
   const validateForm = useCallback(() => {
+    // Check existing required fields
     if (!formData.title || !formData.description || !formData.locationFrom || !formData.locationTo) {
       toast.error('Please fill in all required fields.');
       return false;
@@ -279,6 +283,16 @@ export default function ProgramCreate() {
     }
     if (!formData.fromDate) {
       toast.error('Please select a start date.');
+      return false;
+    }
+    // Check priceInclude
+    if (!stripHtml(formData.priceInclude).trim()) {
+      toast.error('Price Includes field is required.');
+      return false;
+    }
+    // Check generalConditions
+    if (!stripHtml(formData.generalConditions).trim()) {
+      toast.error('General Conditions field is required.');
       return false;
     }
     return true;
@@ -307,7 +321,7 @@ export default function ProgramCreate() {
         generalConditions: formData.generalConditions,
         timeline: formData.timeline.map((item, index) => ({
           title: item.title,
-          description: item.description, // HTML from ReactQuill
+          description: item.description,
           image: '',
           sortOrder: index + 1,
           date: item.date
@@ -417,9 +431,6 @@ export default function ProgramCreate() {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Description*</label>
-                {/*
-                  Replace <textarea> with <ReactQuill>:
-                */}
                 <ReactQuill
                   theme="snow"
                   value={formData.description}
@@ -540,7 +551,6 @@ export default function ProgramCreate() {
             />
           </div>
           
-          {/* Program Images */}
           <div className="mt-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Program Images</h2>
             <div className="flex flex-wrap gap-4">
@@ -577,7 +587,6 @@ export default function ProgramCreate() {
             </div>
           </div>
 
-          {/* Program Timeline */}
           <div className="mt-8">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">Program Timeline</h2>
             <div className="space-y-4">
@@ -595,7 +604,6 @@ export default function ProgramCreate() {
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
                       required
                     />
-                    {/* Use ReactQuill for day description */}
                     <ReactQuill
                       theme="snow"
                       value={item.description}
@@ -643,9 +651,8 @@ export default function ProgramCreate() {
             </div>
           </div>
 
-          {/* Price Includes (HTML) */}
           <div className="col-span-3">
-            <label className="block text-sm font-medium text-gray-700 mb-2">What’s included in the price</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">What’s included in the price*</label>
             <ReactQuill
               theme="snow"
               value={formData.priceInclude}
@@ -654,9 +661,8 @@ export default function ProgramCreate() {
             />
           </div>
 
-          {/* General Conditions (HTML) */}
           <div className="col-span-3">
-            <label className="block text-sm font-medium text-gray-700 mb-2">General Conditions</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">General Conditions*</label>
             <ReactQuill
               theme="snow"
               value={formData.generalConditions}
@@ -665,21 +671,19 @@ export default function ProgramCreate() {
             />
           </div>
 
-          {/* Display Switch */}
           <div className="flex items-center">
             <label className="inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 checked={formData.display}
                 onChange={(e) => setFormData(prev => ({ ...prev, display: e.target.checked }))}
-                className="sr-only peer"
+                className="mr-2 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
               />
               <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               <span className="ms-3 text-sm font-medium text-gray-700">Display on website</span>
             </label>
           </div>
 
-          {/* Buttons */}
           <div className="pt-6 border-t flex justify-end space-x-4">
             <button
               type="button"

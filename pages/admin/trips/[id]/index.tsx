@@ -1,20 +1,26 @@
+/* --------------------------------------------------------------------------
+   app/(admin)/programs/[id]/EditProgram.tsx
+   -------------------------------------------------------------------------- */
 "use client";
-import React, { useState, useEffect, useCallback } from 'react';
-import dynamic from 'next/dynamic';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/router';
-import { Icon } from '@iconify/react';
-import toast, { Toaster } from 'react-hot-toast';
-import Image from 'next/image';
-import { format, addDays } from 'date-fns';
 
+import React, { useState, useEffect, useCallback } from "react";
+import dynamic from "next/dynamic";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { Icon } from "@iconify/react";
+import Image from "next/image";
+import toast, { Toaster } from "react-hot-toast";
+import { format, addDays } from "date-fns";
+
+/* ------------------------------------------------------------------ */
+/* Types                                                              */
+/* ------------------------------------------------------------------ */
 interface TimelineItem {
   title: string;
   description: string;
   date: string;
   image: string;
 }
-
 interface FormData {
   title: string;
   metadata: string;
@@ -23,528 +29,483 @@ interface FormData {
   locationTo: string;
   days: string;
   price: string;
-  singleAdon: string; 
+  singleAdon: string;
   fromDate: string;
   toDate: string;
   timeline: TimelineItem[];
   display: boolean;
   priceInclude: string;
   generalConditions: string;
-  existingImages: string[]; // Added property
+  existingImages: string[];
+  phone: string;
 }
 
-// Dynamically load ReactQuill (for Next.js):
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
-import 'react-quill/dist/quill.snow.css';
+/* ------------------------------------------------------------------ */
+/* Dynamic WYSIWYG (React-Quill)                                      */
+/* ------------------------------------------------------------------ */
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
+import "react-quill/dist/quill.snow.css";
 
+/* ------------------------------------------------------------------ */
+/* Component                                                          */
+/* ------------------------------------------------------------------ */
 export default function EditProgram() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();               /* auth state           */
   const router = useRouter();
-  const { id } = router.query; // program ID from URL
+  const { id } = router.query;                   /* program id (slug)    */
 
+  /* ------------------------- Form state ------------------------- */
   const [formData, setFormData] = useState<FormData>({
-    title: '',
-    metadata: '',
-    description: '',
-    locationFrom: '',
-    locationTo: '',
-    days: '',
-    price: '',
-    singleAdon: '',
-    fromDate: '',
-    toDate: '',
+    title: "",
+    metadata: "",
+    description: "",
+    locationFrom: "",
+    locationTo: "",
+    days: "",
+    price: "",
+    singleAdon: "",
+    fromDate: "",
+    toDate: "",
     timeline: [],
     display: true,
-    priceInclude: '',
-    generalConditions: '',
+    priceInclude: "",
+    generalConditions: "",
     existingImages: [],
+    phone: "",
   });
 
-  // NEW arrays for newly uploaded images
-  const [newImages, setNewImages] = useState<File[]>([]);
-  const [timelineImages, setTimelineImages] = useState<File[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  /* program-level gallery */
+  const [keptImages,    setKeptImages]    = useState<string[]>([]);
+  const [newImages,     setNewImages]     = useState<File[]>([]);
 
-  // ============= Fetch existing program data =============
+  /* timeline replacement images keyed by day index */
+  const [timelineImages, setTimelineImages] = useState<Record<number, File>>({});
+
+  const [submitting, setSubmitting] = useState(false);
+
+  /* ------------------------------------------------------------------
+     1. Fetch program on mount
+     ------------------------------------------------------------------ */
   useEffect(() => {
     if (!id) return;
-    const fetchProgram = async () => {
-      try {
-        const response = await fetch(`/api/programs.controller?id=${id}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch existing program data');
-        }
-        const data = await response.json();
 
-        // Fill the form with existing data
-        setFormData(prev => ({
-          ...prev,
-          title: data.title || '',
-          metadata: data.metadata || '',
-          description: data.description || '',
-          locationFrom: data.location_from || '',
-          locationTo: data.location_to || '',
-          days: data.days?.toString() || '',
-          price: data.price?.toString() || '',
-          singleAdon: data.singleAdon?.toString() || '',
-          fromDate: data.from_date?.split('T')[0] || '', // "YYYY-MM-DD"
-          toDate: data.to_date?.split('T')[0] || '',
-          timeline: (data.timeline || []).map((item: any) => ({
-            title: item.title,
-            description: item.description,
-            date: item.date?.split('T')[0],
-            image: item.image || '',
+    (async () => {
+      try {
+        const res = await fetch(`/api/programs.controller?id=${id}`);
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+
+        setFormData({
+          title:             data.title            ?? "",
+          metadata:          data.metadata         ?? "",
+          description:       data.description      ?? "",
+          locationFrom:      data.location_from    ?? "",
+          locationTo:        data.location_to      ?? "",
+          days:              data.days?.toString() ?? "",
+          price:             data.price?.toString()?? "",
+          singleAdon:        data.singleAdon?.toString() ?? "",
+          fromDate:          data.from_date?.split("T")[0] ?? "",
+          toDate:            data.to_date?.split("T")[0]   ?? "",
+          timeline: (data.timeline || []).map((t: any) => ({
+            title: t.title,
+            description: t.description,
+            date: t.date?.split("T")[0],
+            image: t.image ?? "",
           })),
-          display: !!data.display,
-          priceInclude: data.priceInclude || '',
-          generalConditions: data.generalConditions || '',
-          existingImages: data.images || [],
-        }));
-      } catch (error) {
-        console.error(error);
-        toast.error('Error loading existing program');
+          display:           !!data.display,
+          priceInclude:      data.priceInclude ?? "",
+          generalConditions: data.generalConditions ?? "",
+          existingImages:    data.images ?? [],
+          phone:             data.phone  ?? "",
+        });
+
+        setKeptImages(data.images ?? []);
+      } catch {
+        toast.error("Unable to load program data");
       }
-    };
-    fetchProgram();
+    })();
   }, [id]);
 
-  // If user not authenticated, redirect
+  /* ------------------------------------------------------------------
+     2. Auth redirect
+     ------------------------------------------------------------------ */
   useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push('/admin');
+    if (status === "unauthenticated") {
+      router.push("/admin");
     }
   }, [status, router]);
 
-  // If fromDate or days change, recalc toDate
+  /* ------------------------------------------------------------------
+     3. Recalculate toDate whenever fromDate or days change
+     ------------------------------------------------------------------ */
   useEffect(() => {
-    const daysNumber = parseInt(formData.days);
-    if (formData.fromDate && !isNaN(daysNumber) && daysNumber > 0) {
-      const startDate = new Date(formData.fromDate);
-      const endDate = addDays(startDate, daysNumber - 1);
-      setFormData(prev => ({
-        ...prev,
-        toDate: format(endDate, 'yyyy-MM-dd'),
+    const d = parseInt(formData.days);
+    if (formData.fromDate && d > 0) {
+      setFormData(p => ({
+        ...p,
+        toDate: format(addDays(new Date(formData.fromDate), d - 1), "yyyy-MM-dd"),
       }));
     }
   }, [formData.fromDate, formData.days]);
 
-  const handleSimpleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  /* ------------------------------------------------------------------
+     4. Handlers
+     ------------------------------------------------------------------ */
+  const onSimpleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    if (name === 'toDate') {
-      toast.error('End date is auto-calculated. Modify "From date" or "Days" instead.');
-      return;
-    }
     setFormData(prev => ({ ...prev, [name]: value }));
-  }, []);
-
-  // WYSIWYG fields
-  const handleDescriptionChange = (val: string) => {
-    setFormData(prev => ({ ...prev, description: val }));
-  };
-  const handlePriceIncludeChange = (val: string) => {
-    setFormData(prev => ({ ...prev, priceInclude: val }));
-  };
-  const handleGeneralConditionsChange = (val: string) => {
-    setFormData(prev => ({ ...prev, generalConditions: val }));
   };
 
-  // Timeline fields
-  const handleTimelineTitleChange = useCallback((index: number, val: string) => {
-    setFormData(prev => {
-      const newTimeline = [...prev.timeline];
-      newTimeline[index] = { ...newTimeline[index], title: val };
-      return { ...prev, timeline: newTimeline };
-    });
-  }, []);
+  /* WYSIWYG */
+  const setDescription       = (v: string) => setFormData(p => ({ ...p, description: v }));
+  const setPriceInclude      = (v: string) => setFormData(p => ({ ...p, priceInclude: v }));
+  const setGeneralConditions = (v: string) => setFormData(p => ({ ...p, generalConditions: v }));
 
-  const handleTimelineDescriptionChange = useCallback((index: number, val: string) => {
-    setFormData(prev => {
-      const newTimeline = [...prev.timeline];
-      newTimeline[index] = { ...newTimeline[index], description: val };
-      return { ...prev, timeline: newTimeline };
-    });
-  }, []);
+  /* timeline title / desc */
+  const setTlTitle = (idx: number, v: string) => setFormData(p => {
+    const t = [...p.timeline]; t[idx].title = v; return { ...p, timeline: t };
+  });
+  const setTlDesc  = (idx: number, v: string) => setFormData(p => {
+    const t = [...p.timeline]; t[idx].description = v; return { ...p, timeline: t };
+  });
 
-  // Upload images
-  const handleImageUpload = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>, isTimelineImage = false, timelineIndex?: number) => {
-      try {
-        const files = e.target.files ? Array.from(e.target.files) : [];
-        if (!files.length) {
-          toast.error('No files selected');
-          return;
-        }
+  /* image pickers */
+  const handleImagePick = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    isTimeline = false,
+    tlIdx?: number,
+  ) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    e.target.value = "";
+    if (!files.length) return;
 
-        const validFiles = files.filter(file => {
-          if (!file.type.startsWith('image/')) {
-            toast.error(`File ${file.name} is not an image`);
-            return false;
-          }
-          if (file.size > 5 * 1024 * 1024) {
-            toast.error(`File ${file.name} is too large (max 5MB)`);
-            return false;
-          }
-          return true;
-        });
-
-        if (!validFiles.length) return;
-
-        if (isTimelineImage && timelineIndex !== undefined) {
-          if (validFiles.length > 1) {
-            toast.error('Only one image allowed per timeline day');
-            return;
-          }
-          const file = validFiles[0];
-          const objectUrl = URL.createObjectURL(file);
-
-          setTimelineImages(prev => {
-            const newArr = [...prev];
-            newArr[timelineIndex] = file;
-            return newArr;
-          });
-
-          setFormData(prev => {
-            const newTimeline = [...prev.timeline];
-            newTimeline[timelineIndex].image = objectUrl; // for preview
-            return { ...prev, timeline: newTimeline };
-          });
-        } else {
-          // Program-level images
-          setNewImages(prev => [...prev, ...validFiles]);
-        }
-        e.target.value = '';
-      } catch (error) {
-        console.error(error);
-        toast.error('Failed to upload images');
+    const valid = files.filter(f => {
+      if (!f.type.startsWith("image/")) {
+        toast.error(`${f.name} is not an image`); return false;
       }
-    },
-    []
-  );
-
-  // Remove images (preview only).
-  // For actual images in DB, we rely on the update approach (some do a separate endpoint to remove).
-  const removeImage = useCallback(
-    (index: number, isTimelineImage = false, timelineIndex?: number) => {
-      if (isTimelineImage && typeof timelineIndex === 'number') {
-        setTimelineImages(prev => {
-          const newArr = [...prev];
-          newArr[timelineIndex] = undefined as unknown as File;
-          return newArr;
-        });
-        setFormData(prev => {
-          const newTimeline = [...prev.timeline];
-          if (newTimeline[timelineIndex].image) {
-            URL.revokeObjectURL(newTimeline[timelineIndex].image);
-          }
-          newTimeline[timelineIndex].image = '';
-          return { ...prev, timeline: newTimeline };
-        });
-      } else {
-        // remove from newly added images
-        setNewImages(prev => prev.filter((_, i) => i !== index));
+      if (f.size > 5 * 1024 * 1024) {
+        toast.error(`${f.name} is >5 MB`); return false;
       }
-    },
-    []
-  );
+      return true;
+    });
+    if (!valid.length) return;
 
-  const validateForm = () => {
-    if (!formData.title || !formData.description || !formData.locationFrom || !formData.locationTo) {
-      toast.error('Please fill in all required fields (title, description, from/to locations).');
-      return false;
+    if (isTimeline && tlIdx !== undefined) {
+      const file = valid[0];
+      setTimelineImages(prev => ({ ...prev, [tlIdx]: file }));
+      setFormData(prev => {
+        const t = [...prev.timeline];
+        t[tlIdx].image = URL.createObjectURL(file);  /* preview blob */
+        return { ...prev, timeline: t };
+      });
+    } else {
+      setNewImages(prev => [...prev, ...valid]);
     }
-    if (parseInt(formData.days) <= 0) {
-      toast.error('Number of days must be > 0.');
-      return false;
+  };
+
+  /* remove pictures locally */
+  const removeExisting = (url: string) => {
+    setKeptImages(prev => prev.filter(u => u !== url));
+    setFormData(prev => ({
+      ...prev,
+      existingImages: prev.existingImages.filter(u => u !== url),
+    }));
+  };
+  const removeNew = (idx: number, isTimeline = false, tlIdx?: number) => {
+    if (isTimeline && tlIdx !== undefined) {
+      setTimelineImages(p => { const c = { ...p }; delete c[tlIdx]; return c; });
+      setFormData(p => { const t = [...p.timeline]; t[tlIdx].image = ""; return { ...p, timeline: t }; });
+    } else {
+      setNewImages(p => p.filter((_, i) => i !== idx));
     }
-    if (!formData.fromDate) {
-      toast.error('Please select a start date.');
-      return false;
-    }
+  };
+
+  /* ------------------------------------------------------------------
+     5. Validation & submit
+     ------------------------------------------------------------------ */
+  const validate = () => {
+    if (!formData.title || !formData.description)
+      return toast.error("Title and description required"), false;
+    if (!formData.locationFrom || !formData.locationTo)
+      return toast.error("Locations required"), false;
+    if (parseInt(formData.days) <= 0)
+      return toast.error("Days must be > 0"), false;
+    if (!formData.fromDate)
+      return toast.error("Pick a start date"), false;
     return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateForm()) return;
-    if (!id) {
-      toast.error('No program ID found in URL');
-      return;
-    }
+    if (!validate() || !id) return;
 
-    setIsSubmitting(true);
-
+    setSubmitting(true);
     try {
-      const formDataMultipart = new FormData();
+      const fd = new FormData();
 
-      // Prepare data to send
-      const programData = {
+      /* Append scalar program data */
+      fd.append("programData", JSON.stringify({
         ...formData,
         location_from: formData.locationFrom,
         location_to: formData.locationTo,
         days: parseInt(formData.days),
         price: parseFloat(formData.price),
         singleAdon: parseInt(formData.singleAdon) || 0,
-        timeline: formData.timeline.map((item, index) => ({
-          title: item.title,
-          description: item.description, // HTML
-          image: item.image,            // We'll replace if new image is uploaded
-          sortOrder: index + 1,
-          date: item.date
+        from_date: formData.fromDate,
+        to_date: formData.toDate,
+        timeline: formData.timeline.map((item, idx) => ({
+          ...item,
+          sortOrder: idx + 1,
         })),
-      };
+      }));
 
-      formDataMultipart.append('programData', JSON.stringify(programData));
+      /* New gallery images */
+      newImages.forEach(f => fd.append("program_images", f));
 
-      // newly added images
-      newImages.forEach(file => {
-        formDataMultipart.append('program_images', file);
+      /* Timeline replacement images keyed by index */
+      Object.entries(timelineImages).forEach(([i, f]) =>
+        fd.append(`timeline_images_${i}`, f),
+      );
+
+      /* Gallery state the user wants to keep */
+      fd.append("keptImages", JSON.stringify(keptImages));
+
+      /* PUT request */
+      const res = await fetch(`/api/programs.controller?id=${id}`, {
+        method: "PUT",
+        body: fd,
       });
 
-      // newly added timeline images
-      timelineImages.forEach(file => {
-        if (file) {
-          formDataMultipart.append('timeline_images', file);
-        }
-      });
-
-      const response = await fetch(`/api/programs.controller?id=${id}`, {
-        method: 'PUT',
-        body: formDataMultipart,
-      });
-
-      if (response.ok) {
-        toast.success('Program updated successfully!', {
-          style: { background: '#4BB543', color: 'white' },
-          iconTheme: { primary: 'white', secondary: '#4BB543' },
-        });
-        router.push('/admin/dashboard');
+      if (res.ok) {
+        toast.success("Program updated");
+        router.push("/admin/dashboard");
       } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || 'Failed to update program', {
-          style: { background: '#FF4136', color: 'white' },
-        });
+        const err = await res.json();
+        toast.error(err.message || "Update failed");
       }
-    } catch (error) {
-      console.error(error);
-      toast.error('An unexpected error occurred while updating program', {
-        style: { background: '#FF4136', color: 'white' },
-      });
+    } catch {
+      toast.error("Network / server error");
     } finally {
-      setIsSubmitting(false);
+      setSubmitting(false);
     }
   };
 
-  // Clean up object URLs on unmount
-  useEffect(() => {
-    return () => {
-      newImages.forEach(file => {
-        const url = URL.createObjectURL(file);
-        URL.revokeObjectURL(url);
-      });
-      timelineImages.forEach(file => {
-        if (file) {
-          const url = URL.createObjectURL(file);
-          URL.revokeObjectURL(url);
-        }
-      });
-      formData.timeline.forEach(item => {
-        if (item.image && item.image.startsWith('blob:')) {
-          URL.revokeObjectURL(item.image);
-        }
-      });
-    };
-  }, [newImages, timelineImages, formData.timeline]);
-
-  if (status === 'loading') {
+  /* ------------------------------------------------------------------
+     6. Auth loading spinner
+     ------------------------------------------------------------------ */
+  if (status === "loading")
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex items-center justify-center h-screen">
+        <div className="h-32 w-32 rounded-full border-t-2 border-b-2 border-blue-500 animate-spin" />
       </div>
     );
-  }
 
+  /* ------------------------------------------------------------------
+     7. JSX
+     ------------------------------------------------------------------ */
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <Toaster position="top-right" reverseOrder={false} />
+      <Toaster position="top-right" />
 
-      <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
+      <div className="max-w-5xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+        <header className="bg-gradient-to-r from-blue-500 to-purple-600 p-6">
           <h1 className="text-2xl font-bold text-white flex items-center">
-            <Icon icon="mdi:pencil" className="mr-3 w-8 h-8" />
-            Edit Program
+            <Icon icon="mdi:pencil" className="mr-3" /> Edit Program
           </h1>
-        </div>
+        </header>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          {/* Basic fields */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-4">
+        <form onSubmit={handleSubmit} className="p-8 space-y-10">
+          {/* -------------------------------------------------- */}
+          {/*  BASIC FIELDS                                     */}
+          {/* -------------------------------------------------- */}
+          <section className="grid md:grid-cols-2 gap-8">
+            {/* Left column */}
+            <div className="space-y-6">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Program Title*</label>
+                <label className="block mb-2 font-medium">Program Title*</label>
                 <input
-                  type="text"
                   name="title"
                   value={formData.title}
-                  onChange={handleSimpleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  onChange={onSimpleChange}
+                  className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
 
-              {/* Description (HTML) */}
+              {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description*</label>
-                <ReactQuill
-                  theme="snow"
-                  value={formData.description}
-                  onChange={handleDescriptionChange}
-                  className="bg-white"
+                <label className="block mb-2 font-medium">Description*</label>
+                <ReactQuill value={formData.description} onChange={setDescription} />
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block mb-2 font-medium">Phone</label>
+                <input
+                  name="phone"
+                  value={formData.phone}
+                  onChange={onSimpleChange}
+                  className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
-            <div className="space-y-4">
-              {/* From / To */}
+            {/* Right column */}
+            <div className="space-y-6">
+              {/* Locations */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">From Location*</label>
+                  <label className="block mb-2 font-medium">From*</label>
                   <input
-                    type="text"
                     name="locationFrom"
                     value={formData.locationFrom}
-                    onChange={handleSimpleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    onChange={onSimpleChange}
+                    className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">To Location*</label>
+                  <label className="block mb-2 font-medium">To*</label>
                   <input
-                    type="text"
                     name="locationTo"
                     value={formData.locationTo}
-                    onChange={handleSimpleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    onChange={onSimpleChange}
+                    className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
               </div>
 
-              {/* Days / Price / SingleAdon / FromDate */}
+              {/* Days / Price / Single */}
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Days*</label>
+                  <label className="block mb-2 font-medium">Days*</label>
                   <input
                     type="number"
                     name="days"
                     value={formData.days}
-                    onChange={handleSimpleInputChange}
-                    min="1"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    min={1}
+                    onChange={onSimpleChange}
+                    className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Price*</label>
+                  <label className="block mb-2 font-medium">Price*</label>
                   <input
                     type="number"
                     name="price"
                     value={formData.price}
-                    onChange={handleSimpleInputChange}
-                    min="0"
+                    min={0}
                     step="0.01"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    onChange={onSimpleChange}
+                    className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Single Add-on</label>
+                  <label className="block mb-2 font-medium">Single Add-on</label>
                   <input
                     type="number"
                     name="singleAdon"
                     value={formData.singleAdon}
-                    onChange={handleSimpleInputChange}
-                    min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    min={0}
+                    onChange={onSimpleChange}
+                    className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
+              </div>
+
+              {/* Dates */}
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">From Date*</label>
+                  <label className="block mb-2 font-medium">From Date*</label>
                   <input
                     type="date"
                     name="fromDate"
                     value={formData.fromDate}
-                    onChange={handleSimpleInputChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                    onChange={onSimpleChange}
+                    className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
-              </div>
-
-              {/* toDate (readOnly) */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">To Date</label>
-                <input
-                  type="date"
-                  name="toDate"
-                  value={formData.toDate}
-                  readOnly
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
-                />
+                <div>
+                  <label className="block mb-2 font-medium">To Date</label>
+                  <input
+                    type="date"
+                    name="toDate"
+                    value={formData.toDate}
+                    readOnly
+                    className="w-full rounded-lg border px-4 py-2 bg-gray-100 cursor-not-allowed"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          </section>
 
-          {/* Metadata */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Metadata</label>
+          {/* -------------------------------------------------- */}
+          {/*  Metadata                                          */}
+          {/* -------------------------------------------------- */}
+          <section>
+            <label className="block mb-2 font-medium">Metadata</label>
             <textarea
               name="metadata"
-              value={formData.metadata}
-              onChange={handleSimpleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
               rows={3}
+              value={formData.metadata}
+              onChange={onSimpleChange}
+              className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
             />
-          </div>
+          </section>
 
-          {/* Existing Program Images (read-only previews) */}
-          {formData.existingImages?.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold text-gray-800 mb-2">Existing Images</h2>
-              <p className="text-sm text-gray-500 mb-4">These images are already saved in the system.</p>
+          {/* -------------------------------------------------- */}
+          {/*  Existing gallery (deletable)                      */}
+          {/* -------------------------------------------------- */}
+          {formData.existingImages.length > 0 && (
+            <section>
+              <h2 className="text-xl font-semibold mb-2">Existing Images</h2>
+              <p className="text-sm text-gray-500 mb-3">Click ❌ to remove.</p>
               <div className="flex flex-wrap gap-4">
-                {formData.existingImages.map((url, idx) => (
-                  <div key={idx} className="relative">
+                {formData.existingImages.map(url => (
+                  <div key={url} className="relative">
                     <Image
                       src={url}
-                      alt="Existing image"
+                      alt="existing"
                       width={100}
                       height={100}
                       className="w-24 h-24 object-cover rounded-lg"
                     />
+                    <button
+                      type="button"
+                      onClick={() => removeExisting(url)}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                    >
+                      <Icon icon="mdi:close" className="w-4 h-4" />
+                    </button>
                   </div>
                 ))}
               </div>
-            </div>
+            </section>
           )}
 
-          {/* New Program Images */}
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Add/Replace Program Images</h2>
+          {/* -------------------------------------------------- */}
+          {/*  Add / replace gallery images                      */}
+          {/* -------------------------------------------------- */}
+          <section>
+            <h2 className="text-xl font-semibold mb-4">Add / Replace Images</h2>
             <div className="flex flex-wrap gap-4">
-              {newImages.map((image, index) => (
-                <div key={index} className="relative">
+              {newImages.map((file, i) => (
+                <div key={i} className="relative">
                   <Image
-                    src={URL.createObjectURL(image)}
-                    alt={`New Program image ${index + 1}`}
+                    src={URL.createObjectURL(file)}
+                    alt={`new-${i}`}
                     width={100}
                     height={100}
                     className="w-24 h-24 object-cover rounded-lg"
                   />
                   <button
                     type="button"
-                    onClick={() => removeImage(index)}
+                    onClick={() => removeNew(i)}
                     className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
                   >
                     <Icon icon="mdi:close" className="w-4 h-4" />
@@ -556,7 +517,7 @@ export default function EditProgram() {
                   type="file"
                   accept="image/*"
                   multiple
-                  onChange={(e) => handleImageUpload(e, false)}
+                  onChange={e => handleImagePick(e)}
                   className="hidden"
                 />
                 <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center hover:bg-gray-100">
@@ -564,144 +525,129 @@ export default function EditProgram() {
                 </div>
               </label>
             </div>
-          </div>
+          </section>
 
-          {/* Timeline */}
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Program Timeline</h2>
-            <div className="space-y-4">
-              {formData.timeline.map((item, index) => (
-                <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                  <div className="flex justify-between items-center mb-3">
-                    <h3 className="font-medium text-gray-700">
-                      Day {index + 1} - {item.date}
-                    </h3>
-                  </div>
+          {/* -------------------------------------------------- */}
+          {/*  Timeline                                          */}
+          {/* -------------------------------------------------- */}
+          <section>
+            <h2 className="text-xl font-semibold mb-4">Program Timeline</h2>
+            {formData.timeline.map((item, idx) => (
+              <div key={idx} className="mb-8 p-4 bg-gray-50 rounded-lg border">
+                <h3 className="font-medium mb-4">
+                  Day {idx + 1} — {item.date}
+                </h3>
 
-                  <div className="space-y-3">
-                    <input
-                      type="text"
-                      value={item.title}
-                      onChange={(e) => handleTimelineTitleChange(index, e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                      required
-                    />
+                {/* title */}
+                <input
+                  value={item.title}
+                  onChange={e => setTlTitle(idx, e.target.value)}
+                  placeholder="Day title"
+                  className="w-full mb-4 rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500"
+                />
 
-                    <ReactQuill
-                      theme="snow"
-                      value={item.description}
-                      onChange={(val) => handleTimelineDescriptionChange(index, val)}
-                      className="bg-white"
-                    />
+                {/* description */}
+                <ReactQuill
+                  value={item.description}
+                  onChange={v => setTlDesc(idx, v)}
+                />
 
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Day Image</label>
-                      <div className="flex items-center space-x-4">
-                        {item.image && (
-                          <div className="relative">
-                            <Image
-                              src={item.image}
-                              alt={`Day ${index + 1} image`}
-                              width={100}
-                              height={100}
-                              className="w-24 h-24 object-cover rounded-lg"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => removeImage(index, true, index)}
-                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
-                            >
-                              <Icon icon="mdi:close" className="w-4 h-4" />
-                            </button>
-                          </div>
-                        )}
-                        <label className="cursor-pointer">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleImageUpload(e, true, index)}
-                            className="hidden"
-                          />
-                          <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center hover:bg-gray-100">
-                            <Icon icon="mdi:plus" className="w-8 h-8 text-gray-400" />
-                          </div>
-                        </label>
+                {/* day image picker */}
+                <div className="mt-4">
+                  <label className="block font-medium mb-2">Day Image</label>
+                  <div className="flex gap-4 items-center">
+                    {item.image && (
+                      <div className="relative">
+                        <Image
+                          src={item.image}
+                          alt={`day-${idx}`}
+                          width={100}
+                          height={100}
+                          className="w-24 h-24 object-cover rounded-lg"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeNew(0, true, idx)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1"
+                        >
+                          <Icon icon="mdi:close" className="w-4 h-4" />
+                        </button>
                       </div>
-                    </div>
+                    )}
+
+                    <label className="cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={e => handleImagePick(e, true, idx)}
+                        className="hidden"
+                      />
+                      <div className="w-24 h-24 border-2 border-dashed rounded-lg flex items-center justify-center hover:bg-gray-100">
+                        <Icon icon="mdi:plus" className="w-8 h-8 text-gray-400" />
+                      </div>
+                    </label>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+            ))}
+          </section>
 
-          {/* Price Includes & General Conditions */}
-          <div className="col-span-3">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              What’s included in the price
-            </label>
-            <ReactQuill
-              theme="snow"
-              value={formData.priceInclude}
-              onChange={handlePriceIncludeChange}
-              className="bg-white"
-            />
-          </div>
+          {/* -------------------------------------------------- */}
+          {/*  Price include & general conditions                */}
+          {/* -------------------------------------------------- */}
+          <section>
+            <label className="block mb-2 font-medium">What&lsquo;s included</label>
+            <ReactQuill value={formData.priceInclude} onChange={setPriceInclude} />
+          </section>
 
-          <div className="col-span-3">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              General Conditions
-            </label>
-            <ReactQuill
-              theme="snow"
-              value={formData.generalConditions}
-              onChange={handleGeneralConditionsChange}
-              className="bg-white"
-            />
-          </div>
+          <section>
+            <label className="block mb-2 font-medium">General conditions</label>
+            <ReactQuill value={formData.generalConditions} onChange={setGeneralConditions} />
+          </section>
 
-          {/* Display Switch */}
+          {/* -------------------------------------------------- */}
+          {/*  Display switch                                    */}
+          {/* -------------------------------------------------- */}
           <div className="flex items-center">
             <label className="inline-flex items-center cursor-pointer">
               <input
                 type="checkbox"
                 checked={formData.display}
                 onChange={(e) => setFormData(prev => ({ ...prev, display: e.target.checked }))}
-                className="sr-only peer"
+                className="mr-2 w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
               />
-              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full
-                rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white
-                after:content-[''] after:absolute after:top-[2px] after:start-[2px]
-                after:bg-white after:border-gray-300 after:border after:rounded-full
-                after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"
-              ></div>
+              <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               <span className="ms-3 text-sm font-medium text-gray-700">Display on website</span>
             </label>
           </div>
 
-          {/* Buttons */}
-          <div className="pt-6 border-t flex justify-end space-x-4">
+
+          {/* -------------------------------------------------- */}
+          {/*  Action buttons                                    */}
+          {/* -------------------------------------------------- */}
+          <footer className="flex justify-end gap-4 pt-6 border-t">
             <button
               type="button"
-              onClick={() => router.push('/admin/dashboard')}
-              className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg focus:outline-none hover:bg-gray-300"
+              onClick={() => router.push("/admin/dashboard")}
+              className="px-6 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
             >
               Cancel
             </button>
+
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-500 text-white rounded-lg focus:outline-none hover:bg-blue-600 disabled:opacity-50"
-              disabled={isSubmitting}
+              disabled={submitting}
+              className="px-6 py-2 bg-blue black rounded-lg hover:bg-blue-700 "
             >
-              {isSubmitting ? (
+              {submitting ? (
                 <span className="flex items-center">
-                  <Icon icon="mdi:loading" className="animate-spin mr-2" />
-                  Updating...
+                  <Icon icon="mdi:loading" className="animate-spin mr-2" /> Updating…
                 </span>
               ) : (
-                'Update Program'
+                "Update Program"
               )}
             </button>
-          </div>
+          </footer>
         </form>
       </div>
     </div>

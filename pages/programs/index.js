@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Layout } from "components/Layout";
 import SEO from "components/SEO/SEO";
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { useTranslation } from 'next-i18next';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import Link from "next/link";
@@ -46,7 +45,7 @@ const ProgramCard = ({ program }) => {
       <div className="relative aspect-video w-full overflow-hidden">
         <Image
           src={program.images?.[0] || '/placeholder.jpg'}
-          alt={program.title}
+          alt={`${program.title} - Circuit au départ de ${program.location_from}`}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-105"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -201,7 +200,6 @@ const FeaturedProgram = ({ program }) => {
 };
 
 export default function Programs() {
-  const { t } = useTranslation('common');
   const [programs, setPrograms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDestination, setSelectedDestination] = useState('all');
@@ -211,7 +209,7 @@ export default function Programs() {
     const fetchPrograms = async () => {
       try {
         setLoading(true);
-        const response = await fetch('/api/programs.controller');
+        const response = await fetch('/api/programs.controller?active=true');
         const data = await response.json();
   
         // Ensure data is an array, fallback to empty array
@@ -247,8 +245,8 @@ export default function Programs() {
   return (
     <Layout>
       <SEO
-        title="Nos Programmes de Voyage | Découvrez des Destinations Uniques"
-        description="Explorez nos programmes de voyage soigneusement sélectionnés à travers le monde. Des expériences inoubliables vous attendent."
+          title="Voyages organisés en Tunisie et à l'international | Batouta.tn"
+        description="Explorez nos programmes de voyage : circuits, excursions et séjours en Tunisie et à l'étranger, sélectionnés pour des expériences inoubliables."
       />
 
       {/* Featured Program Hero */}

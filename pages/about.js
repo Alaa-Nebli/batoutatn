@@ -329,9 +329,11 @@ export default function AboutUs() {
     <Layout className="bg-white">
       <div className="main-wrapper pt-18 relative z-10">
         <SEO
-          title="About Batouta Voyages | Your Bridge Between Tunisia and Japan"
-          description="Discover the story of Batouta Voyages, connecting Tunisia and Japan through extraordinary travel experiences since 1995. Learn about our values, journey, and commitment to cultural exchange."
+          title="À propos de Batouta Voyages | Lien entre la Tunisie et le Japon"
+          description="Découvrez l'histoire de Batouta Voyages, agence tunisienne reliant la Tunisie et le Japon depuis 1995. Nos valeurs, notre parcours et notre passion pour les échanges culturels."
         />
+        <h1 className="sr-only">À propos de Batouta Voyages - Tunisie & Japon</h1>
+
         <WhoWeAre />
         <OurValues />
         <History />

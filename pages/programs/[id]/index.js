@@ -31,7 +31,7 @@ const fmtDate = d =>
   });
 
 /* -------------------------------------------------- */
-/*  Timeline item (screen)                            */
+/*  Timeline item (screen)                              */
 /* -------------------------------------------------- */
 const TimelineItem = ({ day, content, isActive, onClick }) => (
   <motion.div
@@ -86,7 +86,7 @@ const TimelineItem = ({ day, content, isActive, onClick }) => (
           <div className="relative aspect-video md:aspect-[3/2] rounded-xl overflow-hidden shadow-lg">
             <Image
               src={content.image}
-              alt={content.title}
+              alt={`Illustration du jour ${day} - ${content.title}`}
               fill
               className="object-cover transition-transform duration-300 hover:scale-105"
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -118,10 +118,11 @@ const ImageCarousel = ({ images = [] }) => (
           <div className="relative h-full w-full">
             <Image
               src={img}
-              alt={`Slide ${idx + 1}`}
+              alt={`Photo ${idx + 1}`}
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+
               priority={idx < 3}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
@@ -198,9 +199,9 @@ const ProgramHeaderCard = ({ program }) => {
       className="bg-white rounded-2xl p-6 shadow-lg h-full flex flex-col"
     >
       <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">{program.title}</h1>
-      <h4 className="text-2xl md:text-2xl font-bold text-gray-800 mb-4">
+      <h2 className="text-2xl md:text-2xl font-bold text-gray-800 mb-4">
   Du {formatDate(program.from_date, { year: undefined })} au {formatDate(program.to_date)}
-</h4>
+</h2>
 
       <br />
       <div className="space-y-4 mb-6">

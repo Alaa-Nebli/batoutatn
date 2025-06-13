@@ -6,11 +6,11 @@ import { Icon } from '@iconify/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { useTranslation } from 'next-i18next';
-import Head from 'next/head';
 import { ContactUs } from 'components/Contact';
 import Image from 'next/image';
 import Link from 'next/link';
 import {ReservationForm} from 'components/ReservationForm';
+import SEO from "components/SEO/SEO";
 
 // Constants for excursions data
 const EXCURSIONS = {
@@ -370,16 +370,14 @@ const ServiceDetails = ({ serviceId }) => {
 
   return (
     <Layout className="bg-white">
-      <Head>
-        <title>{`${serviceData.title} - Batouta Voyages`}</title>
-        <meta name="description" content={serviceData.description} />
-        <meta property="og:title" content={`${serviceData.title} - Batouta Voyages`} />
-        <meta property="og:description" content={serviceData.description} />
-        <meta property="og:image" content={serviceData.image} />
-      </Head>
-
+      <SEO
+        title={`${serviceData.title} - Batouta Voyages`}
+        description={serviceData.description}
+      />
       {/* Hero Section with Parallax Effect */}
       <section className="relative mt-20 h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
+       <h1 className="sr-only">{`${serviceData.title} - Batouta Voyages`}</h1>
+
         <motion.div 
           className="absolute inset-0 bg-black/30 z-10"
           initial={{ opacity: 0 }}

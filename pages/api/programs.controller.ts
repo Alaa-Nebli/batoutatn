@@ -22,13 +22,17 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit for images
 }).fields([
   { name: 'program_images', maxCount: 10 },
-  { name: 'timeline_images', maxCount: 50 }
+  { name: 'timeline_images', maxCount: 50 },
 ]);
 
 const uploadToSupabase = async (file: Express.Multer.File, folder: string) => {
+  if (file.size > 5 * 1024 * 1024) {
+    throw new Error(`File ${file.originalname} exceeds 5MB limit`);
+  }
+
   const fileExt = file.originalname.split('.').pop();
   const fileName = `${uuidv4()}.${fileExt}`;
   const filePath = `${folder}/${fileName}`;
@@ -41,14 +45,13 @@ const uploadToSupabase = async (file: Express.Multer.File, folder: string) => {
     });
 
   if (error) {
-    throw error;
+    throw new Error(`Failed to upload ${file.originalname}: ${error.message}`);
   }
 
   const { data: { publicUrl } } = supabase.storage
     .from('programs')
     .getPublicUrl(filePath);
 
-  console.log(publicUrl)
   return publicUrl;
 };
 
@@ -58,7 +61,7 @@ const deleteFromSupabase = async (url: string) => {
     const { error } = await supabase.storage
       .from('programs')
       .remove([path]);
-    
+
     if (error) {
       console.error('Error deleting file:', error);
     }
@@ -70,9 +73,14 @@ const deleteFromSupabase = async (url: string) => {
 export const createProgram = async (req: NextApiRequest, res: NextApiResponse) => {
   // @ts-ignore
   upload(req, res, async (err) => {
-    if (err) {
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ message: 'One or more files exceed the 5MB limit' });
+      }
+      return res.status(500).json({ message: 'File upload error', error: err.message });
+    } else if (err) {
       console.error('Error uploading files:', err);
-      return res.status(500).json({ message: 'Error uploading files', error: (err as Error).message });
+      return res.status(500).json({ message: 'Error uploading files', error: err.message });
     }
 
     try {
@@ -80,10 +88,34 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
       const files = (req as NextApiRequestWithFiles).files || {};
       const programImages = files['program_images'] || [];
       const timelineImages = files['timeline_images'] 
-            ? Array.isArray(files['timeline_images'])
-              ? files['timeline_images'] as Express.Multer.File[]
-              : Object.values(files['timeline_images']) as Express.Multer.File[]
-            : [];
+        ? Array.isArray(files['timeline_images'])
+          ? files['timeline_images'] as Express.Multer.File[]
+          : Object.values(files['timeline_images']) as Express.Multer.File[]
+        : [];
+
+      // Validate required fields
+      if (!programData.title || !programData.description || !programData.locationFrom || !programData.locationTo) {
+        return res.status(400).json({ message: 'Missing required fields: title, description, locationFrom, or locationTo' });
+      }
+
+      if (!programData.fromDate || isNaN(new Date(programData.fromDate).getTime())) {
+        return res.status(400).json({ message: 'Invalid or missing fromDate' });
+      }
+
+      if (isNaN(parseInt(programData.days)) || parseInt(programData.days) <= 0) {
+        return res.status(400).json({ message: 'Days must be a positive number' });
+      }
+
+      // Validate file types
+      const invalidFiles = [...programImages, ...timelineImages].filter(
+        file => !file.mimetype.startsWith('image/')
+      );
+      if (invalidFiles.length > 0) {
+        return res.status(400).json({ 
+          message: 'Invalid file type(s). Only images are allowed.',
+          invalidFiles: invalidFiles.map(f => f.originalname)
+        });
+      }
 
       const programImageUrls = await Promise.all(
         programImages.map(file => uploadToSupabase(file, 'program-images'))
@@ -93,22 +125,14 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
         timelineImages.map(file => uploadToSupabase(file, 'timeline-images'))
       );
 
-      console.log(timelineImageUrls)
-
       const fromDate = new Date(programData.fromDate);
-      if (isNaN(fromDate.getTime())) {
-        console.error('Invalid fromDate:', programData.fromDate);
-        return res.status(400).json({ message: 'Invalid date format for fromDate' });
-      }
-
       let toDate: Date;
       if (!programData.toDate || programData.toDate.trim() === '') {
         toDate = new Date(fromDate);
-        toDate.setDate(toDate.getDate() + programData.days);
+        toDate.setDate(toDate.getDate() + parseInt(programData.days));
       } else {
         toDate = new Date(programData.toDate);
         if (isNaN(toDate.getTime())) {
-          console.error('Invalid toDate:', programData.toDate);
           return res.status(400).json({ message: 'Invalid date format for toDate' });
         }
       }
@@ -117,28 +141,28 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
         data: {
           title: programData.title,
           metadata: programData.metadata || null,
-          description: programData.description, // HTML is stored here
+          description: programData.description,
           images: programImageUrls,
           location_from: programData.locationFrom,
           location_to: programData.locationTo,
-          days: programData.days,
-          price: programData.price,
-          singleAdon : programData.singleAdon || null,
+          days: parseInt(programData.days),
+          price: parseFloat(programData.price),
+          singleAdon: programData.singleAdon ? parseInt(programData.singleAdon) : 0,
           from_date: fromDate.toISOString(),
           to_date: toDate.toISOString(),
-          display: programData.display,
+          display: programData.display ?? true, // Default to true if not specified
           timeline: {
             create: programData.timeline?.map((item: any, index: number) => ({
               title: item.title,
-              description: item.description, // HTML stored here
+              description: item.description,
               image: timelineImageUrls[index] || null,
-              sortOrder: item.sortOrder,
+              sortOrder: index + 1,
               date: new Date(item.date)
             })) || []
           },
           phone: programData.phone || null,
-          priceInclude : programData.priceInclude || null,     // HTML
-          generalConditions : programData.generalConditions || null,  // HTML
+          priceInclude: programData.priceInclude || null,
+          generalConditions: programData.generalConditions || null,
         },
         include: {
           timeline: true
@@ -156,115 +180,138 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
   });
 };
 
-
 export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) => {
   // @ts-ignore
   upload(req, res, async (err) => {
-    if (err) {
-      console.error('Error uploading files:', err);
-      return res.status(500).json({ message: 'Error uploading files', error: (err as Error).message });
+    if (err instanceof multer.MulterError) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ message: 'One or more files exceed the 5MB limit' });
+      }
+      return res.status(500).json({ message: 'File upload error', error: err.message });
+    } else if (err) {
+      console.error('Upload error:', err);
+      return res.status(500).json({ message: 'Upload error', error: err.message });
     }
 
     try {
       const programData = JSON.parse(req.body.programData);
+      const keptImages: string[] = req.body.keptImages
+        ? JSON.parse(req.body.keptImages)
+        : [];
       const { id } = req.query;
       const files = (req as NextApiRequestWithFiles).files || {};
-      const programImages = files['program_images'] || [];
-      const timelineImages = files['timeline_images'] || [];
 
-      // Parse and validate dates
-      const fromDate = new Date(programData.fromDate);
-      const toDate = new Date(programData.toDate);
-
-      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
-        console.error('Invalid date(s):', programData.fromDate, programData.toDate);
-        return res.status(400).json({ message: 'Invalid date format for fromDate or toDate' });
+      // Validate required fields
+      if (!programData.title || !programData.description || !programData.location_from || !programData.location_to) {
+        return res.status(400).json({ message: 'Missing required fields: title, description, location_from, or location_to' });
       }
 
-      // Get existing program to handle image updates
-      const existingProgram = await prisma.trip.findUnique({
+      if (!programData.fromDate || isNaN(new Date(programData.fromDate).getTime())) {
+        return res.status(400).json({ message: 'Invalid or missing fromDate' });
+      }
+
+      if (isNaN(parseInt(programData.days)) || parseInt(programData.days) <= 0) {
+        return res.status(400).json({ message: 'Days must be a positive number' });
+      }
+
+      // Validate file types
+      const galleryFiles: Express.Multer.File[] = (files['program_images'] || []) as Express.Multer.File[];
+      const timelineFiles: Record<number, Express.Multer.File> = {};
+      for (const [field, fileArr] of Object.entries(files)) {
+        if (field.startsWith('timeline_images_')) {
+          const idx = Number(field.split('_').pop()!);
+          timelineFiles[idx] = (fileArr as Express.Multer.File[])[0];
+        }
+      }
+
+      const invalidFiles = [...galleryFiles, ...Object.values(timelineFiles)].filter(
+        file => !file.mimetype.startsWith('image/')
+      );
+      if (invalidFiles.length > 0) {
+        return res.status(400).json({ 
+          message: 'Invalid file type(s). Only images are allowed.',
+          invalidFiles: invalidFiles.map(f => f.originalname)
+        });
+      }
+
+      const fromDate = new Date(programData.fromDate);
+      const toDate = new Date(programData.toDate);
+      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+        return res.status(400).json({ message: 'Invalid fromDate/toDate' });
+      }
+
+      const existing = await prisma.trip.findUnique({
         where: { id: id as string },
-        include: { timeline: true }
+        include: { timeline: true },
       });
+      if (!existing) {
+        return res.status(404).json({ message: 'Program not found' });
+      }
 
-      // Upload new program images to Supabase
-      const newProgramImageUrls = await Promise.all(
-        programImages.map(file => uploadToSupabase(file, 'program-images'))
+      const newGalleryUrls = await Promise.all(
+        galleryFiles.map(f => uploadToSupabase(f, 'program-images')),
       );
 
-      // Upload new timeline images to Supabase
-      const newTimelineImageUrls = await Promise.all(
-        timelineImages.map(file => uploadToSupabase(file, 'timeline-images'))
+      const uploadedTimelineUrls: Record<number, string> = {};
+      await Promise.all(
+        Object.entries(timelineFiles).map(async ([idx, file]) => {
+          uploadedTimelineUrls[Number(idx)] = await uploadToSupabase(file, 'timeline-images');
+        }),
       );
 
-      // Combine new images with existing ones if not all are being replaced
-      const finalProgramImages = newProgramImageUrls.length > 0 
-        ? newProgramImageUrls 
-        : existingProgram?.images || [];
+      const finalGallery = [...keptImages, ...newGalleryUrls];
 
-      // Update program with timeline
-      const program = await prisma.trip.update({
+      const timelineCreate = programData.timeline.map((item: any, idx: number) => ({
+        title: item.title,
+        description: item.description,
+        image: uploadedTimelineUrls[idx] || item.image || null,
+        sortOrder: item.sortOrder,
+        date: new Date(item.date),
+      }));
+
+      const updated = await prisma.trip.update({
         where: { id: id as string },
         data: {
           title: programData.title,
           metadata: programData.metadata || null,
           description: programData.description,
-          images: finalProgramImages,
+          images: finalGallery,
           location_from: programData.location_from,
           location_to: programData.location_to,
-          days: programData.days,
-          price: programData.price,
-          singleAdon : programData.singleAdon || null,
+          days: parseInt(programData.days),
+          price: parseFloat(programData.price),
+          singleAdon: programData.singleAdon ? parseInt(programData.singleAdon) : undefined,
           from_date: fromDate,
           to_date: toDate,
-          display: programData.display,
-          timeline: {
-            deleteMany: {},
-            create: programData.timeline?.map((item: any, index: number) => ({
-              title: item.title,
-              description: item.description,
-              image: newTimelineImageUrls[index] || item.image || null,
-              sortOrder: item.sortOrder,
-              date: new Date(item.date)
-            })) || []
-          }, 
+          display: programData.display ?? existing.display, // Preserve existing display if not provided
           phone: programData.phone || null,
-          priceInclude : programData.priceInclude || null,
-          generalConditions : programData.generalConditions || null,
+          priceInclude: programData.priceInclude || null,
+          generalConditions: programData.generalConditions || null,
+          timeline: { deleteMany: {}, create: timelineCreate },
         },
-        include: {
-          timeline: true
-        }
+        include: { timeline: true },
       });
 
-      // Clean up old images that were replaced
-      if (existingProgram) {
-        if (newProgramImageUrls.length > 0 && existingProgram.images) {
-          for (const oldImage of (existingProgram.images as string[])) {
-            await deleteFromSupabase(oldImage);
-          }
-        }
-        
-        if (newTimelineImageUrls.length > 0) {
-          for (const timelineItem of existingProgram.timeline) {
-            if (timelineItem.image) {
-              await deleteFromSupabase(timelineItem.image);
-            }
-          }
-        }
-      }
+      const galleryToPurge = (existing.images as string[]).filter(
+        url => !keptImages.includes(url),
+      );
 
-      res.status(200).json({ 
-        message: 'Program updated successfully',
-        programId: program.id
-      });
-    } catch (error) {
-      console.error('Error updating program:', error);
-      res.status(500).json({ message: 'Error updating program', error: (error as Error).message });
+      const timelineToPurge = existing.timeline
+        .filter(t => t.image && uploadedTimelineUrls[t.sortOrder - 1] !== undefined)
+        .map(t => t.image!);
+
+      await Promise.all([
+        ...galleryToPurge.map(deleteFromSupabase),
+        ...timelineToPurge.map(deleteFromSupabase),
+      ]);
+
+      return res.status(200).json({ message: 'Updated', programId: updated.id });
+    } catch (e) {
+      console.error('Update error:', e);
+      return res.status(500).json({ message: 'Update error', error: (e as Error).message });
     }
   });
 };
-
 
 export const deleteProgram = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
@@ -272,29 +319,26 @@ export const deleteProgram = async (req: NextApiRequest, res: NextApiResponse) =
 
     const program = await prisma.trip.findUnique({
       where: { id: id as string },
-      include: { timeline: true }
+      include: { timeline: true },
     });
 
-    if (program) {
-      // Delete all associated images from Supabase
-      if (program.images) {
-        for (const imageUrl of (program.images as string[])) {
-          await deleteFromSupabase(imageUrl);
-        }
-      }
-
-      // Delete timeline images
-      for (const timelineItem of program.timeline) {
-        if (timelineItem.image) {
-          await deleteFromSupabase(timelineItem.image);
-        }
-      }
-
-      // Delete the program record
-      await prisma.trip.delete({
-        where: { id: id as string },
-      });
+    if (!program) {
+      return res.status(404).json({ message: 'Program not found' });
     }
+
+    if (program.images) {
+      await Promise.all((program.images as string[]).map(deleteFromSupabase));
+    }
+
+    for (const timelineItem of program.timeline) {
+      if (timelineItem.image) {
+        await deleteFromSupabase(timelineItem.image);
+      }
+    }
+
+    await prisma.trip.delete({
+      where: { id: id as string },
+    });
 
     res.status(200).json({ message: 'Program deleted successfully' });
   } catch (error) {
@@ -303,16 +347,15 @@ export const deleteProgram = async (req: NextApiRequest, res: NextApiResponse) =
   }
 };
 
-// Fetch corrections for timeline sorting and creation
 export const fetchAllPrograms = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const programs = await prisma.trip.findMany({
       include: {
         timeline: {
-          orderBy: { sortOrder: 'asc' }
-        }
+          orderBy: { sortOrder: 'asc' },
+        },
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
     });
 
     res.status(200).json(programs);
@@ -322,20 +365,36 @@ export const fetchAllPrograms = async (req: NextApiRequest, res: NextApiResponse
   }
 };
 
+export const fetchActivePrograms = async (req: NextApiRequest, res: NextApiResponse) => {
+  try {
+    const programs = await prisma.trip.findMany({
+      where: { display: true },
+      include: {
+        timeline: {
+          orderBy: { sortOrder: 'asc' },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
 
+    res.status(200).json(programs);
+  } catch (error) {
+    console.error('Error fetching active programs:', error);
+    res.status(500).json({ message: 'Error fetching active programs', error: (error as Error).message });
+  }
+};
 
-// Fetch program by ID
 export const fetchProgramById = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { id } = req.query;
-    
+
     const program = await prisma.trip.findUnique({
       where: { id: id as string },
       include: {
         timeline: {
-          orderBy: { sortOrder: 'asc' }
-        }
-      }
+          orderBy: { sortOrder: 'asc' },
+        },
+      },
     });
 
     if (!program) {
@@ -360,6 +419,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return deleteProgram(req, res);
       case 'GET':
         if (req.query.id) return fetchProgramById(req, res);
+        if (req.query.active === 'true') return fetchActivePrograms(req, res);
         return fetchAllPrograms(req, res);
       default:
         res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE']);

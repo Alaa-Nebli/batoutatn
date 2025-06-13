@@ -1,11 +1,14 @@
-import React, { useState, useEffect,useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Layout } from 'components/Layout';
 import Image from "next/legacy/image";
 import { Icon } from "@iconify/react";
 import { useTranslation } from 'next-i18next';
 import Contact from 'components/Contact/ContactUs';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import SEO from 'components/SEO/SEO';
+import { MotionDiv, MotionH3 } from '../utils/motion_framer';
+
 
 export async function getStaticProps({ locale }) {
   return {
@@ -52,7 +55,7 @@ const WhyChooseUsSection = () => {
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -64,11 +67,11 @@ const WhyChooseUsSection = () => {
 
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-pink-500 mx-auto" />
-        </motion.div>
+        </MotionDiv>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
   {reasonsToChoose.map((reason, index) => (
-    <motion.div
+    <MotionDiv
       key={index}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -91,7 +94,7 @@ const WhyChooseUsSection = () => {
           ))}
         </ul>
       </div>
-    </motion.div>
+    </MotionDiv>
   ))}
 </div>
 
@@ -165,7 +168,7 @@ const EsteemSection = () => {
   return (
     <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4">
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -180,17 +183,17 @@ const EsteemSection = () => {
           <p className="text-xl text-gray-600 max-w-2xl mx-auto font-bold">
             Découvrez comment nous réinventons le tourisme en Tunisie avec des expériences qui respectent les hommes et la nature
           </p>
-          <motion.div 
+          <MotionDiv 
             initial={{ width: 0 }}
             whileInView={{ width: "6rem" }}
             transition={{ duration: 0.8 }}
             className="h-1 bg-gradient-to-r from-emerald-500 to-teal-500 mx-auto mt-6"
           />
-        </motion.div>
+        </MotionDiv>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
           {principles.map((principle, index) => (
-            <motion.div
+            <MotionDiv
               key={index}
               initial={{ opacity: 0, y: 40, rotateY: 15 }}
               whileInView={{ opacity: 1, y: 0, rotateY: 0 }}
@@ -215,7 +218,7 @@ const EsteemSection = () => {
                   </div>
                 </div>
 
-                <motion.div 
+                <MotionDiv 
                   className="relative h-48 transition-transform duration-500 transform-gpu preserve-3d"
                   style={{
                     transform: `rotateY(${hovered[index] ? '180deg' : '0deg'})`,
@@ -239,17 +242,17 @@ const EsteemSection = () => {
                       <p className="text-gray-700 font-medium text-center">
                         {principle.description}
                       </p>
-                      <motion.div
+                      <MotionDiv
                         initial={{ scale: 0.8 }}
                         whileInView={{ scale: 1 }}
                         className="mt-4 mx-auto w-8 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
                       />
                     </div>
                   </div>
-                </motion.div>
+                </MotionDiv>
 
                 {/* Image below card */}
-                <motion.div 
+                <MotionDiv 
                   className="mt-4 relative h-32 rounded-xl overflow-hidden shadow-lg"
                   whileHover={{ scale: 1.05 }}
                 >
@@ -260,13 +263,13 @@ const EsteemSection = () => {
                     objectFit="cover"
                     className="transition-transform duration-300"
                   />
-                </motion.div>
+                </MotionDiv>
               </div>
-            </motion.div>
+            </MotionDiv>
           ))}
         </div>
 
-        <motion.div
+        <MotionDiv
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
@@ -276,7 +279,7 @@ const EsteemSection = () => {
             <span className="font-bold text-2xl text-emerald-600">Notre promesse :<br/> </span> Un voyage où chaque détail compte 
             pour vous, pour les locaux, et pour la planète.
           </p>
-        </motion.div>
+        </MotionDiv>
       </div>
     </section>
   );
@@ -316,11 +319,17 @@ const ServicesPage = () => {
 
   return (
     <Layout className="bg-gradient-to-b from-white to-orange-50">
+      <SEO
+        title="Nos Services | Batouta Voyages - Excursions, Billetterie, Transport"
+        description="Découvrez tous les services proposés par Batouta Voyages : circuits, excursions, billetterie, organisation d'événements et transport en Tunisie."
+      />
+
       <div className="main-wrapper pt-20 relative z-10">
+        <h1 className="sr-only">Services de voyage en Tunisie - Batouta Voyages</h1>
         <div id="our-services" className="mt-5" />
         <section ref={servicesSectionRef} className="py-20">
           <div className="max-w-7xl mx-auto px-4">
-            <motion.div
+            <MotionDiv
               className="text-center mb-16"
               initial={{ opacity: 0, y: -50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -334,14 +343,14 @@ const ServicesPage = () => {
               <p className="text-gray-600 max-w-4xl mx-auto font-bold">
                 {t('Home.Our_Services_section.Our_Services_Description')}
               </p>
-            </motion.div>
+            </MotionDiv>
 
             {services.map((service, index) => {
               const isExpanded = expandedIndex === index;
               const shortDescription = service.description.slice(0, 150);
 
               return (
-                <motion.div
+                <MotionDiv
                   key={index}
                   className={`flex flex-col ${
                     index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'
@@ -352,7 +361,7 @@ const ServicesPage = () => {
                   transition={{ duration: 0.5, delay: index * 0.2 }}
                 >
                   <div className="w-full md:w-1/2 relative overflow-hidden rounded-2xl shadow-lg">
-                    <motion.div
+                    <MotionDiv
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.3 }}
                       className="w-full h-full"
@@ -366,11 +375,11 @@ const ServicesPage = () => {
                         objectFit="cover"
                         className="rounded-2xl"
                       />
-                    </motion.div>
+                    </MotionDiv>
                   </div>
 
                   <div className="w-full md:w-1/2">
-                    <motion.h3
+                    <MotionH3
                       className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-pink-500"
                       initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
                       whileInView={{ opacity: 1, x: 0 }}
@@ -378,7 +387,7 @@ const ServicesPage = () => {
                       transition={{ duration: 0.5, delay: index * 0.2 + 0.2 }}
                     >
                       {service.title}
-                    </motion.h3>
+                    </MotionH3>
                     <motion.p
                       className="text-gray-600 text-xl md:text-xl leading-relaxed"
                       initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
@@ -397,7 +406,7 @@ const ServicesPage = () => {
                       {isExpanded ? 'Voir moins' : 'Voir plus'}
                     </button>
                   </div>
-                </motion.div>
+                </MotionDiv>
               );
             })}
           </div>

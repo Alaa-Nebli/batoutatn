@@ -1,237 +1,3 @@
-// import { Layout } from "components//Layout";
-// import SEO from "components//SEO/SEO";
-// import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-// import { useTranslation } from 'next-i18next';
-// import Image from 'next/image';
-// import { motion } from 'framer-motion';
-// import styles from 'components//About/AboutSection.module.css'; // Ensure you have the CSS file
-// import { useState, useEffect, useRef } from 'react';
-// import Link from "next/link";
-// import { Icon } from "@iconify/react";
-// import { ContactUs } from "components//Contact";
-
-// export async function getStaticProps({ locale }) {
-//     return {
-//       props: {
-//         ...(await serverSideTranslations(locale, ['common'])),
-//       },
-//     }
-// }
-// const Banner = () => {
-//   const { t } = useTranslation('common');
-//   const [currentIndex, setCurrentIndex] = useState(0);
-//   const [featuredItems, setFeaturedItems] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   // Default banners to use as fallback
-//   const defaultBanners = [
-//     {
-//       id: 1,
-//       imageUrl: '/tunisia/japan.webp',
-//       alt: 'Japan',
-//     },
-//     {
-//       id: 2,
-//       imageUrl: '/tunisia/nepal_places.jpg',
-//       alt: t('Home.banner.slide2.alt'),
-//     },
-//     {
-//       id: 3,
-//       imageUrl: '/tunisia/thailand-chaing-mai.jpg',
-//       alt: t('Home.banner.slide3.alt'),
-//     },
-//     {
-//       id: 4,
-//       imageUrl: '/tunisia/suisse.jpg',
-//       alt: t('Home.banner.slide4.alt'),
-//     },
-//     {
-//       id: 5,
-//       imageUrl: '/tunisia/thailand_1.jpg',
-//       alt: t('Home.banner.slide5.alt'),
-//     },
-//     {
-//       id: 6,
-//       imageUrl: '/tunisia/africa_south.webp',
-//       alt: t('Home.banner.slide6.alt'),
-//     },
-//     {
-//       id: 7,
-//       imageUrl: '/tunisia/safari.png',
-//       alt: t('Home.banner.slide7.alt'),
-//     },
-//   ];
-
-//   // Fetch featured items from the API
-//   useEffect(() => {
-//     const fetchFeaturedItems = async () => {
-//       try {
-//         setLoading(true);
-//         const response = await fetch('/api/featured');
-
-//         if (!response.ok) {
-//           throw new Error(
-//             `Failed to fetch featured items: ${response.status} ${response.statusText}`
-//           );
-//         }
-
-//         const data = await response.json();
-//         setFeaturedItems(data);
-//         setLoading(false);
-//       } catch (err) {
-//         console.error('Error fetching featured items:', err);
-//         setError(err);
-//         setLoading(false);
-//       }
-//     };
-
-//     fetchFeaturedItems();
-//   }, []);
-
-//   // Determine which banners to display
-//   const displayBanners = featuredItems.length > 0
-//     ? featuredItems.map((item) => ({
-//         id: item.id,
-//         imageUrl: item.image,
-//         title: item.trip?.name || '',
-//         description: item.trip?.description || '',
-//         alt: item.trip?.name || 'Featured destination',
-//         cta: item.cta || 'Explore Destination',
-//         tripId: item.tripId,
-//       }))
-//     : defaultBanners;
-
-//   const handlePrev = () => {
-//     setCurrentIndex(
-//       (prevIndex) => (prevIndex - 1 + displayBanners.length) % displayBanners.length
-//     );
-//   };
-
-//   const handleNext = () => {
-//     setCurrentIndex((prevIndex) => (prevIndex + 1) % displayBanners.length);
-//   };
-
-//   // Auto-rotate slides every 4 seconds
-//   useEffect(() => {
-//     const interval = setInterval(() => {
-//       handleNext();
-//     }, 4000);
-
-//     return () => clearInterval(interval);
-//     // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [displayBanners.length]);
-
-//   if (loading) {
-//     return (
-//       <section className="relative h-screen flex items-center justify-center bg-gray-100">
-//         <div className="text-center">
-//           <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-//           <p className="mt-4 text-gray-600">Loading amazing destinations...</p>
-//         </div>
-//       </section>
-//     );
-//   }
-
-//   if (error) {
-//     console.warn('Falling back to default banners due to API error');
-//     // We'll silently fall back to default banners if there's an error
-//   }
-
-//   return (
-//     <section className="relative h-screen overflow-hidden">
-//       {/* Subtle global overlay */}
-
-//       {/* Carousel slides */}
-//       <section
-//   className="relative overflow-hidden"
-//   // Shift down by header height, and shrink height so it's still "full screen" minus the nav
-//   style={{ marginTop: '80px', height: 'calc(100vh - 80px)' }}
-// >
-//   <div className="absolute inset-0 flex">
-//     {displayBanners.map((banner, index) => (
-//       <div
-//         key={banner.id}
-//         className={`w-full h-full flex-shrink-0 transition-opacity duration-500 ${
-//           index === currentIndex ? 'opacity-100' : 'opacity-0'
-//         }`}
-//       >
-//         <Image
-//           src={banner.imageUrl}
-//           alt={banner.alt}
-//           layout="fill"
-//           objectFit="cover"
-//           objectPosition="center"
-//           priority
-//           className="w-full h-full"
-//         />
-//       </div>
-//     ))}
-//   </div>
-// </section>
-
-
-//       {/* Beautiful CTA button (shown only if there is a tripId) */}
-//       {displayBanners[currentIndex]?.tripId && (
-//         <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-30">
-//           <Link
-//             href={`/programs/${displayBanners[currentIndex].tripId}`}
-//             passHref
-//             legacyBehavior
-//           >
-//             <a className="inline-block px-8 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold text-lg rounded-full shadow-xl transition-transform transform hover:-translate-y-1 active:translate-y-0">
-//               {displayBanners[currentIndex].cta}
-//             </a>
-//           </Link>
-//         </div>
-//       )}
-
-//       {/* Carousel indicator dots */}
-//       <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-30 flex space-x-2">
-//         {displayBanners.map((_, index) => (
-//           <button
-//             key={index}
-//             onClick={() => setCurrentIndex(index)}
-//             className={`w-3 h-3 rounded-full transition-all duration-300 ${
-//               index === currentIndex ? 'bg-white scale-125' : 'bg-white/50'
-//             }`}
-//             aria-label={`Go to slide ${index + 1}`}
-//           />
-//         ))}
-//       </div>
-
-//       {/* Improved carousel controls */}
-//       <div className="absolute top-1/2 transform -translate-y-1/2 w-full flex justify-between px-4 md:px-6 z-30">
-//         <button
-//           className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors duration-300"
-//           onClick={handlePrev}
-//           aria-label="Previous slide"
-//         >
-//           <Icon icon="lucide:chevron-left" className="w-6 h-6 text-gray-800" />
-//         </button>
-//         <button
-//           className="p-3 bg-white/80 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-colors duration-300"
-//           onClick={handleNext}
-//           aria-label="Next slide"
-//         >
-//           <Icon icon="lucide:chevron-right" className="w-6 h-6 text-gray-800" />
-//         </button>
-//       </div>
-
-//       {/* Improved scroll indicator */}
-//       {/* <motion.div
-//         className="absolute bottom-10 left-1/2 transform -translate-x-1/2 z-30"
-//         animate={{ y: [0, 10, 0] }}
-//         transition={{ duration: 1.5, repeat: Infinity }}
-//       >
-//         <div className="backdrop-blur-sm bg-white/20 p-2 rounded-full">
-//           <Icon icon="mdi:arrow-down-circle" className="w-8 h-8 md:w-12 md:h-12 text-white" />
-//         </div>
-//       </motion.div> */}
-//     </section>
-//   );
-// };
-
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 
 import { Layout } from "components//Layout";
@@ -245,7 +11,6 @@ import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { ContactUs } from "components//Contact";
 import { useScroll, useTransform } from 'framer-motion';
-import Typewriter from 'typewriter-effect';
 
 export async function getStaticProps({ locale }) {
     return {
@@ -257,9 +22,6 @@ export async function getStaticProps({ locale }) {
 
 
 // Create a singleton video instance outside the component
-let globalVideo = null;
-
-
 const Banner = () => {
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 500], [0, 150]);
@@ -283,18 +45,21 @@ const Banner = () => {
 
   // Function to create or reuse a singleton video
   const createVideo = () => {
-    const existing = document.getElementById('singleton-video');
-    if (existing) return existing;
+  const existing = document.getElementById('singleton-video');
+  if (existing) return existing;
 
-    const video = document.createElement('video');
-    video.id = 'singleton-video';
-    video.src = 'https://bnlpzibmwmoragheykpt.supabase.co/storage/v1/object/public/programs//cdfa0de5-b243-4103-a163-9a0943873794.mp4'; // Replace with your actual video path
-    video.loop = true;
-    video.muted = false;
-    video.playsInline = true;
-    video.className = 'w-full h-full object-cover absolute inset-0';
-    return video;
-  };
+  const video = document.createElement('video');
+  video.id = 'singleton-video';
+  video.src = 'https://firebasestorage.googleapis.com/v0/b/taktak-2b9c5.appspot.com/o/tunisia.mp4?alt=media&token=54459283-2886-490b-a180-512fc5eb9087'; 
+  video.poster = "/tunisia/Discover_Tunisia_Banner.webp"
+  video.loop = true;
+  video.muted = true; // ✅ MUST be muted to autoplay
+  video.playsInline = true;
+  video.autoplay = true; // ✅ Ensure autoplay is set
+  video.className = 'w-full h-full object-cover absolute inset-0';
+  return video;
+};
+
 
   useEffect(() => {
     const video = createVideo();
@@ -312,9 +77,11 @@ const Banner = () => {
       container.appendChild(video);
 
       if (video.paused) {
-        video.load();
-        video.play().catch(console.error);
-      }
+  video.load();
+  video.play().catch((err) => {
+    console.warn("Video autoplay failed:", err);
+  });
+}
     }
 
     setIsVideoLoaded(video.readyState >= 2);
@@ -387,9 +154,7 @@ const Banner = () => {
 
 
 
-const UniqueFeatureCard = ({ icon, title,title2, description, delay }) => {
-  console.log(title, title2);
-  
+const UniqueFeatureCard = ({ icon, title,title2, description, delay }) => {  
     return (
       <motion.div
         className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
@@ -409,68 +174,6 @@ const UniqueFeatureCard = ({ icon, title,title2, description, delay }) => {
       </motion.div>
     );
 };
-
-// Program Card component from programs page
-const ProgramCard = ({ program }) => (
-  <motion.div
-    className="bg-white rounded-xl m-5 m-h-100 shadow-lg overflow-hidden group hover:shadow-2xl transition-all duration-500 flex flex-col"
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, amount: 0.1 }}
-    transition={{ duration: 0.4 }}
-    whileHover={{ y: -5 }}
-  >
-    <div className="relative h-56 w-full overflow-hidden">
-      <Image
-        src={program.images && program.images.length > 0 ? `/uploads/${program.images[0]}` : '/placeholder.jpg'}
-        alt={program.title}
-        layout="fill"
-        objectFit="cover"
-        className="transform transition-transform duration-700 group-hover:scale-110"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
-        <div className="absolute bottom-4 left-4 right-4">
-          <div className="flex items-center space-x-2 text-white mb-2">
-            <Icon icon="mdi:map-marker" className="w-5 h-5" />
-            <span className="text-sm">{program.location_from} → {program.location_to}</span>
-          </div>
-          <div className="flex items-center space-x-2 text-white">
-            <Icon icon="mdi:calendar" className="w-5 h-5" />
-            <span className="text-sm">
-              {new Date(program.from_date).toLocaleDateString()} - {new Date(program.to_date).toLocaleDateString()}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div className="p-6 flex-grow flex flex-col">
-      <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors">
-        {program.title}
-      </h3>
-      <p className="text-gray-600 mb-4 line-clamp-2">
-        {program.description}
-      </p>
-      <div className="flex justify-between items-center mt-auto">
-        <div className="flex space-x-4">
-          <div className="flex items-center text-gray-600">
-            <Icon icon="mdi:clock-outline" className="w-5 h-5 mr-1" />
-            <span>{program.days} Jours </span>
-          </div>
-          <div className="flex items-center text-orange-500 font-semibold">
-            <Icon icon="mdi:currency-usd" className="w-5 h-5 mr-1" />
-            <span>{program.price} TND</span>
-          </div>
-        </div>
-        <Link href={`/programs/${program.id}`} passHref>
-          <button className="px-4 py-2 bg-orange-500 text-white rounded-lg flex items-center space-x-2 hover:bg-orange-600 transition-colors group">
-            <span>Voir Plus</span>
-            <Icon icon="mdi:arrow-right" className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" />
-          </button>
-        </Link>
-      </div>
-    </div>
-  </motion.div>
-);
 
 export default function Home() {
     const { t } = useTranslation('common');
@@ -573,6 +276,8 @@ export default function Home() {
                 description={t('Home.SEO.description')}
             />
             <div className="main-wrapper bg-white relative z-10 ">
+              <h1 className="sr-only">Agence de Voyage en Tunisie - Batouta.tn</h1>
+
                 {/* Page Banner */}
                 <Banner />
                 {/* About Section */}
@@ -625,10 +330,11 @@ export default function Home() {
                       <Image
                         src={imageUrl}
                         alt={`Puzzle piece ${index + 1}`}
-                        layout="fill"
-                        objectFit="cover"
-                        className={styles.puzzleImage}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="transition-transform duration-500 group-hover:scale-110"
                       />
+
                     </div>
                   ))}
                 </div>
@@ -670,8 +376,7 @@ export default function Home() {
                           <Image
                             src={service.image}
                             alt={service.imageAlt}
-                            layout="fill"
-                            objectFit="fill"
+                            fill
                             className="transition-transform duration-500 group-hover:scale-110"
                           />
                           {/* Gradient Overlay */}
@@ -681,10 +386,11 @@ export default function Home() {
                         <div className="absolute inset-0 flex flex-col justify-end p-6 text-white z-10">
                           <h3 className="text-2xl font-bold mb-2">{service.title}</h3>
                           <Link href={`/services/${service.id}`}>
-                            <button className="px-6 py-2 bg-orange-500 text-white rounded-full font-semibold hover:bg-orange-600 transition-colors duration-300">
+                            <button aria-label={`Voir plus sur ${service.title}`}>
                               Voir Plus
                             </button>
                           </Link>
+
                         </div>
 
                         {/* Hover Effect */}

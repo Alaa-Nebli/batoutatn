@@ -7,9 +7,13 @@ const { i18n } = require('./next-i18next.config')
 
 const nextConfig = {
     reactStrictMode: true,
-    experimental: {
-        appDir: false
-    },
+    swcMinify: true,
+    optimizeCss: true,
+  experimental: {
+    legacyBrowsers: false,
+    modularizeImports: true,
+  },
+  
     sassOptions: {
         includePaths: [path.join(__dirname, "styles")]
     },
