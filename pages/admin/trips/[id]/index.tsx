@@ -235,60 +235,61 @@ export default function EditProgram() {
     return true;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate() || !id) return;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!validate() || !id) return;
 
-    setSubmitting(true);
-    try {
-      const fd = new FormData();
+  setSubmitting(true);
+  try {
+    const fd = new FormData();
 
-      /* Append scalar program data */
-      fd.append("programData", JSON.stringify({
-        ...formData,
-        location_from: formData.locationFrom,
-        location_to: formData.locationTo,
-        days: parseInt(formData.days),
-        price: parseFloat(formData.price),
-        singleAdon: parseInt(formData.singleAdon) || 0,
-        from_date: formData.fromDate,
-        to_date: formData.toDate,
-        timeline: formData.timeline.map((item, idx) => ({
-          ...item,
-          sortOrder: idx + 1,
-        })),
-      }));
+    /* Append scalar program data */
+    fd.append("programData", JSON.stringify({
+      ...formData,
+      location_from: formData.locationFrom,
+      location_to: formData.locationTo,
+      days: parseInt(formData.days),
+      price: parseFloat(formData.price),
+      singleAdon: parseInt(formData.singleAdon) || 0,
+      from_date: formData.fromDate,
+      to_date: formData.toDate,
+      timeline: formData.timeline.map((item, idx) => ({
+        ...item,
+        sortOrder: idx + 1,
+      })),
+    }));
 
-      /* New gallery images */
-      newImages.forEach(f => fd.append("program_images", f));
+    /* New gallery images */
+    newImages.forEach(f => fd.append("program_images", f));
 
-      /* Timeline replacement images keyed by index */
-      Object.entries(timelineImages).forEach(([i, f]) =>
-        fd.append(`timeline_images_${i}`, f),
-      );
+    /* Timeline replacement images in order */
+    const sortedIndices = Object.keys(timelineImages)
+      .map(Number)
+      .sort((a, b) => a - b);
+    sortedIndices.forEach(idx => fd.append("timeline_images", timelineImages[idx]));
 
-      /* Gallery state the user wants to keep */
-      fd.append("keptImages", JSON.stringify(keptImages));
+    /* Gallery state the user wants to keep */
+    fd.append("keptImages", JSON.stringify(keptImages));
 
-      /* PUT request */
-      const res = await fetch(`/api/programs.controller?id=${id}`, {
-        method: "PUT",
-        body: fd,
-      });
+    /* PUT request */
+    const res = await fetch(`/api/programs.controller?id=${id}`, {
+      method: "PUT",
+      body: fd,
+    });
 
-      if (res.ok) {
-        toast.success("Program updated");
-        router.push("/admin/dashboard");
-      } else {
-        const err = await res.json();
-        toast.error(err.message || "Update failed");
-      }
-    } catch {
-      toast.error("Network / server error");
-    } finally {
-      setSubmitting(false);
+    if (res.ok) {
+      toast.success("Program updated");
+      router.push("/admin/dashboard");
+    } else {
+      const err = await res.json();
+      toast.error(err.message || "Update failed");
     }
-  };
+  } catch {
+    toast.error("Network / server error");
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   /* ------------------------------------------------------------------
      6. Auth loading spinner

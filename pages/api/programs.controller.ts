@@ -216,15 +216,9 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
 
       // Validate file types
       const galleryFiles: Express.Multer.File[] = (files['program_images'] || []) as Express.Multer.File[];
-      const timelineFiles: Record<number, Express.Multer.File> = {};
-      for (const [field, fileArr] of Object.entries(files)) {
-        if (field.startsWith('timeline_images_')) {
-          const idx = Number(field.split('_').pop()!);
-          timelineFiles[idx] = (fileArr as Express.Multer.File[])[0];
-        }
-      }
+      const timelineFiles: Express.Multer.File[] = (files['timeline_images'] || []) as Express.Multer.File[];
 
-      const invalidFiles = [...galleryFiles, ...Object.values(timelineFiles)].filter(
+      const invalidFiles = [...galleryFiles, ...timelineFiles].filter(
         file => !file.mimetype.startsWith('image/')
       );
       if (invalidFiles.length > 0) {
@@ -252,11 +246,8 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
         galleryFiles.map(f => uploadToSupabase(f, 'program-images')),
       );
 
-      const uploadedTimelineUrls: Record<number, string> = {};
-      await Promise.all(
-        Object.entries(timelineFiles).map(async ([idx, file]) => {
-          uploadedTimelineUrls[Number(idx)] = await uploadToSupabase(file, 'timeline-images');
-        }),
+      const uploadedTimelineUrls = await Promise.all(
+        timelineFiles.map(file => uploadToSupabase(file, 'timeline-images'))
       );
 
       const finalGallery = [...keptImages, ...newGalleryUrls];
@@ -264,7 +255,7 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
       const timelineCreate = programData.timeline.map((item: any, idx: number) => ({
         title: item.title,
         description: item.description,
-        image: uploadedTimelineUrls[idx] || item.image || null,
+        image: uploadedTimelineUrls[idx] || item.image || null, // Use existing image if no new image
         sortOrder: item.sortOrder,
         date: new Date(item.date),
       }));
@@ -283,7 +274,7 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
           singleAdon: programData.singleAdon ? parseInt(programData.singleAdon) : undefined,
           from_date: fromDate,
           to_date: toDate,
-          display: programData.display ?? existing.display, // Preserve existing display if not provided
+          display: programData.display ?? existing.display,
           phone: programData.phone || null,
           priceInclude: programData.priceInclude || null,
           generalConditions: programData.generalConditions || null,
