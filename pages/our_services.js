@@ -322,6 +322,31 @@ const ServicesPage = () => {
       <SEO
         title="Nos Services | Batouta Voyages - Excursions, Billetterie, Transport"
         description="Découvrez tous les services proposés par Batouta Voyages : circuits, excursions, billetterie, organisation d'événements et transport en Tunisie."
+        keywords="batouta voyages, services de voyage tunisie, excursions tunisie, billetterie tunisie, transport touristique tunisie, organisation événements tunisie, circuits tunisie, agence de voyage tunis, tourisme responsable tunisie, voyages groupe tunisie"
+      />
+      {/* BreadcrumbList JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Accueil",
+                "item": process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Nos Services",
+                "item": (process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn") + "/our_services"
+              },
+            ]
+          })
+        }}
       />
 
       <div className="main-wrapper pt-20 relative z-10">

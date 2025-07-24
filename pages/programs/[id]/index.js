@@ -554,12 +554,63 @@ export default function ProgramPage() {
     );
   }
 
+  // Dynamic keywords for SEO
+  const keywords = [
+    program.title,
+    program.location_from,
+    program.location_to,
+    'voyage organisé',
+    'circuit',
+    'excursion',
+    'séjour',
+    'Tunisie',
+    'Batouta',
+    'programme de voyage',
+    'agence de voyage Tunisie',
+    'voyage groupe',
+    'tourisme',
+  ]
+    .filter(Boolean)
+    .join(', ');
+
+  // BreadcrumbList JSON-LD
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Accueil",
+        "item": process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Programmes",
+        "item": (process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn") + "/programs"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": program.title,
+        "item": (process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn") + `/programs/${program.id}`
+      }
+    ]
+  };
+
   return (
     <Layout>
       <SEO
         title={`${program.title} | Voyages`}
         description={stripHtml(program.description).substring(0, 160)}
         image={program.images?.[0]}
+        keywords={keywords}
+      />
+      {/* BreadcrumbList JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
 
       {/* Actions (buttons) */}

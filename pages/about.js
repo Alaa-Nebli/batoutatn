@@ -325,12 +325,38 @@ export async function getStaticProps({ locale }) {
 }
 
 export default function AboutUs() {
+  // BreadcrumbList structured data for About page
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Accueil",
+        "item": process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "À propos",
+        "item": (process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn") + "/about"
+      }
+    ]
+  };
+
   return (
     <Layout className="bg-white">
       <div className="main-wrapper pt-18 relative z-10">
         <SEO
           title="À propos de Batouta Voyages | Lien entre la Tunisie et le Japon"
           description="Découvrez l'histoire de Batouta Voyages, agence tunisienne reliant la Tunisie et le Japon depuis 1995. Nos valeurs, notre parcours et notre passion pour les échanges culturels."
+          keywords="batouta voyages, agence de voyage tunisie, tunisie japon, histoire batouta, valeurs batouta, agence touristique tunisienne, échanges culturels tunisie japon, excellence voyage tunisie, agence de voyage tunis, tourisme durable tunisie"
+        />
+        {/* BreadcrumbList JSON-LD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
         />
         <h1 className="sr-only">À propos de Batouta Voyages - Tunisie & Japon</h1>
 

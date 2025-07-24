@@ -368,11 +368,46 @@ const ServiceDetails = ({ serviceId }) => {
     );
   }
 
+  // Dynamic keywords based on serviceId
+  const keywordsMap = {
+    outbound: 'voyages groupe, circuits tunisie, voyage organisé, batouta voyages, agence de voyage tunisie, tourisme tunisie',
+    excursions: 'excursions tunisie, escapade tunis, voyage cap bon, excursion jerba, batouta voyages, agence de voyage tunisie, tourisme tunisie, circuits tunisie',
+    transport: 'transport touristique tunisie, services de transport tunisie, location bus tunisie, batouta voyages, agence de voyage tunis',
+    ticketing: 'billetterie tunisie, réservation billets tunisie, agence de voyage tunis, batouta voyages, ticketing tunisie, billets avion tunisie'
+  };
+  const keywords = keywordsMap[serviceId] || 'batouta voyages, agence de voyage tunisie, tourisme tunisie';
+
+  // BreadcrumbList structured data for dynamic service page
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Accueil",
+        "item": process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": serviceData.title,
+        "item": (process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn") + "/services/" + serviceId
+      }
+    ]
+  };
+
   return (
     <Layout className="bg-white">
       <SEO
         title={`${serviceData.title} - Batouta Voyages`}
         description={serviceData.description}
+        keywords={keywords}
+      />
+      {/* BreadcrumbList JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {/* Hero Section with Parallax Effect */}
       <section className="relative mt-20 h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">

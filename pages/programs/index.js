@@ -245,8 +245,33 @@ export default function Programs() {
   return (
     <Layout>
       <SEO
-          title="Voyages organisés en Tunisie et à l'international | Batouta.tn"
+        title="Voyages organisés en Tunisie et à l'international | Batouta.tn"
         description="Explorez nos programmes de voyage : circuits, excursions et séjours en Tunisie et à l'étranger, sélectionnés pour des expériences inoubliables."
+        keywords="voyages organisés tunisie, circuits tunisie, excursions tunisie, séjours tunisie, batouta voyages, agence de voyage tunisie, voyages internationaux, programmes de voyage tunisie, tourisme tunisie, voyages groupe tunisie"
+      />
+      {/* BreadcrumbList JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Accueil",
+                "item": process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Programmes",
+                "item": (process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn") + "/programs"
+              }
+            ]
+          })
+        }}
       />
 
       {/* Featured Program Hero */}

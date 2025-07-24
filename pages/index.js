@@ -274,6 +274,25 @@ export default function Home() {
             <SEO
                 title={t('Home.SEO.title')}
                 description={t('Home.SEO.description')}
+                keywords="batouta voyages, agence de voyage tunisie, voyage tunisie, excursions tunisie, tourisme tunisie, billetterie tunisie, transport touristique tunisie, circuits tunisie, agence de voyage tunis, tourisme responsable tunisie"
+            />
+            {/* BreadcrumbList JSON-LD */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "Accueil",
+                                "item": process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn"
+                            }
+                        ]
+                    })
+                }}
             />
             <div className="main-wrapper bg-white relative z-10 ">
               <h1 className="sr-only">Agence de Voyage en Tunisie - Batouta.tn</h1>

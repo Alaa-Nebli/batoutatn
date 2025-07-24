@@ -6,6 +6,58 @@ const SEO = ({ title, description, keywords }) => {
     const siteURL = process.env.NEXT_PUBLIC_SITE_URL;
     const imagePreview = `${siteURL}/${process.env.NEXT_PUBLIC_SITE_IMAGE_PREVIEW_URL}`;
 
+    const jsonLdOrganization = {
+        "@context": "https://schema.org",
+        "@type": "TravelAgency",
+        "name": "Batouta Voyages",
+        "url": siteURL,
+        "logo": `${siteURL}/Batouta_Logo.png`,
+        "description": metaDescription,
+        "telephone": "+216 71 802 881",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "97 Rue de La Palestine",
+            "addressLocality": "Tunis",
+            "postalCode": "1002",
+            "addressCountry": "TN"
+        },
+        "contactPoint": [{
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "telephone": "+216 71 802 881",
+            "email": "contact@batouta.tn"
+        }],
+        "sameAs": [
+            "https://www.facebook.com/batoutavoyages",
+            "https://www.instagram.com/batoutavoyages",
+        ],
+        "openingHoursSpecification": [{
+            "@type": "OpeningHoursSpecification",
+            "dayOfWeek": [
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday"
+            ],
+            "opens": "09:00",
+            "closes": "18:00"
+        }]
+    };
+
+    const jsonLdWebSite = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "url": siteURL,
+        "name": "Batouta Voyages",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": `${siteURL}/search?q={search_term_string}`,
+            "query-input": "required name=search_term_string"
+        }
+    };
+
     return (
         <Head>
             <meta charSet="utf-8" />
@@ -36,6 +88,16 @@ const SEO = ({ title, description, keywords }) => {
             <meta name="theme-color" content="#ffffff" />
 
             <title>{title}</title>
+            {/* JSON-LD Structured Data for Organization */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdOrganization) }}
+            />
+            {/* JSON-LD Structured Data for WebSite (site-wide search) */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWebSite) }}
+            />
         </Head>
     );
 };
