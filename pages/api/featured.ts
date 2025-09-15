@@ -59,6 +59,7 @@ export const fetchAllFeatured = async (_: NextApiRequest, res: NextApiResponse) 
   try {
     const featuredItems = await prisma.featured.findMany({
       include: { trip: true },
+      // where: { trip: { display: true } },
       orderBy: { createdAt: 'desc' }
     });
     res.status(200).json(featuredItems);

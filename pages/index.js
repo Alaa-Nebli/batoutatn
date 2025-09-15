@@ -11,6 +11,7 @@ import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { ContactUs } from "components//Contact";
 import { useScroll, useTransform } from 'framer-motion';
+import Banner from '../components/Banner/Banner';
 
 export async function getStaticProps({ locale }) {
     return {
@@ -22,135 +23,138 @@ export async function getStaticProps({ locale }) {
 
 
 // Create a singleton video instance outside the component
-const Banner = () => {
-  const { scrollY } = useScroll();
-  const y = useTransform(scrollY, [0, 500], [0, 150]);
+// const Banner = () => {
+//   const { scrollY } = useScroll();
+//   const y = useTransform(scrollY, [0, 500], [0, 150]);
 
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [videoError, setVideoError] = useState(false);
-  const videoRef = React.useRef(null);
+//   const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+//   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+//   const [videoError, setVideoError] = useState(false);
+//   const videoRef = React.useRef(null);
 
-  const handleVideoLoad = useCallback(() => {
-    setIsVideoLoaded(true);
-  }, []);
+//   const handleVideoLoad = useCallback(() => {
+//     setIsVideoLoaded(true);
+//   }, []);
 
-  const handleVideoError = useCallback(() => {
-    setVideoError(true);
-  }, []);
+//   const handleVideoError = useCallback(() => {
+//     setVideoError(true);
+//   }, []);
 
-  const handleVideoPlay = useCallback(() => {
-    setIsVideoPlaying(true);
-  }, []);
+//   const handleVideoPlay = useCallback(() => {
+//     setIsVideoPlaying(true);
+//   }, []);
 
-  // Function to create or reuse a singleton video
-  const createVideo = () => {
-  const existing = document.getElementById('singleton-video');
-  if (existing) return existing;
+//   // Function to create or reuse a singleton video
+//   const createVideo = () => {
+//   const existing = document.getElementById('singleton-video');
+//   if (existing) return existing;
 
-  const video = document.createElement('video');
-  video.id = 'singleton-video';
-  video.src = 'https://firebasestorage.googleapis.com/v0/b/taktak-2b9c5.appspot.com/o/tunisia.mp4?alt=media&token=54459283-2886-490b-a180-512fc5eb9087'; 
-  video.poster = "/tunisia/Discover_Tunisia_Banner.webp"
-  video.loop = true;
-  video.muted = true; // ✅ MUST be muted to autoplay
-  video.playsInline = true;
-  video.autoplay = true; // ✅ Ensure autoplay is set
-  video.className = 'w-full h-full object-cover absolute inset-0';
-  return video;
-};
+//   const video = document.createElement('video');
+//   video.id = 'singleton-video';
+//   video.src = 'https://firebasestorage.googleapis.com/v0/b/taktak-2b9c5.appspot.com/o/tunisia.mp4?alt=media&token=54459283-2886-490b-a180-512fc5eb9087'; 
+//   video.poster = "/tunisia/Discover_Tunisia_Banner.webp"
+//   video.loop = true;
+//   video.muted = true; // ✅ MUST be muted to autoplay
+//   video.playsInline = true;
+//   video.autoplay = true; // ✅ Ensure autoplay is set
+//   video.className = 'w-full h-full object-cover absolute inset-0';
+//   return video;
+// };
 
 
-  useEffect(() => {
-    const video = createVideo();
-    videoRef.current = video;
+//   useEffect(() => {
+//     const video = createVideo();
+//     videoRef.current = video;
 
-    if (!video.hasAttribute('data-initialized')) {
-      video.onloadeddata = handleVideoLoad;
-      video.onplay = handleVideoPlay;
-      video.onerror = handleVideoError;
-      video.setAttribute('data-initialized', 'true');
-    }
+//     if (!video.hasAttribute('data-initialized')) {
+//       video.onloadeddata = handleVideoLoad;
+//       video.onplay = handleVideoPlay;
+//       video.onerror = handleVideoError;
+//       video.setAttribute('data-initialized', 'true');
+//     }
 
-    const container = document.getElementById('video-container');
-    if (container && !container.contains(video)) {
-      container.appendChild(video);
+//     const container = document.getElementById('video-container');
+//     if (container && !container.contains(video)) {
+//       container.appendChild(video);
 
-      if (video.paused) {
-  video.load();
-  video.play().catch((err) => {
-    console.warn("Video autoplay failed:", err);
-  });
-}
-    }
+//       if (video.paused) {
+//   video.load();
+//   video.play().catch((err) => {
+//     console.warn("Video autoplay failed:", err);
+//   });
+// }
+//     }
 
-    setIsVideoLoaded(video.readyState >= 2);
-    setIsVideoPlaying(!video.paused);
-    setVideoError(video.error !== null);
+//     setIsVideoLoaded(video.readyState >= 2);
+//     setIsVideoPlaying(!video.paused);
+//     setVideoError(video.error !== null);
 
-    return () => {
-      if (videoRef.current) {
-        videoRef.current.pause();
-        videoRef.current.src = '';
-        videoRef.current.load();
-        videoRef.current.remove();
-      }
-    };
-  }, [handleVideoLoad, handleVideoPlay, handleVideoError]);
+//     return () => {
+//       if (videoRef.current) {
+//         videoRef.current.pause();
+//         videoRef.current.src = '';
+//         videoRef.current.load();
+//         videoRef.current.remove();
+//       }
+//     };
+//   }, [handleVideoLoad, handleVideoPlay, handleVideoError]);
 
-  return (
-    <section className="relative h-screen overflow-hidden">
-      <Image
-        src="/tunisia/Discover_Tunisia_Banner.webp"
-        alt="Video Poster"
-        layout="fill"
-        objectFit="cover"
-        priority
-        className={`transition-opacity duration-500 ${isVideoPlaying ? 'opacity-0' : 'opacity-100'}`}
-      />
+//   return (
+//     <section className="relative h-screen overflow-hidden">
+//       <Image
+//         src="/tunisia/Discover_Tunisia_Banner.webp"
+//         alt="Video Poster"
+//         layout="fill"
+//         objectFit="cover"
+//         priority
+//         className={`transition-opacity duration-500 ${isVideoPlaying ? 'opacity-0' : 'opacity-100'}`}
+//       />
 
-      <div
-        id="video-container"
-        className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${
-          isVideoPlaying ? 'opacity-100' : 'opacity-0'
-        }`}
-      />
+//       <div
+//         id="video-container"
+//         className={`absolute inset-0 overflow-hidden transition-opacity duration-500 ${
+//           isVideoPlaying ? 'opacity-100' : 'opacity-0'
+//         }`}
+//       />
 
-      <div className="relative z-10 flex flex-col items-center justify-center h-full w-full text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: 'easeOut' }}
-          style={{ y }}
-        >
-          <motion.div
-            className="mb-8"
-            animate={{ rotate: [0, 5, -5, 0] }}
-            transition={{ duration: 5, repeat: Infinity }}
-          >
-            <Icon
-              icon="game-icons:torii-gate"
-              className="w-16 h-16 md:w-24 md:h-24 text-orange-500"
-            />
-          </motion.div>
-        </motion.div>
+//       <div className="relative z-10 flex flex-col items-center justify-center h-full w-full text-center">
+//         <motion.div
+//           initial={{ opacity: 0, y: 50 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           transition={{ duration: 1, ease: 'easeOut' }}
+//           style={{ y }}
+//         >
+//           <motion.div
+//             className="mb-8"
+//             animate={{ rotate: [0, 5, -5, 0] }}
+//             transition={{ duration: 5, repeat: Infinity }}
+//           >
+//             <Icon
+//               icon="game-icons:torii-gate"
+//               className="w-16 h-16 md:w-24 md:h-24 text-orange-500"
+//             />
+//           </motion.div>
+//         </motion.div>
 
-        <motion.div
-          className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 10, 0], opacity: [1, 0.5, 1] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <div className="text-white flex flex-col items-center gap-2">
-            <p className="text-sm font-light tracking-widest uppercase">
-              Scroll
-            </p>
-            <Icon icon="mdi:arrow-down-circle" className="w-8 h-8 md:w-12 md:h-12" />
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-};
+//         <motion.div
+//           className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+//           animate={{ y: [0, 10, 0], opacity: [1, 0.5, 1] }}
+//           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+//         >
+//           <div className="text-white flex flex-col items-center gap-2">
+//             <p className="text-sm font-light tracking-widest uppercase">
+//               Scroll
+//             </p>
+//             <Icon icon="mdi:arrow-down-circle" className="w-8 h-8 md:w-12 md:h-12" />
+//           </div>
+//         </motion.div>
+//       </div>
+//     </section>
+//   );
+// };
+
+
+
 
 
 
