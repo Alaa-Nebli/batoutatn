@@ -10,8 +10,8 @@ import styles from 'components//About/AboutSection.module.css'; // Ensure you ha
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 import { ContactUs } from "components//Contact";
-import { useScroll, useTransform } from 'framer-motion';
 import Banner from '../components/Banner/Banner';
+import UnifiedReservation from '../components/UnifiedReservation';
 
 export async function getStaticProps({ locale }) {
     return {
@@ -303,8 +303,11 @@ export default function Home() {
 
                 {/* Page Banner */}
                 <Banner />
+                
+                {/* Unified Reservation Section */}
+                <UnifiedReservation />
                 {/* About Section */}
-                <section className={styles.aboutSection} ref={aboutSectionRef}>
+                {/* <section className={styles.aboutSection} ref={aboutSectionRef}>
                              
                     <motion.div
                         className={styles.textContainer}
@@ -343,7 +346,7 @@ export default function Home() {
                         layout="responsive"
                       />
                     </motion.div>
-                </section>
+                </section> */}
 
                 
                 <section className={styles.puzzleSection}>

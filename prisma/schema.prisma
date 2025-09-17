@@ -42,6 +42,7 @@ model Trip {
   updatedAt    DateTime    @updatedAt
   timeline     TripTimeline[]
   featured     Featured[]
+  reservations ProgramReservation[]
   priceInclude String
   generalConditions String
   phone String
@@ -98,4 +99,51 @@ model ProgramTimeline {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   localProgram LocalProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+}
+
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model ProgramReservation {
+  id              String            @id @default(cuid())
+  tripId          String
+  firstName       String
+  lastName        String
+  email           String
+  phone           String
+  numberOfPersons Int               @default(1)
+  roomType        String            @default("double") // single, double, triple
+  specialRequests String?
+  preferredDate   DateTime?
+  status          ReservationStatus @default(PENDING)
+  totalPrice      Float?
+  notes           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  trip            Trip              @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
+
+model TicketingReservation {
+  id              String            @id @default(cuid())
+  typeOfTrip      String            // one-way, round-trip
+  fromLocation    String
+  toLocation      String
+  departureDate   DateTime
+  returnDate      DateTime?
+  numberOfPersons Int               @default(1)
+  firstName       String
+  lastName        String
+  email           String
+  phone           String
+  classType       String?           @default("economy") // economy, business, first
+  specialRequests String?
+  status          ReservationStatus @default(PENDING)
+  estimatedPrice  Float?
+  notes           String?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
 }

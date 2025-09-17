@@ -3,7 +3,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { Icon } from "@iconify/react";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from "components//Header";
 import { Footer } from "components//Footer";
 import GoogleAnalytics from '../analytics';
@@ -21,6 +21,14 @@ export const Layout = ({ children, className = "" }) => {
     const { data: session } = useSession();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const isAdminRoute = router.pathname.startsWith('/admin');
+
+    // Apply zoom class to body on mount
+    useEffect(() => {
+        document.body.classList.add('zoomed-out');
+        return () => {
+            document.body.classList.remove('zoomed-out');
+        };
+    }, []);
 
     // Regular user layout
     if (!isAdminRoute) {
