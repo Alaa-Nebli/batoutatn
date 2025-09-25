@@ -1,6 +1,6 @@
 /* eslint-disable react/display-name */
 "use client";
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import { Layout } from 'components/Layout';
 import { Icon } from '@iconify/react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,95 +9,96 @@ import { useTranslation } from 'next-i18next';
 import { ContactUs } from 'components/Contact';
 import Image from 'next/image';
 import Link from 'next/link';
-import {ReservationForm} from 'components/ReservationForm';
+import { ReservationForm } from 'components/ReservationForm';
 import SEO from "components/SEO/SEO";
 
-// Constants for excursions data
+// Optimized constants with better structure
 const EXCURSIONS = {
   tunis: {
     id: 'tunis',
-    title: 'ESCAPADE TUNIS-HAMMAMET-ZAGHOUAN',
+    title: 'Escapade Tunis-Hammamet-Zaghouan',
     location: 'Tunis',
-    duration: '1 Day',
-    description: 'Jour 1 : Tunis - Hammamet 07h45, départ de Tunis vers Hammamet 09h00, Arrivée au Port Yasmine, Hammamet Embarquement à bord du Bateau Pirate, balade en mer & déjeuner 12H30-13H00',
+    duration: '1 Jour',
+    price: '120 TND',
+    description: 'Découvrez les merveilles de Tunis et Hammamet avec une balade en mer sur un bateau pirate authentique.',
+    shortDesc: 'Balade en mer sur bateau pirate avec déjeuner inclus',
     image: '/excursions/tunis-hammamet.jpg',
-    highlights: [
-      'Balade en mer sur un bateau pirate',
-      'Déjeuner inclus',
-      'Départ tôt le matin',
-      'Transport inclus'
-    ]
+    highlights: ['Bateau pirate authentique', 'Déjeuner gastronomique', 'Transport premium', 'Guide expert'],
+    features: ['Transport aller-retour', 'Déjeuner 3 services', 'Animation à bord', 'Photos souvenirs']
   },
   cap_bon: {
     id: 'cap_bon',
-    title: 'Escapade au Cap Bon de Tunisie',
-    location: 'Cap Bon de Tunisie',
-    duration: '3 Days',
-    description: 'ESCAPADE DANS LE TEMPS TUNIS-HAMMAMET-NABEUL-HAOUARIA-HAMMAMET- TUNIS 3 JOURS & 2 NUITS Jour 1 : Tunis – Hammamet 09h00, départ de Tunis vers Hammamet 10h30,...',
+    title: 'Escapade Cap Bon Authentique',
+    location: 'Cap Bon',
+    duration: '3 Jours',
+    price: '350 TND',
+    description: 'Immersion totale dans l\'authenticité tunisienne : Hammamet, Nabeul, Haouaria sur 3 jours inoubliables.',
+    shortDesc: 'Circuit authentique de 3 jours avec hébergement premium',
     image: '/excursions/cap-bon.jpg',
-    highlights: [
-      '3 jours de découverte',
-      'Visite de plusieurs villes',
-      'Hébergement inclus',
-      'Guide touristique'
-    ]
+    highlights: ['Circuit complet 3 jours', 'Hôtels sélectionnés', 'Visites guidées', 'Gastronomie locale'],
+    features: ['Hébergement 4*', 'Tous repas inclus', 'Guide francophone', 'Transport climatisé']
   },
   jerba: {
     id: 'jerba',
-    title: 'ESCAPADE À JERBA 4 JOURS/ 3 NUITS',
+    title: 'Évasion Jerba Premium',
     location: 'Jerba',
-    duration: '4 Days',
-    description: 'Escapade à Jerba 4 jours / 3 nuits Jour 1: Tunis- Matmata-Djerba 06h30 : Départ de Tunis vers Matmata. Arrivée & Déjeuner à Diar El B...',
+    duration: '4 Jours',
+    price: '580 TND',
+    description: 'Séjour de luxe à Jerba avec découverte de Matmata et hébergement dans les meilleurs établissements.',
+    shortDesc: 'Séjour premium 4 jours avec découverte de Matmata',
     image: '/excursions/jerba.jpg',
-    highlights: [
-      '4 jours de vacances',
-      'Visite de Matmata',
-      'Hébergement de luxe',
-      'Transport confortable'
-    ]
+    highlights: ['Séjour luxueux 4 jours', 'Découverte Matmata', 'Hôtels premium', 'Expériences uniques'],
+    features: ['Hôtel 5*', 'Demi-pension', 'Excursions incluses', 'Transferts VIP']
   }
 };
 
-// Helper function to memoize service data
+// Optimized service data hook
 const useServiceData = (t) => {
   return useMemo(() => ({
     "outbound": {
-      // title: t('Services.ServiceCards.Group_Travel.Title'),
-      title: '',
+      title: t('Services.ServiceCards.Group_Travel.Title'),
       description: t('Services.ServiceCards.Group_Travel.Description'),
+      shortDesc: "Voyages en groupe personnalisés avec accompagnement expert",
       image: '/voyage.jpg',
-      imageAlt: 'Voyages en Groupe',
+      imageAlt: 'Voyages en Groupe Premium',
       features: t('Services.ServiceCards.Group_Travel.features', { returnObjects: true }),
       highlights: t('Services.ServiceCards.Group_Travel.highlights', { returnObjects: true }),
+      benefits: ['Groupes de 8 à 50 personnes', 'Accompagnateur expert', 'Itinéraires sur-mesure', 'Hébergements sélectionnés']
     },
     "excursions": {
       title: t('Services.ServiceCards.Events_Organization.Title'),
       description: t('Services.ServiceCards.Events_Organization.Description'),
+      shortDesc: "Excursions et escapades authentiques en Tunisie",
       image: '/excursions.webp',
-      imageAlt: 'Organisation d\'événements',
+      imageAlt: 'Excursions Tunisie Authentiques',
       features: t('Services.ServiceCards.Events_Organization.features', { returnObjects: true }),
       highlights: t('Services.ServiceCards.Events_Organization.highlights', { returnObjects: true }),
+      benefits: ['Découverte authentique', 'Guides locaux experts', 'Groupes intimistes', 'Expériences uniques']
     },
     "transport": {
       title: t('Services.ServiceCards.Transport.Title'),
       description: t('Services.ServiceCards.Transport.Description'),
+      shortDesc: "Services de transport premium pour tous vos déplacements",
       image: '/transport.jpg',
-      imageAlt: 'Services de Transport',
+      imageAlt: 'Transport Premium Tunisie',
       features: t('Services.ServiceCards.Transport.features', { returnObjects: true }),
       highlights: t('Services.ServiceCards.Transport.highlights', { returnObjects: true }),
+      benefits: ['Flotte moderne', 'Chauffeurs expérimentés', 'Ponctualité garantie', 'Confort optimal']
     },
     "ticketing": {
       title: t('Services.ServiceCards.Billetterie.Title'),
       description: t('Services.ServiceCards.Billetterie.Description'),
+      shortDesc: "Réservation simple et rapide pour tous vos voyages",
       image: '/billeterie_banniere.png',
-      imageAlt: 'Services de Billetterie',
+      imageAlt: 'Billetterie Services Premium',
       features: t('Services.ServiceCards.Billetterie.features', { returnObjects: true }),
       highlights: t('Services.ServiceCards.Billetterie.highlights', { returnObjects: true }),
+      benefits: ['Réservation instantanée', 'Meilleurs prix garantis', 'Support 24/7', 'Modification gratuite']
     },
   }), [t]);
 };
 
-// Static paths generation
+// Static paths generation (optimized)
 export const getStaticPaths = async ({ locales }) => {
   const serviceIds = ["transport", "outbound", "excursions", "ticketing"];
   const paths = serviceIds.flatMap(id => 
@@ -106,7 +107,6 @@ export const getStaticPaths = async ({ locales }) => {
       locale,
     }))
   );
-
   return { paths, fallback: false };
 };
 
@@ -117,46 +117,84 @@ export const getStaticProps = async ({ locale, params }) => ({
   },
 });
 
-function stripHtml(htmlString = '') {
-  return htmlString.replace(/<[^>]+>/g, '');
-}
+// Utility functions
+const stripHtml = (htmlString = '') => htmlString.replace(/<[^>]+>/g, '');
 
+// Hero Section Component
+const HeroSection = ({ serviceData, serviceId }) => (
+  <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
+    <div className="absolute inset-0 z-0">
+      <Image
+        src={serviceData.image}
+        alt={serviceData.imageAlt}
+        fill
+        className="object-cover"
+        priority
+        quality={85}
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
+    </div>
+    
+    <div className="relative z-10 container mx-auto px-4 text-center text-white">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          {serviceData.title}
+        </h1>
+        <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto font-light">
+          {serviceData.shortDesc}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link 
+            href="#services" 
+            className="px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-full text-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            Découvrir nos offres
+          </Link>
+          <Link 
+            href="#contact" 
+            className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-full text-lg font-semibold border-2 border-white/30 hover:bg-white/20 transition-all duration-300"
+          >
+            Demander un devis
+          </Link>
+        </div>
+      </motion.div>
+    </div>
+  </section>
+);
+
+// Optimized Program Card
 const ProgramCard = ({ program }) => {
-  // Strip out HTML for listing snippet:
   const snippet = stripHtml(program.description || '');
-
+  
   return (
-    <motion.div
-      className="bg-white rounded-xl shadow-lg overflow-hidden group hover:shadow-xl transition-all duration-300"
+    <motion.article
+      className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-2"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.4 }}
-      whileHover={{ y: -5 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.6 }}
     >
-      <div className="relative aspect-video w-full overflow-hidden">
+      <div className="relative aspect-[4/3] overflow-hidden">
         <Image
           src={program.images?.[0] || '/placeholder.jpg'}
           alt={program.title}
           fill
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          priority={program.featured}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
-          <div className="absolute bottom-4 left-4 right-4">
-            <div className="flex items-center space-x-2 text-white mb-2">
-              <Icon icon="mdi:map-marker" className="w-5 h-5 text-orange-300" />
-              <span className="text-sm font-medium">
-                {program.location_from} → {program.location_to}
-              </span>
-            </div>
-            <div className="flex items-center space-x-2 text-white">
-              <Icon icon="mdi:calendar" className="w-5 h-5 text-orange-300" />
-              <span className="text-sm font-medium">
-                {new Date(program.from_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
-                {' - '}
-                {new Date(program.to_date).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+          <div className="absolute bottom-4 left-4 right-4 text-white">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center space-x-2">
+                <Icon icon="mdi:map-marker" className="w-4 h-4" />
+                <span className="text-sm">{program.location_from} → {program.location_to}</span>
+              </div>
+              <span className="bg-orange-500 px-2 py-1 rounded-full text-xs font-semibold">
+                {program.days} Jours
               </span>
             </div>
           </div>
@@ -164,104 +202,89 @@ const ProgramCard = ({ program }) => {
       </div>
 
       <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors">
+        <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-orange-500 transition-colors line-clamp-2">
           {program.title}
         </h3>
-
-        {/* Display plain text snippet with line clamp */}
-        <p className="text-gray-600 mb-4 line-clamp-3 text-sm">
+        <p className="text-gray-600 mb-4 line-clamp-2 text-sm leading-relaxed">
           {snippet}
         </p>
-
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="flex flex-wrap gap-4">
-            <div className="flex items-center text-gray-600 text-sm">
-              <Icon icon="mdi:clock-outline" className="w-4 h-4 mr-1.5" />
-              <span>{program.days} Jours</span>
-            </div>
-            <div className="flex items-center text-orange-500 font-semibold">
-              <span>{program.price} TND</span>
-            </div>
+        
+        <div className="flex items-center justify-between">
+          <div className="text-2xl font-bold text-orange-500">
+            {program.price} TND
           </div>
           <Link 
             href={`/programs/${program.id}`} 
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg flex items-center space-x-2 hover:bg-orange-600 transition-colors text-sm group"
+            className="px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center space-x-2 text-sm font-medium"
           >
-            <span>Détails</span>
-            <Icon icon="mdi:arrow-right" className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
+            <span>Voir détails</span>
+            <Icon icon="mdi:arrow-right" className="w-4 h-4" />
           </Link>
         </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 };
 
+// Optimized Excursion Card
 const ExcursionCard = React.memo(({ excursion }) => (
-  <motion.div
-    className="bg-white rounded-2xl shadow-xl overflow-hidden group hover:shadow-2xl transition-all duration-500 h-full flex flex-col border border-gray-100 transform hover:-translate-y-2 will-change-transform"
-    initial={{ opacity: 0, y: 20 }}
+  <motion.article
+    className="group bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-2"
+    initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-    transition={{ duration: 0.4, type: "spring", damping: 10 }}
-    whileHover={{ scale: 1.02 }}
+    viewport={{ once: true, margin: "-50px" }}
+    transition={{ duration: 0.6 }}
   >
-    <div className="relative h-72 w-full overflow-hidden rounded-t-2xl">
+    <div className="relative h-64 overflow-hidden">
       <Image
         src={excursion.image}
         alt={excursion.title}
         fill
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         className="object-cover transition-transform duration-700 group-hover:scale-110"
-        priority={false}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent">
-        <div className="absolute bottom-4 left-4 right-4">
-          <div className="flex items-center space-x-2 text-white mb-2">
-            <Icon icon="mdi:map-marker" className="w-5 h-5" />
-            <span className="text-sm">{excursion.location}</span>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent">
+        <div className="absolute top-4 right-4">
+          <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+            {excursion.duration}
+          </span>
+        </div>
+        <div className="absolute bottom-4 left-4 right-4 text-white">
+          <div className="flex items-center space-x-2 mb-2">
+            <Icon icon="mdi:map-marker" className="w-4 h-4" />
+            <span className="text-sm font-medium">{excursion.location}</span>
           </div>
-          <div className="flex items-center space-x-2 text-white">
-            <Icon icon="mdi:clock-outline" className="w-5 h-5" />
-            <span className="text-sm">{excursion.duration}</span>
-          </div>
+          <div className="text-2xl font-bold">{excursion.price}</div>
         </div>
       </div>
     </div>
-    <div className="p-6 flex-grow flex flex-col">
-      <h3 className="text-2xl font-bold text-gray-800 mb-3 group-hover:text-orange-500 transition-colors line-clamp-2">
+    
+    <div className="p-6">
+      <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-orange-500 transition-colors line-clamp-2">
         {excursion.title}
       </h3>
-      <p className="text-gray-600 mb-4 line-clamp-3">
-        {excursion.description}
+      <p className="text-gray-600 mb-4 line-clamp-2">
+        {excursion.shortDesc}
       </p>
-      <div className="mb-4">
-        <h4 className="font-semibold text-gray-800 mb-2">Highlights:</h4>
-        <ul className="space-y-2">
-          {excursion.highlights.map((highlight, i) => (
-            <motion.li 
-              key={i} 
-              className="flex items-start"
-              initial={{ opacity: 0, x: -10 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1 }}
-              viewport={{ once: true }}
-            >
-              <Icon icon="mdi:check-circle" className="text-green-500 mt-1 mr-2 flex-shrink-0" />
-              <span className="text-gray-600">{highlight}</span>
-            </motion.li>
-          ))}
-        </ul>
+      
+      <div className="space-y-2 mb-6">
+        {excursion.highlights.slice(0, 3).map((highlight, i) => (
+          <div key={i} className="flex items-center space-x-2 text-sm text-gray-600">
+            <Icon icon="mdi:check-circle" className="w-4 h-4 text-green-500 flex-shrink-0" />
+            <span>{highlight}</span>
+          </div>
+        ))}
       </div>
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-auto">
-        <button className="px-4 py-2 bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white rounded-lg flex items-center space-x-2 transition-all group w-full sm:w-auto justify-center shadow-md hover:shadow-lg">
-          <span>Contactez Nous</span>
-          <Icon icon="mdi:arrow-right" className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-        </button>
-      </div>
+      
+      <button className="w-full px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2">
+        <span>Réserver maintenant</span>
+        <Icon icon="mdi:arrow-right" className="w-4 h-4" />
+      </button>
     </div>
-  </motion.div>
+  </motion.article>
 ));
 
+// Minimalist Engagement Card Component
 const FeatureCard = ({ feature, index, serviceId }) => (
   <motion.div
     initial={{ opacity: 0, y: 50 }}
@@ -327,6 +350,138 @@ const FeatureCard = ({ feature, index, serviceId }) => (
   </motion.div>
 );
 
+// Benefits Section Component
+const BenefitsSection = ({ serviceData }) => (
+  <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
+    <div className="container mx-auto px-4">
+      <motion.div
+        className="text-center mb-16"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Pourquoi nous choisir?
+        </h2>
+        <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-pink-500 mx-auto rounded-full" />
+      </motion.div>
+      
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {serviceData.benefits?.map((benefit, index) => (
+          <motion.div
+            key={index}
+            className="text-center p-6 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: index * 0.1 }}
+          >
+            <div className="w-16 h-16 bg-gradient-to-r from-orange-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Icon icon="mdi:check-bold" className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">{benefit}</h3>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+// Nos Engagements Section
+const EngagementsSection = ({ serviceData, serviceId }) => (
+    <section className="py-20 bg-white relative overflow-hidden">
+    {/* Features Section - Modernized "Nos Promesses" */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <div className="max-w-4xl mx-auto text-center mb-16">
+            <motion.h2 
+              className="text-3xl md:text-4xl font-bold mb-4 text-gray-800"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+            >
+              Nos <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">Engagements</span>
+            </motion.h2>
+            
+          </div>
+
+          <div className="max-w-6xl mx-auto">
+            {serviceData.features.map((feature, index) => (
+              <FeatureCard 
+                key={index} 
+                feature={feature} 
+                index={index} 
+                serviceId={serviceId} 
+              />
+            ))}
+          </div>
+        </motion.section>
+
+
+      {/* Bottom CTA */}
+      <motion.div
+        className="text-center mt-16"
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+      >
+        <Link 
+          href="#contact"
+          className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-full font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+        >
+          <span>Découvrez nos services</span>
+          <Icon icon="mdi:arrow-right" className="w-5 h-5 ml-2" />
+        </Link>
+      </motion.div>
+  </section>
+);
+
+// CTA Section Component
+const CTASection = () => (
+  <section className="py-20 bg-gradient-to-r from-orange-500 via-pink-500 to-purple-500 relative overflow-hidden">
+    <div className="absolute inset-0 bg-black/20" />
+    <div className="container mx-auto px-4 relative z-10">
+      <motion.div
+        className="text-center text-white max-w-4xl mx-auto"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.8 }}
+      >
+        <h2 className="text-3xl md:text-5xl font-bold mb-6">
+          Prêt pour votre prochaine aventure?
+        </h2>
+        <p className="text-xl mb-8 opacity-90">
+          Laissez-nous créer des souvenirs inoubliables pour vous
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link
+            href="#contact"
+            className="px-8 py-4 bg-white text-orange-500 rounded-full text-lg font-bold hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            Contactez-nous
+          </Link>
+          <Link
+            href="/devis"
+            className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-full text-lg font-bold hover:bg-white hover:text-orange-500 transition-all duration-300"
+          >
+            Devis gratuit
+          </Link>
+        </div>
+      </motion.div>
+    </div>
+  </section>
+);
+
+// Main Component
 const ServiceDetails = ({ serviceId }) => {
   const { t } = useTranslation('common');
   const services = useServiceData(t);
@@ -361,23 +516,21 @@ const ServiceDetails = ({ serviceId }) => {
   if (!serviceData) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-orange-500"></div>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-orange-500" />
         </div>
       </Layout>
     );
   }
 
-  // Dynamic keywords based on serviceId
+  // SEO optimization
   const keywordsMap = {
-    outbound: 'voyages groupe, circuits tunisie, voyage organisé, batouta voyages, agence de voyage tunisie, tourisme tunisie',
-    excursions: 'excursions tunisie, escapade tunis, voyage cap bon, excursion jerba, batouta voyages, agence de voyage tunisie, tourisme tunisie, circuits tunisie',
-    transport: 'transport touristique tunisie, services de transport tunisie, location bus tunisie, batouta voyages, agence de voyage tunis',
-    ticketing: 'billetterie tunisie, réservation billets tunisie, agence de voyage tunis, batouta voyages, ticketing tunisie, billets avion tunisie'
+    outbound: 'voyages groupe tunisie, circuits organisés, voyage sur mesure tunisie, agence voyage tunisie, batouta voyages',
+    excursions: 'excursions tunisie, escapades tunisie, voyage découverte, excursion jerba, cap bon tunisie, batouta voyages',
+    transport: 'transport touristique tunisie, location bus tunisie, transfert aéroport tunisie, transport groupe',
+    ticketing: 'billetterie voyage tunisie, réservation billet avion, agence billetterie tunis, booking tunisie'
   };
-  const keywords = keywordsMap[serviceId] || 'batouta voyages, agence de voyage tunisie, tourisme tunisie';
 
-  // BreadcrumbList structured data for dynamic service page
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -392,7 +545,7 @@ const ServiceDetails = ({ serviceId }) => {
         "@type": "ListItem",
         "position": 2,
         "name": serviceData.title,
-        "item": (process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn") + "/services/" + serviceId
+        "item": `${process.env.NEXT_PUBLIC_SITE_URL || "https://batouta.tn"}/services/${serviceId}`
       }
     ]
   };
@@ -400,289 +553,138 @@ const ServiceDetails = ({ serviceId }) => {
   return (
     <Layout className="bg-white">
       <SEO
-        title={`${serviceData.title} - Batouta Voyages`}
-        description={serviceData.description}
-        keywords={keywords}
+        title={`${serviceData.title} | Batouta Voyages - Expert en Tourisme Tunisie`}
+        description={`${serviceData.shortDesc}. Découvrez nos services premium avec Batouta Voyages, votre expert en tourisme en Tunisie.`}
+        keywords={keywordsMap[serviceId]}
       />
-      {/* BreadcrumbList JSON-LD */}
+      
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      {/* Hero Section with Parallax Effect */}
-      <section className="relative mt-20 h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
-       <h1 className="sr-only">{`${serviceData.title} - Batouta Voyages`}</h1>
 
-        <motion.div 
-          className="absolute inset-0 bg-black/30 z-10"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        />
-        <Image
-          src={serviceData.image}
-          alt={serviceData.imageAlt}
-          fill
-          priority
-          className="object-fill z-0"
-          sizes="120vw"
-        />
+      <main>
+        {/* Hero Section */}
+        <HeroSection serviceData={serviceData} serviceId={serviceId} />
 
-
-
-      </section>
-      
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-12 md:py-20">
-        {/* Service Description Section */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="mb-20 max-w-5xl mx-auto"
-        >
-          <motion.div 
-            className="bg-gradient-to-r from-orange-500 to-pink-500 p-1 rounded-full mb-12 mx-auto w-64"
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
-          />
-
-<motion.section
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-            className="mb-20"
-          >
-            <div className="prose prose-lg max-w-4xl mx-auto text-gray-700">              
-              <p className='text-xl' >{serviceData.description}</p>
-            </div>
-          </motion.section>
-          
-         
-        </motion.section>
-
-        {/* Programs/Excursions Section */}
-        <AnimatePresence>
-          {serviceId === 'outbound' && (
-            <motion.section
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              viewport={{ once: true }}
-              className="mb-20"
-              key="programs-section"
-            >
-              <div className="max-w-4xl mx-auto text-center mb-12">
-                <motion.h2 
-                  className="text-3xl md:text-4xl font-bold mb-4 text-gray-800"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  viewport={{ once: true }}
+        {/* Services Content */}
+        <section id="services" className="py-20">
+          <div className="container mx-auto px-4">
+            {/* Service-specific content */}
+            <AnimatePresence mode="wait">
+              {serviceId === 'ticketing' && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="max-w-6xl mx-auto"
                 >
-                  Nos Voyages à l&apos;étranger
-                </motion.h2>
-                <motion.p 
-                  className="text-gray-600"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                  viewport={{ once: true }}
-                >
-                  Découvrez nos destinations exclusives soigneusement sélectionnées pour vous offrir des expériences uniques.
-                </motion.p>
-              </div>
-              
-              {loading ? (
-                <div className="flex justify-center items-center h-64">
-                  <motion.div 
-                    className="animate-spin rounded-full h-12 w-12 border-4 border-orange-500 border-t-transparent"
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                  />
-                </div>
-              ) : error ? (
-                <div className="text-center py-20">
-                  <motion.div 
-                    className="bg-red-50 border border-red-200 rounded-xl p-6 max-w-2xl mx-auto"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5 }}
-                  >
-                    <Icon icon="mdi:alert-circle" className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-red-700 mb-2">Une erreur est survenue!</h3>
-                    <p className="text-red-600">{error}</p>
-                    <motion.button 
-                      onClick={() => window.location.reload()}
-                      className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      Réessayer
-                    </motion.button>
-                  </motion.div>
-                </div>
-              ) : programs.length > 0 ? (
-                <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                  {programs.map((program) => (
-                    <ProgramCard key={program.id} program={program} />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-20">
-                  <motion.div 
-                    className="bg-blue-50 border border-blue-200 rounded-xl p-6 max-w-2xl mx-auto"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
-                    viewport={{ once: true }}
-                  >
-                    <Icon icon="mdi:information" className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-blue-700 mb-2">Pas de programme disponible en ce moment</h3>
-                    <p className="text-blue-600">
-                      {t('Check back soon for our new travel programs!')}
+                  <div className="text-center mb-16">
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                      Réservation Simplifiée
+                    </h2>
+                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                      {serviceData.description}
                     </p>
-                  </motion.div>
-                </div>
+                  </div>
+                  <Suspense fallback={<div className="animate-pulse bg-gray-200 h-96 rounded-2xl" />}>
+                    <ReservationForm />
+                  </Suspense>
+                </motion.div>
               )}
-            </motion.section>
-          )}
-        </AnimatePresence>
 
-        {serviceId === 'ticketing' && (
-        <section className="container mx-auto px-4 py-12">
-          <h2 className="text-3xl font-bold text-center mb-8">
-            Réservez Votre Voyage
-          </h2>
-          <p className="max-w-2xl mx-auto text-center text-gray-700 mb-6">
-            Remplissez les détails ci-dessous pour nous envoyer votre demande de réservation.
-          </p>
-          <ReservationForm />
+              {serviceId === 'excursions' && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <div className="text-center mb-16">
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                      Nos Excursions Premium
+                    </h2>
+                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                      Découvrez la Tunisie authentique avec nos excursions soigneusement sélectionnées
+                    </p>
+                  </div>
+                  <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+                    {Object.values(EXCURSIONS).map((excursion) => (
+                      <ExcursionCard key={excursion.id} excursion={excursion} />
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+
+              {serviceId === 'outbound' && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                >
+                  <div className="text-center mb-16">
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                      Nos Programmes de Voyages
+                    </h2>
+                    <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                      Des voyages en groupe personnalisés pour des expériences inoubliables
+                    </p>
+                  </div>
+                  
+                  {loading ? (
+                    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                      {[1, 2, 3, 4, 5, 6].map(i => (
+                        <div key={i} className="animate-pulse">
+                          <div className="bg-gray-300 aspect-[4/3] rounded-2xl mb-4" />
+                          <div className="bg-gray-300 h-4 rounded mb-2" />
+                          <div className="bg-gray-300 h-4 rounded w-2/3" />
+                        </div>
+                      ))}
+                    </div>
+                  ) : error ? (
+                    <div className="text-center py-12">
+                      <p className="text-gray-600">Erreur lors du chargement des programmes</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto">
+                      {programs.slice(0, 6).map((program) => (
+                        <ProgramCard key={program.id} program={program} />
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+
+              {serviceId === 'transport' && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="text-center max-w-4xl mx-auto"
+                >
+                  <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+                    Transport Premium
+                  </h2>
+                  <p className="text-xl text-gray-600 mb-12">
+                    {serviceData.description}
+                  </p>
+                  <Link
+                    href="#contact"
+                    className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-full text-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                  >
+                    <span>Demander un devis</span>
+                    <Icon icon="mdi:arrow-right" className="w-5 h-5 ml-2" />
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </section>
-      )}
-
-
-        {serviceId === 'excursions' && (
-          <motion.section
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
-            className="mb-20"
-          >
-            <div className="max-w-4xl mx-auto text-center mb-12">
-              <motion.h2 
-                className="text-3xl md:text-4xl font-bold mb-4 text-gray-800"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                viewport={{ once: true }}
-              >
-                Nos Excursions en Tunisie
-              </motion.h2>
-              <motion.p 
-                className="text-gray-600"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                viewport={{ once: true }}
-              >
-                Découvrez les merveilles de la Tunisie avec nos excursions soigneusement planifiées.
-              </motion.p>
-            </div>
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {Object.values(EXCURSIONS).map((excursion) => (
-                <ExcursionCard key={excursion.id} excursion={excursion} />
-              ))}
-            </div>
-          </motion.section>
-        )}
-
-        {/* Features Section - Modernized "Nos Promesses" */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          viewport={{ once: true }}
-          className="mb-20"
-        >
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <motion.h2 
-              className="text-3xl md:text-4xl font-bold mb-4 text-gray-800"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              Nos <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-pink-500">Engagements</span>
-            </motion.h2>
-            <motion.p 
-              className="text-gray-600"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              Nous nous engageons à vous offrir une expérience exceptionnelle à chaque étape de votre voyage.
-            </motion.p>
-          </div>
-
-          <div className="max-w-6xl mx-auto">
-            {serviceData.features.map((feature, index) => (
-              <FeatureCard 
-                key={index} 
-                feature={feature} 
-                index={index} 
-                serviceId={serviceId} 
-              />
-            ))}
-          </div>
-        </motion.section>
+        <EngagementsSection serviceData={serviceData} serviceId={serviceId} />
+        {/* Benefits Section */}
+        <BenefitsSection serviceData={serviceData} />
 
         {/* CTA Section */}
-        <motion.section
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="mb-20 py-16 bg-gradient-to-r from-orange-500 to-pink-500 rounded-3xl text-center"
-        >
-          <div className="max-w-4xl mx-auto px-4">
-            <motion.h2 
-              className="text-3xl md:text-4xl font-bold mb-6 text-white"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              viewport={{ once: true }}
-            >
-              Prêt à vivre une expérience inoubliable?
-            </motion.h2>
-            <motion.p 
-              className="text-xl text-white mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-              viewport={{ once: true }}
-            >
-              Contactez-nous dès aujourd&apos;hui pour planifier votre prochaine aventure.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <Link href={"#contact"} className="px-8 py-3 w-56 bg-white text-orange-500 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center mx-auto hover:bg-gray-100">
-                <span>Contactez-nous</span>
-                <Icon icon="mdi:arrow-right" className="w-6 h-6 ml-2" />
-              </Link>
-            </motion.div>
-          </div>
-        </motion.section>
+        <CTASection />
       </main>
 
       <ContactUs />

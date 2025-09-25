@@ -121,27 +121,9 @@ export const ReservationForm = () => {
   return (
     <section className="relative py-16 px-4 sm:px-6 lg:px-8">
       {/* Background with overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/80 via-white/60 to-cyan-50/80 backdrop-blur-sm"></div>
       
       <div className="relative max-w-7xl mx-auto">
-        {/* Section Header */}
-        <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="flex items-center justify-center mb-4">
-            <Icon icon="mdi:airplane-takeoff" className="w-8 h-8 text-blue-500 mr-3 mb-7" />
-            <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
-              Réservation de Billets
-            </h2>
-          </div>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Avec notre service de billetterie expert, nous sélectionnons et réservons pour vous les meilleures options de vols, adaptées à vos besoins et à votre budget.
-          </p>
-        </motion.div>
+        
 
         {/* Quick Search Bar */}
         {!showForm && (

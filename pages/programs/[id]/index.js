@@ -12,6 +12,7 @@ import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
 import { Layout } from 'components/Layout';
 import SEO from 'components/SEO/SEO';
+import { VoyageForm } from 'components/ProgramReservation/ProgramReservation';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -31,104 +32,163 @@ const fmtDate = d =>
   });
 
 /* -------------------------------------------------- */
-/*  Timeline item (screen)                              */
+/*  Timeline item (screen) - Modern Clean Design       */
 /* -------------------------------------------------- */
-const TimelineItem = ({ day, content, isActive, onClick }) => (
+const TimelineItem = ({ day, content }) => (
   <motion.div
-    initial={{ opacity: 0, y: 20 }}
+    initial={{ opacity: 0, y: 30 }}
     whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: '0px 0px -100px 0px' }}
-    className="border border-gray-200 rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-all duration-300"
+    viewport={{ once: true }}
+    transition={{ duration: 0.6, ease: "easeOut" }}
+    className="group"
   >
-    <button
-      type="button"
-      onClick={onClick}
-      className={`w-full px-6 py-4 flex items-center justify-between transition-colors ${
-        isActive
-          ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white'
-          : 'bg-white text-gray-800 hover:bg-gray-50'
-      }`}
-    >
-      <div className="flex items-center space-x-4">
-        <span
-          className={`text-2xl font-bold ${
-            isActive ? 'text-white' : 'text-orange-500'
-          }`}
-        >
-          Jour {day}
-        </span>
-        <div className="flex flex-col items-start">
-          <span className="text-2xl font-bold text-left">{content.title}</span>
-          {!isActive && (
-            <span className="text-sm text-gray-500 mt-1">
-              Cliquer pour voir les détails
-            </span>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:border-orange-200 transition-all duration-500 overflow-hidden">
+      {/* Clean Header */}
+      <div className="bg-gradient-to-r from-orange-50 to-amber-50 px-8 py-6 border-b border-gray-50">
+        <div className="flex items-center space-x-6">
+          <div className="flex-shrink-0">
+            <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">{day}</span>
+            </div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
+              {content.title}
+            </h3>
+            <div className="flex items-center space-x-4 text-sm text-gray-500">
+              <span className="flex items-center">
+                <Icon icon="mdi:clock-outline" className="w-4 h-4 mr-1" />
+                Jour {day}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content - Always visible */}
+      <div className="p-8">
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* Description takes most space */}
+          <div className="lg:col-span-2">
+            <div 
+              className="prose prose-lg prose-gray max-w-none text-gray-700 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: content.description }}
+            />
+          </div>
+          
+          {/* Compact image */}
+          {content.image && (
+            <div className="lg:col-span-1">
+              <div className="relative aspect-[4/3] rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-shadow duration-300">
+                <Image
+                  src={content.image}
+                  alt={`Jour ${day} - ${content.title}`}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+            </div>
           )}
         </div>
       </div>
-      <motion.div animate={{ rotate: isActive ? 180 : 0 }} transition={{ duration: 0.3 }}>
-        <Icon icon="mdi:chevron-down" className="w-6 h-6" />
-      </motion.div>
-    </button>
+    </div>
+  </motion.div>
+);
 
-    <motion.div
-      initial={false}
-      animate={{ height: isActive ? 'auto' : 0, opacity: isActive ? 1 : 0 }}
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="overflow-hidden"
-    >
-      <div className="p-6 grid md:grid-cols-2 gap-8">
-        <div
-          className="text-gray-600 leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: content.description }}
-        />
+/* -------------------------------------------------- */
+/*  Summary Timeline Item - Compact Version           */
+/* -------------------------------------------------- */
+const TimelineSummaryItem = ({ day, content }) => (
+  <motion.div
+    initial={{ opacity: 0, x: -20 }}
+    whileInView={{ opacity: 1, x: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.5, delay: day * 0.1 }}
+    className="group"
+  >
+    <div className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-lg hover:border-orange-200 transition-all duration-300 p-6">
+      <div className="flex items-start space-x-4">
+        <div className="flex-shrink-0">
+          <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center">
+            <span className="text-white font-bold text-sm">{day}</span>
+          </div>
+        </div>
+        <div className="flex-1 min-w-0">
+          <h4 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
+            {content.title}
+          </h4>
+          <p className="text-sm text-gray-600 leading-relaxed">
+            {content.description.replace(/<[^>]+>/g, '').substring(0, 150)}...
+          </p>
+        </div>
         {content.image && (
-          <div className="relative aspect-video md:aspect-[3/2] rounded-xl overflow-hidden shadow-lg">
-            <Image
-              src={content.image}
-              alt={`Illustration du jour ${day} - ${content.title}`}
-              fill
-              className="object-cover transition-transform duration-300 hover:scale-105"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              priority={isActive}
-            />
+          <div className="flex-shrink-0 hidden sm:block">
+            <div className="relative w-16 h-16 rounded-lg overflow-hidden">
+              <Image
+                src={content.image}
+                alt={`Jour ${day}`}
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-300"
+                sizes="64px"
+              />
+            </div>
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   </motion.div>
 );
 
 
 /* -------------------------------------------------- */
-/*  Image carousel (screen)                           */
+/*  Modern Image carousel (screen)                    */
 /* -------------------------------------------------- */
 const ImageCarousel = ({ images = [] }) => (
-  <div className="relative h-full rounded-xl overflow-hidden shadow-lg screen-only">
+  <div className="relative h-80 lg:h-full min-h-[500px] rounded-2xl overflow-hidden shadow-2xl screen-only">
     <Swiper
       modules={[Navigation, Pagination, Autoplay]}
-      navigation
-      pagination={{ clickable: true }}
-      autoplay={{ delay: 5000, disableOnInteraction: false }}
-      loop
-      className="h-full"
+      navigation={{
+        nextEl: '.custom-next',
+        prevEl: '.custom-prev',
+      }}
+      pagination={{ 
+        clickable: true,
+        bulletClass: 'swiper-pagination-bullet !bg-white/70 !w-3 !h-3',
+        bulletActiveClass: 'swiper-pagination-bullet-active !bg-white !scale-125'
+      }}
+      autoplay={{ delay: 4000, disableOnInteraction: false }}
+      loop={images.length > 1}
+      className="h-full group"
     >
       {images.map((img, idx) => (
         <SwiperSlide key={idx}>
           <div className="relative h-full w-full">
             <Image
               src={img}
-              alt={`Photo ${idx + 1}`}
+              alt={`${idx + 1}`}
               fill
               className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-
-              priority={idx < 3}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 60vw, 50vw"
+              priority={idx < 2}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
           </div>
         </SwiperSlide>
       ))}
+      
+      {/* Custom Navigation */}
+      {images.length > 1 && (
+        <>
+          <button className="custom-prev absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110">
+            <Icon icon="mdi:chevron-left" className="w-6 h-6 text-gray-800" />
+          </button>
+          <button className="custom-next absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-white hover:scale-110">
+            <Icon icon="mdi:chevron-right" className="w-6 h-6 text-gray-800" />
+          </button>
+        </>
+      )}
     </Swiper>
   </div>
 );
@@ -267,7 +327,7 @@ const ProgramHeaderCard = ({ program }) => {
           <Link href={`/programs/detailed/${program.id}`} legacyBehavior>
           
             <span className="px-6 py-3 bg-orange-600 text-white rounded-lg shadow-lg hover:bg-orange-700 flex items-center">
-              Programme Détaillé
+              Réserver
             </span>
           </Link>
            {/* Call button */}
@@ -453,6 +513,20 @@ export default function ProgramPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeDay, setActiveDay] = useState(null);
+  
+  // Reservation state
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    numberOfPersons: 2,
+    roomType: 'double',
+    specialRequests: '',
+    tripId: ''
+  });
+  const [reservationLoading, setReservationLoading] = useState(false);
+  const [timelineView, setTimelineView] = useState('detailed'); // 'detailed' or 'summary'
 
   useEffect(() => {
     if (!id) return;
@@ -463,6 +537,8 @@ export default function ProgramPage() {
         if (!res.ok) throw new Error('Programme non trouvé');
         const data = await res.json();
         setProgram(Array.isArray(data) ? data[0] : data);
+        // Set the program ID in form data
+        setFormData(prev => ({ ...prev, tripId: Array.isArray(data) ? data[0]?.id : data?.id }));
       } catch (e) {
         setError(e.message);
       } finally {
@@ -488,6 +564,56 @@ export default function ProgramPage() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  // Reservation handlers
+  const handleReservationSubmit = async (e) => {
+    e.preventDefault();
+    setReservationLoading(true);
+    
+    try {
+      const reservationData = {
+        ...formData,
+        programId: program.id,
+        programTitle: program.title,
+        totalPrice: calculatePrice(),
+      };
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      alert('Demande de réservation envoyée avec succès! Nous vous contacterons bientôt.');
+      
+      // Reset form
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        numberOfPersons: 2,
+        roomType: 'double',
+        specialRequests: '',
+        tripId: program.id
+      });
+      
+    } catch (error) {
+      console.error('Reservation error:', error);
+      alert('Une erreur est survenue. Veuillez réessayer.');
+    } finally {
+      setReservationLoading(false);
+    }
+  };
+
+  const calculatePrice = () => {
+    if (!program) return 0;
+    
+    let total = program.price * formData.numberOfPersons;
+    
+    if (formData.roomType === 'single' && program.singleAdon) {
+      total += program.singleAdon * formData.numberOfPersons;
+    }
+    
+    return total;
   };
 
   const handleDownloadText = () => {
@@ -614,85 +740,287 @@ export default function ProgramPage() {
       />
 
       {/* Actions (buttons) */}
-      <ActionButtons
-        onPrint={handlePrint}
-        onShare={handleShare}
-        onDownloadPDF={handlePrint}
-        onDownloadText={handleDownloadText}
-      />
+      
 
-      {/* ---------- ÉCRAN --------------------------------------- */}
-      <section className="py-32 screen-only">
-        <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-8">
-          <ImageCarousel images={program.images ?? []} />
-          <ProgramHeaderCard program={program} />
+      {/* ---------- MODERN SCREEN LAYOUT ----------------------- */}
+      <section className="py-20 md:py-24 screen-only bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-7xl mx-auto px-4">
+          {/* Mobile: Header first, then carousel */}
+          <div className="lg:hidden space-y-8">
+            <ProgramHeaderCard program={program} />
+            <ImageCarousel images={program.images ?? []} />
+          </div>
+          
+          {/* Desktop: Side by side with equal heights */}
+          <div className="hidden lg:grid lg:grid-cols-2 gap-12">
+            <div className="h-full">
+              <ImageCarousel images={program.images ?? []} />
+            </div>
+            <div className="h-full">
+              <ProgramHeaderCard program={program} />
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="bg-gray-50 py-12 screen-only">
-        <div className="max-w-7xl mx-auto px-4">
+      {/* Modern Overview Section */}
+      <section className="py-16 screen-only bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Aperçu du séjour
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full mx-auto mb-6"></div>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Découvrez tous les détails de cette expérience unique
+            </p>
+          </motion.div>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-8"
+            className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 md:p-12"
           >
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-              Aperçu du séjour
-            </h2>
-            <div
-              className="bg-white p-6 rounded-xl shadow-sm"
+            <div 
+              className="prose prose-lg prose-gray max-w-none text-gray-700 leading-relaxed"
               dangerouslySetInnerHTML={{ __html: program.description }}
             />
           </motion.div>
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 py-12 screen-only">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '0px 0px -50px' }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3">
-            Itinéraire détaillé
-          </h2>
-          <p className="text-lg text-gray-600">Jour par jour</p>
-        </motion.div>
+      {/* Modern Timeline Section */}
+      <section className="py-20 screen-only bg-gradient-to-b from-gray-50 to-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Itinéraire détaillé
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full mx-auto mb-6"></div>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Jour par jour, découvrez votre aventure dans ses moindres détails
+            </p>
+          </motion.div>
 
-        <div className="space-y-6">
-          {program.timeline.map((t, i) => (
-            <TimelineItem
-              key={i}
-              day={i + 1}
-              content={t}
-              isActive={activeDay === i}
-              onClick={() => setActiveDay(activeDay === i ? null : i)}
-            />
-          ))}
+          {/* Timeline Tabs */}
+          <div className="flex justify-center mb-12">
+            <div className="bg-white rounded-xl shadow-lg p-1 flex border border-gray-200">
+              <button
+                onClick={() => setTimelineView('detailed')}
+                className={`px-8 py-3 rounded-lg font-medium transition-all duration-300 ${
+                  timelineView === 'detailed'
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                }`}
+              >
+                Programme détaillé
+              </button>
+              <button
+                onClick={() => setTimelineView('summary')}
+                className={`px-8 py-3 rounded-lg font-medium transition-all duration-300 ${
+                  timelineView === 'summary'
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-lg'
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50'
+                }`}
+              >
+                Programme abrégé
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-8">
+            {timelineView === 'detailed' ? (
+              program.timeline.map((t, i) => (
+                <TimelineItem
+                  key={i}
+                  day={i + 1}
+                  content={t}
+                />
+              ))
+            ) : (
+              program.timeline.map((t, i) => (
+                <TimelineSummaryItem
+                  key={i}
+                  day={i + 1}
+                  content={t}
+                />
+              ))
+            )}
+          </div>
         </div>
       </section>
 
-      <section className="screen-only flex justify-center items-center py-12">
-  {/* Call Section */}
-  <a
-    href={`tel:+216${program.phone}`}
-    aria-label="Appelez votre conseiller"
-    className="text-center flex flex-col items-center group"
-  >
-    <h3 className="text-2xl md:text-3xl font-bold text-orange-600 group-hover:underline">
-      Appelez votre conseiller
-    </h3>
-    <p className="text-lg font-bol text-gray-700 mt-2 group-hover:text-orange-700">
-      +216 {program.phone}
-    </p>
-  </a>
-</section>
+      {/* Modern Reservation Section */}
+      <section id="reservation-section" className="py-20 screen-only bg-gradient-to-br from-orange-50 via-white to-amber-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Réservez votre voyage
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full mx-auto mb-6"></div>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Prêt à vivre cette aventure exceptionnelle ? Complétez votre réservation en quelques clics
+            </p>
+          </motion.div>
+
+          <VoyageForm
+            trips={[program]}
+            selectedTrip={program}
+            formData={formData}
+            setFormData={setFormData}
+            setSelectedTrip={() => {}}
+            onSubmit={handleReservationSubmit}
+            loading={reservationLoading}
+            calculatePrice={calculatePrice}
+          />
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section className="screen-only py-16 bg-white border-t border-gray-100">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              Une question ? Contactez-nous
+            </h3>
+            <a
+              href={`tel:+216${program.phone}`}
+              className="inline-flex items-center space-x-3 bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              <Icon icon="mdi:phone" className="w-6 h-6" />
+              <span className="text-lg">+216 {program.phone}</span>
+            </a>
+          </motion.div>
+        </div>
+      </section>
 
 
       {/* ---------- PRINT -------------------------------------- */}
       <PrintLayer program={program} />
+
+      {/* Optimized Floating Action Buttons */}
+      <div className="screen-only fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50">
+        {/* Desktop: Vertical layout */}
+        <div className="hidden md:flex flex-col space-y-3">
+          <motion.button
+            onClick={() => {
+              const element = document.getElementById('reservation-section');
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="group bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300"
+            title="Réserver ce voyage"
+          >
+            <Icon icon="mdi:calendar-check" className="w-6 h-6" />
+          </motion.button>
+          
+          <motion.button
+            onClick={handlePrint}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="group bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
+            title="Télécharger PDF"
+          >
+            <Icon icon="mdi:file-pdf-box" className="w-5 h-5" />
+          </motion.button>
+          
+          <motion.button
+            onClick={handlePrint}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="group bg-gray-600 hover:bg-gray-700 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
+            title="Imprimer"
+          >
+            <Icon icon="mdi:printer" className="w-5 h-5" />
+          </motion.button>
+          
+          <motion.button
+            onClick={handleShare}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="group bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
+            title="Partager"
+          >
+            <Icon icon="mdi:share-variant" className="w-5 h-5" />
+          </motion.button>
+        </div>
+
+        {/* Mobile: Horizontal expandable layout */}
+        <div className="md:hidden">
+          {/* Main action button */}
+          <motion.div className="relative">
+            <motion.button
+              onClick={() => {
+                const element = document.getElementById('reservation-section');
+                if (element) {
+                  element.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300"
+            >
+              <Icon icon="mdi:calendar-check" className="w-6 h-6" />
+            </motion.button>
+            
+            {/* Secondary actions - appear on tap/hover */}
+            <div className="absolute bottom-0 right-16 flex space-x-2 opacity-0 hover:opacity-100 focus-within:opacity-100 transition-opacity duration-300">
+              <motion.button
+                onClick={handlePrint}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                title="PDF"
+              >
+                <Icon icon="mdi:file-pdf-box" className="w-4 h-4" />
+              </motion.button>
+              
+              <motion.button
+                onClick={handlePrint}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                title="Imprimer"
+              >
+                <Icon icon="mdi:printer" className="w-4 h-4" />
+              </motion.button>
+              
+              <motion.button
+                onClick={handleShare}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
+                title="Partager"
+              >
+                <Icon icon="mdi:share-variant" className="w-4 h-4" />
+              </motion.button>
+            </div>
+          </motion.div>
+        </div>
+      </div>
 
       {/* ---------- GLOBAL PRINT STYLES ------------------------ */}
       <style jsx global>{`
