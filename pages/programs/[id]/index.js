@@ -1142,7 +1142,7 @@ export default function ProgramPage() {
                   <span className="text-orange-800 font-medium">Pour télécharger le PDF</span>
                 </div>
                 <p className="text-sm text-orange-700 mb-4">
-                  👉 Cliquez sur les trois points <strong>⋮</strong> et sélectionnez <strong>"Ouvrir dans le navigateur"</strong>
+                  👉 Cliquez sur les trois points <strong>⋮</strong> et sélectionnez <strong>&quot;Ouvrir dans le navigateur&quot;</strong>
                 </p>
                 <button
                   onClick={() => window.open(window.location.href, '_blank')}
