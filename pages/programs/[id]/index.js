@@ -521,43 +521,6 @@ const PrintLayer = ({ program }) => (
 );
 
 /* -------------------------------------------------- */
-/*  Floating buttons (screen)                         */
-/* -------------------------------------------------- */
-const ActionButtons = ({ onPrint, onShare, onDownloadPDF, onDownloadText }) => (
-  <div className="screen-only fixed bottom-5 right-5 z-50 flex flex-col space-y-3">
-   
-    {/* We still rely on the browser’s “Print → Save as PDF”,   
-        but the @page margin has been raised to avoid trimming. */}
-    <button
-      type="button"
-      onClick={onDownloadPDF}
-      className="px-5 py-3 bg-orange-500 text-white rounded-lg shadow-lg hover:bg-orange-600 flex items-center"
-    >
-      <Icon icon="mdi:file-pdf-box" className="w-5 h-5 mr-2" />
-      Télécharger <br /> Le Programme
-    </button>
-
-    {/* <button
-      type="button"
-      onClick={onPrint}
-      className="px-5 py-3 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 flex items-center"
-    >
-      <Icon icon="mdi:printer" className="w-5 h-5 mr-2" />
-      Imprimer
-    </button> */}
-
-    <button
-      type="button"
-      onClick={onShare}
-      className="px-5 py-3 bg-green-600 text-white rounded-lg shadow-lg hover:bg-green-700 flex items-center"
-    >
-      <Icon icon="mdi:share-variant" className="w-5 h-5 mr-2" />
-      Partager
-    </button>
-  </div>
-);
-
-/* -------------------------------------------------- */
 /*  Main component                                   */
 /* -------------------------------------------------- */
 export default function ProgramPage() {
@@ -612,34 +575,51 @@ export default function ProgramPage() {
       const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       
       if (isInAppBrowser) {
-        // Show toast with instructions for in-app browsers
-        toast.error(
-          'Pour télécharger le PDF, cliquez sur les trois points ⋮ et sélectionnez "Ouvrir dans le navigateur"',
-          { duration: 6000 }
-        );
-        
-        // Try to force redirect to external browser
-        try {
-          // First try to open in external browser directly
-          window.open(window.location.href, '_blank');
-        } catch (error) {
-          console.log('Failed to open in external browser, trying share API');
-        }
-        
-        // Also try Web Share API as backup
-        if (navigator.share) {
-          setTimeout(async () => {
-            try {
-              await navigator.share({
-                title: `${program.title} - Programme PDF`,
-                text: 'Ouvrir dans le navigateur pour télécharger le PDF',
-                url: window.location.href
-              });
-            } catch (shareError) {
-              console.log('Share API failed:', shareError);
-            }
-          }, 1000);
-        }
+        // Show custom toast with copy link option for in-app browsers
+        const copyLink = async () => {
+          try {
+            await navigator.clipboard.writeText(window.location.href);
+            toast.success('Lien copié! Collez-le dans votre navigateur pour télécharger le PDF');
+          } catch {
+            prompt('Copiez ce lien et ouvrez-le dans votre navigateur:', window.location.href);
+          }
+        };
+
+        // Show toast with embedded copy button
+        toast.custom((t) => (
+          <div className="bg-white border border-red-200 rounded-lg shadow-lg p-4 max-w-sm">
+            <div className="flex items-start space-x-3">
+              <div className="flex-shrink-0">
+                <Icon icon="mdi:alert-circle" className="w-6 h-6 text-red-500" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-gray-800 mb-3">
+                  Pour télécharger le PDF, copiez ce lien et ouvrez-le dans votre navigateur (Chrome, Safari, etc.)
+                </p>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => {
+                      copyLink();
+                      toast.dismiss(t.id);
+                    }}
+                    className="px-3 py-2 bg-orange-500 text-white text-sm font-medium rounded hover:bg-orange-600 transition-colors"
+                  >
+                    Copier lien
+                  </button>
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="px-3 py-2 bg-gray-300 text-gray-700 text-sm font-medium rounded hover:bg-gray-400 transition-colors"
+                  >
+                    Fermer
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ), {
+          duration: 8000,
+          position: 'top-center',
+        });
         return;
       }
       
@@ -1133,27 +1113,7 @@ export default function ProgramPage() {
             <h3 className="text-2xl font-bold text-gray-900 mb-6">
               Une question ? Contactez-nous
             </h3>
-            
-            {/* Special "Open in Browser" button for Facebook users */}
-            {/FBAN|FBAV/i.test(typeof navigator !== 'undefined' ? navigator.userAgent : '') && (
-              <div className="mb-8 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                <div className="flex items-center justify-center mb-3">
-                  <Icon icon="mdi:information" className="w-5 h-5 text-orange-600 mr-2" />
-                  <span className="text-orange-800 font-medium">Pour télécharger le PDF</span>
-                </div>
-                <p className="text-sm text-orange-700 mb-4">
-                  👉 Cliquez sur les trois points <strong>⋮</strong> et sélectionnez <strong>&quot;Ouvrir dans le navigateur&quot;</strong>
-                </p>
-                <button
-                  onClick={() => window.open(window.location.href, '_blank')}
-                  className="inline-flex items-center space-x-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
-                >
-                  <Icon icon="mdi:open-in-new" className="w-5 h-5" />
-                  <span>Ouvrir dans le navigateur</span>
-                </button>
-              </div>
-            )}
-            
+
             {/* Desktop-only Copy Phone button */}
             <button
               onClick={() => {
