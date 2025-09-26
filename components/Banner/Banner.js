@@ -164,7 +164,7 @@ const Banner = () => {
                       <Icon icon="mdi:arrow-right" className="w-5 h-5" />
                     </motion.button>
                   </Link>
-                  <Link href={`/reserve/${banner.tripId}`}>
+                  <Link href={`/programs/${banner.tripId}#reservation-section`}>
                     <motion.button 
                       className="px-6 py-3 bg-white/20 backdrop-blur-sm text-white font-semibold rounded-lg hover:bg-white/30 transition-colors flex items-center justify-center space-x-2"
                       whileHover={{ scale: 1.05 }}
