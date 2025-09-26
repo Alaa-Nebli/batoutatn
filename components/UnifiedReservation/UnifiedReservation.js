@@ -254,7 +254,7 @@ const UnifiedReservation = () => {
             </span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light">
-            Que ce soit un <span className="font-medium text-gray-800">voyage à l'étranger clé en main</span> ou une <span className="font-medium text-gray-800">billetterie 100% personnalisée</span>, nous nous occupons de tout pour vous.
+            Que ce soit un <span className="font-medium text-gray-800">voyage à l&lsquo;étranger clé en main</span> ou une <span className="font-medium text-gray-800">billetterie 100% personnalisée</span>, nous nous occupons de tout pour vous.
           </p>
         </motion.div>
 

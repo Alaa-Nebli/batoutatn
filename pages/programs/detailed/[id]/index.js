@@ -5,7 +5,6 @@ import SEO from "components/SEO/SEO";
 import { ContactUs } from "components/Contact";
 import { useRouter } from 'next/router';
 import toast, { Toaster } from 'react-hot-toast';
-import { ContactUs } from "components/Contact";
 import { useRouter } from 'next/router';
 
 const ProgramHeaderCard = ({ program }) => {
