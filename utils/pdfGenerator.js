@@ -2,6 +2,42 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
 /**
+ * Clean HTML content by removing tags and decoding HTML entities
+ * @param {string} html - HTML content to clean
+ * @returns {string} - Clean text
+ */
+const cleanHtmlContent = (html = '') => {
+  if (typeof document !== 'undefined') {
+    // Browser environment - use DOM to decode entities
+    const textarea = document.createElement('textarea');
+    const withoutTags = html.replace(/<[^>]*>/g, '');
+    textarea.innerHTML = withoutTags;
+    return textarea.value
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .trim();
+  } else {
+    // Server environment - manual entity decoding
+    const withoutTags = html.replace(/<[^>]*>/g, '');
+    return withoutTags
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .replace(/&rsquo;/g, "'")
+      .replace(/&lsquo;/g, "'")
+      .replace(/&rdquo;/g, '"')
+      .replace(/&ldquo;/g, '"')
+      .replace(/&hellip;/g, '...')
+      .replace(/&mdash;/g, '—')
+      .replace(/&ndash;/g, '–')
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .trim();
+  }
+};
+
+/**
  * Generate PDF from program data
  * @param {Object} program - Program data
  * @returns {Promise<void>}
@@ -102,7 +138,7 @@ export const generateProgramPDF = async (program) => {
     yPosition += 10;
 
     // Clean HTML description
-    const cleanDescription = program.description?.replace(/<[^>]*>/g, '') || '';
+    const cleanDescription = cleanHtmlContent(program.description);
     pdf.setFontSize(10);
     pdf.setFont('helvetica', 'normal');
     
@@ -138,7 +174,7 @@ export const generateProgramPDF = async (program) => {
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       
-      const cleanItemDescription = item.description?.replace(/<[^>]*>/g, '') || '';
+      const cleanItemDescription = cleanHtmlContent(item.description);
       const itemLines = pdf.splitTextToSize(cleanItemDescription, contentWidth);
       itemLines.forEach(line => {
         checkAndAddPage();
@@ -157,7 +193,7 @@ export const generateProgramPDF = async (program) => {
       pdf.text('CE QUE COMPREND LE PRIX', margin, yPosition);
       yPosition += 10;
 
-      const cleanPriceInclude = program.priceInclude.replace(/<[^>]*>/g, '');
+      const cleanPriceInclude = cleanHtmlContent(program.priceInclude);
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       
@@ -179,7 +215,7 @@ export const generateProgramPDF = async (program) => {
       pdf.text('CONDITIONS GÉNÉRALES', margin, yPosition);
       yPosition += 10;
 
-      const cleanConditions = program.generalConditions.replace(/<[^>]*>/g, '');
+      const cleanConditions = cleanHtmlContent(program.generalConditions);
       pdf.setFontSize(10);
       pdf.setFont('helvetica', 'normal');
       

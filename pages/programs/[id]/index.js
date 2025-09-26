@@ -22,8 +22,21 @@ import { generateProgramPDF } from '../../../utils/pdfGenerator';
 /* -------------------------------------------------- */
 /*  Helpers                                           */
 /* -------------------------------------------------- */
-const stripHtml = (html = '') =>
-  html.replace(/<[^>]+>/g, '').replace(/\n{3,}/g, '\n\n').trim();
+const decodeHtmlEntities = (text = '') => {
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = text;
+  return textarea.value;
+};
+
+const stripHtml = (html = '') => {
+  // First remove HTML tags, then decode entities, then clean up whitespace
+  const withoutTags = html.replace(/<[^>]+>/g, '');
+  const decodedEntities = decodeHtmlEntities(withoutTags);
+  return decodedEntities
+    .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+    .replace(/\n{3,}/g, '\n\n') // Replace multiple newlines with double newline
+    .trim();
+};
 
 const fmtDate = d =>
   new Date(d).toLocaleDateString('fr-FR', {
@@ -688,22 +701,55 @@ export default function ProgramPage() {
 
   const handleDownloadText = () => {
     if (!program) return;
-    let txt = `${program.title}\n\nDestination : ${program.location_from} → ${
-      program.location_to
-    }\nDates : ${fmtDate(program.from_date)} – ${fmtDate(program.to_date)}\nDurée : ${
-      program.days
-    } jours\nPrix : ${program.price?.toLocaleString('fr-FR')} TND\n`;
-    if (program.singleAdon)
-      txt += `Supplément single : ${program.singleAdon.toLocaleString('fr-FR')} TND\n`;
-
-    txt += `\nAperçu :\n${stripHtml(program.description)}\n\nItinéraire :\n`;
+    
+    let txt = `${program.title}\n`;
+    txt += `${'='.repeat(program.title.length)}\n\n`;
+    
+    txt += `DESTINATION: ${program.location_from} → ${program.location_to}\n`;
+    txt += `DATES: ${fmtDate(program.from_date)} – ${fmtDate(program.to_date)}\n`;
+    txt += `DURÉE: ${program.days} jours\n`;
+    txt += `PRIX: ${program.price?.toLocaleString('fr-FR')} TND par personne\n`;
+    
+    if (program.singleAdon) {
+      txt += `SUPPLÉMENT SINGLE: ${program.singleAdon.toLocaleString('fr-FR')} TND\n`;
+    }
+    
+    txt += '\n' + '='.repeat(50) + '\n';
+    txt += 'APERÇU DU SÉJOUR\n';
+    txt += '='.repeat(50) + '\n\n';
+    txt += `${stripHtml(program.description)}\n\n`;
+    
+    txt += '='.repeat(50) + '\n';
+    txt += 'ITINÉRAIRE DÉTAILLÉ\n';
+    txt += '='.repeat(50) + '\n\n';
+    
     program.timeline.forEach((t, i) => {
-      txt += `Jour ${i + 1} : ${t.title}\n${stripHtml(t.description)}\n`;
+      const dayTitle = stripHtml(t.title);
+      txt += `JOUR ${i + 1}: ${dayTitle}\n`;
+      txt += `${'-'.repeat(dayTitle.length + 10)}\n`;
+      txt += `${stripHtml(t.description)}\n\n`;
     });
 
-    txt += `\nComprend/Ne comprend pas :\n${stripHtml(program.priceInclude)}\n\nConditions générales :\n${stripHtml(
-      program.generalConditions,
-    )}\n`;
+    if (program.priceInclude) {
+      txt += '='.repeat(50) + '\n';
+      txt += 'CE QUE COMPREND LE PRIX\n';
+      txt += '='.repeat(50) + '\n\n';
+      txt += `${stripHtml(program.priceInclude)}\n\n`;
+    }
+
+    if (program.generalConditions) {
+      txt += '='.repeat(50) + '\n';
+      txt += 'CONDITIONS GÉNÉRALES\n';
+      txt += '='.repeat(50) + '\n\n';
+      txt += `${stripHtml(program.generalConditions)}\n\n`;
+    }
+
+    txt += '='.repeat(50) + '\n';
+    txt += 'CONTACT\n';
+    txt += '='.repeat(50) + '\n';
+    txt += 'BATOUTA VOYAGES\n';
+    txt += 'Tél: +216 71 802 881\n';
+    txt += 'Email: outgoing.batouta@gmail.com\n';
 
     const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -716,6 +762,8 @@ export default function ProgramPage() {
     a.remove();
     URL.revokeObjectURL(url);
   };
+
+  
 
   /* -------- render ------------------------------------------- */
   if (loading) {
@@ -1089,6 +1137,8 @@ export default function ProgramPage() {
           >
             <Icon icon="mdi:file-pdf-box" className="w-5 h-5" /> Télécharger
           </motion.button>
+
+        
           
           {/* <motion.button
             onClick={handlePrint}
