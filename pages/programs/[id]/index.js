@@ -606,120 +606,395 @@ export default function ProgramPage() {
   const handlePrint = () => window.print();
 
   const handleDownloadPDF = async () => {
-    try {
-      // Detect if we're in Facebook's in-app browser or other restricted environments
-      const isInAppBrowser = /FBAN|FBAV|Instagram|Twitter|Line|WhatsApp|LinkedIn/i.test(navigator.userAgent);
-      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      
-      if (isInAppBrowser) {
-        // Show toast with instructions for in-app browsers
-        toast.error(
-          'Pour télécharger le PDF, veuillez ouvrir ce lien dans votre navigateur (Chrome, Safari, etc.)',
-          { duration: 5000 }
-        );
-        
-        // Try to open in external browser
-        if (navigator.share) {
-          await navigator.share({
-            title: `${program.title} - Programme PDF`,
-            text: 'Ouvrir dans le navigateur pour télécharger le PDF',
-            url: window.location.href
-          });
-        } else {
-          // Copy URL to clipboard as fallback
-          try {
-            await navigator.clipboard.writeText(window.location.href);
-            toast.success('Lien copié! Collez-le dans votre navigateur pour télécharger le PDF');
-          } catch {
-            // If clipboard fails, show the URL
-            prompt('Copiez ce lien et ouvrez-le dans votre navigateur:', window.location.href);
-          }
-        }
-        return;
-      }
-      
-      // For mobile browsers, try PDF generation with better error handling
-      if (isMobile) {
-        try {
-          await generateProgramPDF(program);
-        } catch (error) {
-          console.error('Mobile PDF generation failed:', error);
-          // Fallback: try to open a new window with printable content
-          const printWindow = window.open('', '_blank');
-          if (printWindow) {
-            printWindow.document.write(`
-              <html>
-                <head>
-                  <title>${program.title} - Programme</title>
-                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                  <style>
-                    body { font-family: Arial, sans-serif; padding: 20px; }
-                    h1 { color: #ea580c; }
-                    h2 { color: #9a3412; margin-top: 30px; }
-                    .section { margin-bottom: 30px; }
-                    .day-title { font-weight: bold; color: #ea580c; }
-                    @media print { 
-                      body { margin: 0; }
-                      .no-print { display: none; }
-                    }
-                  </style>
-                </head>
-                <body>
-                  <div class="no-print">
-                    <button onclick="window.print()" style="background: #ea580c; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-bottom: 20px;">Imprimer / Enregistrer en PDF</button>
-                  </div>
-                  <h1>${program.title}</h1>
-                  <div class="section">
-                    <strong>Destination:</strong> ${program.location_from} → ${program.location_to}<br>
-                    <strong>Dates:</strong> ${fmtDate(program.from_date)} – ${fmtDate(program.to_date)}<br>
-                    <strong>Durée:</strong> ${program.days} jours<br>
-                    <strong>Prix:</strong> ${program.price?.toLocaleString('fr-FR')} TND
-                    ${program.singleAdon ? `<br><strong>Supplément single:</strong> ${program.singleAdon.toLocaleString('fr-FR')} TND` : ''}
-                  </div>
-                  <h2>Aperçu du séjour</h2>
-                  <div class="section">${stripHtml(program.description)}</div>
-                  <h2>Itinéraire détaillé</h2>
-                  ${program.timeline.map((t, i) => `
-                    <div class="section">
-                      <div class="day-title">Jour ${i + 1}: ${stripHtml(t.title)}</div>
-                      <div>${stripHtml(t.description)}</div>
-                    </div>
-                  `).join('')}
-                  ${program.priceInclude ? `
-                    <h2>Ce que comprend le prix</h2>
-                    <div class="section">${stripHtml(program.priceInclude)}</div>
-                  ` : ''}
-                  ${program.generalConditions ? `
-                    <h2>Conditions générales</h2>
-                    <div class="section">${stripHtml(program.generalConditions)}</div>
-                  ` : ''}
-                  <div class="section">
-                    <strong>BATOUTA VOYAGES</strong><br>
-                    Tél: +216 71 802 881<br>
-                    Email: outgoing.batouta@gmail.com
-                  </div>
-                </body>
-              </html>
-            `);
-            printWindow.document.close();
-            toast.success('Fenêtre ouverte! Cliquez sur "Imprimer" puis "Enregistrer en PDF"');
-          } else {
-            // If popup is blocked, fall back to print current page
-            window.print();
-          }
-        }
-      } else {
-        // Desktop browsers - standard PDF generation
+  try {
+    // Detect browser environment
+    const userAgent = navigator.userAgent;
+    const isInAppBrowser = /FBAN|FBAV|Instagram|Twitter|Line|WhatsApp|LinkedIn/i.test(userAgent);
+    const isFacebookBrowser = /FBAN|FBAV/i.test(userAgent);
+    const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+    
+    console.log('Browser detection:', {
+      isInAppBrowser,
+      isFacebookBrowser,
+      isMobile,
+      isIOS,
+      userAgent: userAgent.substring(0, 100)
+    });
+
+    // Show loading state
+    toast.info('Génération du PDF en cours...');
+
+    // Strategy 1: For Facebook in-app browser, try direct PDF generation first
+    if (isFacebookBrowser) {
+      try {
+        console.log('Attempting Facebook-compatible PDF generation...');
         await generateProgramPDF(program);
+        toast.success('PDF téléchargé avec succès!');
+        return;
+      } catch (error) {
+        console.error('Facebook PDF generation failed:', error);
+        // Fall through to other strategies
       }
-      
-    } catch (error) {
-      console.error('PDF generation error:', error);
-      toast.error('Impossible de générer le PDF. Essayez d\'imprimer la page.');
-      // Final fallback to print method
-      window.print();
     }
+
+    // Strategy 2: For other in-app browsers, provide guidance but still try
+    if (isInAppBrowser && !isFacebookBrowser) {
+      toast.warning(
+        'Pour un meilleur téléchargement, ouvrez ce lien dans votre navigateur principal',
+        { duration: 7000 }
+      );
+      
+      // Still attempt the download
+      try {
+        await generateProgramPDF(program);
+        toast.success('PDF généré! Vérifiez vos téléchargements.');
+        return;
+      } catch (error) {
+        console.error('In-app browser PDF failed:', error);
+        // Proceed to fallback methods
+      }
+    }
+
+    // Strategy 3: Regular browsers
+    if (!isInAppBrowser) {
+      try {
+        await generateProgramPDF(program);
+        toast.success('PDF téléchargé avec succès!');
+        return;
+      } catch (error) {
+        console.error('Regular PDF generation failed:', error);
+        // Proceed to fallback methods
+      }
+    }
+
+    // Strategy 4: iOS Safari fallback - open in new tab
+    if (isIOS) {
+      console.log('Using iOS fallback method...');
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        const htmlContent = generatePrintableHTML(program);
+        printWindow.document.write(htmlContent);
+        printWindow.document.close();
+        
+        // Add download button in the new window
+        setTimeout(() => {
+          if (printWindow && !printWindow.closed) {
+            printWindow.focus();
+            toast.success('Page ouverte! Utilisez "Partager" > "Imprimer" > "Enregistrer en PDF"');
+          }
+        }, 1000);
+      } else {
+        throw new Error('Popup blocked');
+      }
+      return;
+    }
+
+    // Strategy 5: Server-side generation fallback (if available)
+    if (window.location.origin.includes('your-domain.com')) {
+      try {
+        console.log('Attempting server-side PDF generation...');
+        const response = await fetch('/api/generate-pdf', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ program })
+        });
+        
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `programme-${program.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+          toast.success('PDF téléchargé depuis le serveur!');
+          return;
+        }
+      } catch (error) {
+        console.error('Server-side PDF generation failed:', error);
+      }
+    }
+
+    // Strategy 6: Final fallback - printable HTML page
+    console.log('Using final fallback method...');
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      const htmlContent = generatePrintableHTML(program);
+      printWindow.document.write(htmlContent);
+      printWindow.document.close();
+      toast.info('Page d\'impression ouverte. Utilisez Ctrl+P puis "Enregistrer en PDF"');
+    } else {
+      // If popups are blocked, use current window
+      const newTab = document.createElement('div');
+      newTab.innerHTML = generatePrintableHTML(program);
+      document.body.appendChild(newTab);
+      window.print();
+      document.body.removeChild(newTab);
+    }
+
+  } catch (error) {
+    console.error('All PDF generation methods failed:', error);
+    toast.error('Impossible de générer le PDF. Contactez le support.');
+  }
+};
+
+  // Helper function to generate printable HTML
+  const generatePrintableHTML = (program) => {
+    const formatDate = (date) => {
+      return new Date(date).toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    };
+
+    const stripHtml = (html) => {
+      return html ? html.replace(/<[^>]*>/g, '').trim() : '';
+    };
+
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${program.title} - Programme PDF</title>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              padding: 20px; 
+              line-height: 1.6;
+              max-width: 800px;
+              margin: 0 auto;
+            }
+            .header { 
+              text-align: center; 
+              margin-bottom: 30px; 
+              border-bottom: 2px solid #ea580c;
+              padding-bottom: 20px;
+            }
+            .company-name { 
+              font-size: 24px; 
+              font-weight: bold; 
+              color: #000;
+              margin-bottom: 10px;
+            }
+            .program-title { 
+              font-size: 20px; 
+              color: #ea580c; 
+              margin-bottom: 20px;
+            }
+            .details-grid {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 10px;
+              margin-bottom: 30px;
+              background: #f8f9fa;
+              padding: 20px;
+              border-radius: 8px;
+            }
+            .detail-item {
+              margin-bottom: 5px;
+            }
+            .detail-label {
+              font-weight: bold;
+              color: #333;
+            }
+            h2 { 
+              color: #ea580c; 
+              margin-top: 40px; 
+              margin-bottom: 15px;
+              font-size: 18px;
+              border-bottom: 1px solid #ea580c;
+              padding-bottom: 5px;
+            }
+            .section { 
+              margin-bottom: 30px; 
+            }
+            .day-title { 
+              font-weight: bold; 
+              color: #ea580c; 
+              margin-top: 25px;
+              margin-bottom: 10px;
+              font-size: 16px;
+            }
+            .day-description {
+              margin-left: 15px;
+              margin-bottom: 15px;
+            }
+            .contact-info {
+              margin-top: 50px;
+              padding-top: 20px;
+              border-top: 2px solid #ea580c;
+              text-align: center;
+              font-weight: bold;
+            }
+            .download-buttons {
+              text-align: center;
+              margin: 20px 0;
+              padding: 20px;
+              background: #f0f9ff;
+              border-radius: 8px;
+            }
+            .download-btn {
+              background: #ea580c;
+              color: white;
+              padding: 12px 24px;
+              border: none;
+              border-radius: 6px;
+              font-size: 16px;
+              cursor: pointer;
+              margin: 0 10px;
+              text-decoration: none;
+              display: inline-block;
+            }
+            .download-btn:hover {
+              background: #c2410c;
+            }
+            @media print {
+              .download-buttons { display: none; }
+              body { margin: 0; padding: 15mm; }
+              .details-grid { 
+                display: block; 
+                background: none;
+                padding: 0;
+              }
+              .detail-item { 
+                margin-bottom: 8px; 
+              }
+              h2 { 
+                page-break-after: avoid; 
+                margin-top: 25px;
+              }
+              .day-title { 
+                page-break-after: avoid; 
+              }
+            }
+            @media (max-width: 600px) {
+              .details-grid {
+                grid-template-columns: 1fr;
+              }
+              .download-btn {
+                display: block;
+                margin: 5px 0;
+              }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="download-buttons">
+            <button onclick="window.print()" class="download-btn">
+              📄 Imprimer / Enregistrer en PDF
+            </button>
+            <button onclick="downloadAsDataURL()" class="download-btn">
+              💾 Télécharger PDF
+            </button>
+            <button onclick="shareProgram()" class="download-btn">
+              📤 Partager
+            </button>
+          </div>
+
+          <div class="header">
+            <div class="company-name">BATOUTA VOYAGES</div>
+            <div class="program-title">${program.title}</div>
+          </div>
+
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Destination:</span><br>
+              ${program.location_from} → ${program.location_to}
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Dates:</span><br>
+              ${formatDate(program.from_date)} - ${formatDate(program.to_date)}
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Durée:</span><br>
+              ${program.days} jours
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Prix:</span><br>
+              ${program.price?.toLocaleString('fr-FR')} TND / personne
+              ${program.singleAdon ? `<br><small>Supplément single: ${program.singleAdon.toLocaleString('fr-FR')} TND</small>` : ''}
+            </div>
+          </div>
+
+          <h2>APERÇU DU SÉJOUR</h2>
+          <div class="section">${stripHtml(program.description)}</div>
+
+          <h2>ITINÉRAIRE DÉTAILLÉ</h2>
+          ${program.timeline?.map((t, i) => `
+            <div class="day-title">Jour ${i + 1}: ${stripHtml(t.title)}</div>
+            <div class="day-description">${stripHtml(t.description)}</div>
+          `).join('')}
+
+          ${program.priceInclude ? `
+            <h2>CE QUE COMPREND LE PRIX</h2>
+            <div class="section">${stripHtml(program.priceInclude)}</div>
+          ` : ''}
+
+          ${program.generalConditions ? `
+            <h2>CONDITIONS GÉNÉRALES</h2>
+            <div class="section">${stripHtml(program.generalConditions)}</div>
+          ` : ''}
+
+          <div class="contact-info">
+            BATOUTA VOYAGES<br>
+            Tél: +216 71 802 881<br>
+            Email: outgoing.batouta@gmail.com
+          </div>
+
+          <script>
+            // Enhanced download functionality for in-app browsers
+            function downloadAsDataURL() {
+              try {
+                // Import jsPDF dynamically if available
+                if (typeof jsPDF !== 'undefined') {
+                  generateAndDownloadPDF();
+                } else {
+                  // Fallback to print
+                  window.print();
+                }
+              } catch (error) {
+                console.error('Download failed:', error);
+                window.print();
+              }
+            }
+
+            function shareProgram() {
+              if (navigator.share) {
+                navigator.share({
+                  title: '${program.title} - Programme',
+                  text: 'Découvrez ce programme de voyage',
+                  url: window.location.href
+                });
+              } else if (navigator.clipboard) {
+                navigator.clipboard.writeText(window.location.href)
+                  .then(() => alert('Lien copié dans le presse-papiers!'))
+                  .catch(() => prompt('Copiez ce lien:', window.location.href));
+              } else {
+                prompt('Copiez ce lien:', window.location.href);
+              }
+            }
+
+            // Auto-focus and show instructions for mobile users
+            if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+              setTimeout(() => {
+                const buttons = document.querySelector('.download-buttons');
+                if (buttons) {
+                  buttons.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+              }, 1000);
+            }
+          </script>
+        </body>
+      </html>
+    `;
   };
+
 
   const handleShare = async () => {
     try {
