@@ -607,10 +607,116 @@ export default function ProgramPage() {
 
   const handleDownloadPDF = async () => {
     try {
-      await generateProgramPDF(program);
+      // Detect if we're in Facebook's in-app browser or other restricted environments
+      const isInAppBrowser = /FBAN|FBAV|Instagram|Twitter|Line|WhatsApp|LinkedIn/i.test(navigator.userAgent);
+      const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isInAppBrowser) {
+        // Show toast with instructions for in-app browsers
+        toast.error(
+          'Pour télécharger le PDF, veuillez ouvrir ce lien dans votre navigateur (Chrome, Safari, etc.)',
+          { duration: 5000 }
+        );
+        
+        // Try to open in external browser
+        if (navigator.share) {
+          await navigator.share({
+            title: `${program.title} - Programme PDF`,
+            text: 'Ouvrir dans le navigateur pour télécharger le PDF',
+            url: window.location.href
+          });
+        } else {
+          // Copy URL to clipboard as fallback
+          try {
+            await navigator.clipboard.writeText(window.location.href);
+            toast.success('Lien copié! Collez-le dans votre navigateur pour télécharger le PDF');
+          } catch {
+            // If clipboard fails, show the URL
+            prompt('Copiez ce lien et ouvrez-le dans votre navigateur:', window.location.href);
+          }
+        }
+        return;
+      }
+      
+      // For mobile browsers, try PDF generation with better error handling
+      if (isMobile) {
+        try {
+          await generateProgramPDF(program);
+        } catch (error) {
+          console.error('Mobile PDF generation failed:', error);
+          // Fallback: try to open a new window with printable content
+          const printWindow = window.open('', '_blank');
+          if (printWindow) {
+            printWindow.document.write(`
+              <html>
+                <head>
+                  <title>${program.title} - Programme</title>
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    h1 { color: #ea580c; }
+                    h2 { color: #9a3412; margin-top: 30px; }
+                    .section { margin-bottom: 30px; }
+                    .day-title { font-weight: bold; color: #ea580c; }
+                    @media print { 
+                      body { margin: 0; }
+                      .no-print { display: none; }
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="no-print">
+                    <button onclick="window.print()" style="background: #ea580c; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-bottom: 20px;">Imprimer / Enregistrer en PDF</button>
+                  </div>
+                  <h1>${program.title}</h1>
+                  <div class="section">
+                    <strong>Destination:</strong> ${program.location_from} → ${program.location_to}<br>
+                    <strong>Dates:</strong> ${fmtDate(program.from_date)} – ${fmtDate(program.to_date)}<br>
+                    <strong>Durée:</strong> ${program.days} jours<br>
+                    <strong>Prix:</strong> ${program.price?.toLocaleString('fr-FR')} TND
+                    ${program.singleAdon ? `<br><strong>Supplément single:</strong> ${program.singleAdon.toLocaleString('fr-FR')} TND` : ''}
+                  </div>
+                  <h2>Aperçu du séjour</h2>
+                  <div class="section">${stripHtml(program.description)}</div>
+                  <h2>Itinéraire détaillé</h2>
+                  ${program.timeline.map((t, i) => `
+                    <div class="section">
+                      <div class="day-title">Jour ${i + 1}: ${stripHtml(t.title)}</div>
+                      <div>${stripHtml(t.description)}</div>
+                    </div>
+                  `).join('')}
+                  ${program.priceInclude ? `
+                    <h2>Ce que comprend le prix</h2>
+                    <div class="section">${stripHtml(program.priceInclude)}</div>
+                  ` : ''}
+                  ${program.generalConditions ? `
+                    <h2>Conditions générales</h2>
+                    <div class="section">${stripHtml(program.generalConditions)}</div>
+                  ` : ''}
+                  <div class="section">
+                    <strong>BATOUTA VOYAGES</strong><br>
+                    Tél: +216 71 802 881<br>
+                    Email: outgoing.batouta@gmail.com
+                  </div>
+                </body>
+              </html>
+            `);
+            printWindow.document.close();
+            toast.success('Fenêtre ouverte! Cliquez sur "Imprimer" puis "Enregistrer en PDF"');
+          } else {
+            // If popup is blocked, fall back to print current page
+            window.print();
+          }
+        }
+      } else {
+        // Desktop browsers - standard PDF generation
+        await generateProgramPDF(program);
+      }
+      
     } catch (error) {
       console.error('PDF generation error:', error);
-      // Fallback to print method
+      toast.error('Impossible de générer le PDF. Essayez d\'imprimer la page.');
+      // Final fallback to print method
       window.print();
     }
   };
@@ -1092,6 +1198,8 @@ export default function ProgramPage() {
             <Icon icon="mdi:file-pdf-box" className="w-5 h-5 mr-5" /> Télécharger PDF
           </motion.button>
           
+          
+          
           {/* <motion.button
             onClick={handlePrint}
             whileHover={{ scale: 1.05 }}
@@ -1137,7 +1245,8 @@ export default function ProgramPage() {
           >
             <Icon icon="mdi:file-pdf-box" className="w-5 h-5" /> Télécharger
           </motion.button>
-
+          
+         
         
           
           {/* <motion.button
