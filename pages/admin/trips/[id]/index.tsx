@@ -80,6 +80,8 @@ export default function EditProgram() {
 
   /* timeline replacement images keyed by day index */
   const [timelineImages, setTimelineImages] = useState<Record<number, File>>({});
+  /* track which timeline days should get new images */
+  const [timelineImageReplacements, setTimelineImageReplacements] = useState<Record<number, boolean>>({});
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -193,6 +195,7 @@ export default function EditProgram() {
     if (isTimeline && tlIdx !== undefined) {
       const file = valid[0];
       setTimelineImages(prev => ({ ...prev, [tlIdx]: file }));
+      setTimelineImageReplacements(prev => ({ ...prev, [tlIdx]: true }));
       setFormData(prev => {
         const t = [...prev.timeline];
         t[tlIdx].image = URL.createObjectURL(file);  /* preview blob */
@@ -214,6 +217,7 @@ export default function EditProgram() {
   const removeNew = (idx: number, isTimeline = false, tlIdx?: number) => {
     if (isTimeline && tlIdx !== undefined) {
       setTimelineImages(p => { const c = { ...p }; delete c[tlIdx]; return c; });
+      setTimelineImageReplacements(prev => ({ ...prev, [tlIdx]: false }));
       setFormData(p => { const t = [...p.timeline]; t[tlIdx].image = ""; return { ...p, timeline: t }; });
     } else {
       setNewImages(p => p.filter((_, i) => i !== idx));
@@ -270,6 +274,9 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     /* Gallery state the user wants to keep */
     fd.append("keptImages", JSON.stringify(keptImages));
+
+    /* Timeline image replacement mapping */
+    fd.append("timelineImageReplacements", JSON.stringify(timelineImageReplacements));
 
     /* PUT request */
     const res = await fetch(`/api/programs.controller?id=${id}`, {

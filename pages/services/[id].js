@@ -149,10 +149,10 @@ const HeroSection = ({ serviceData, serviceId }) => (
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link 
-            href="#services" 
+            href="#contact" 
             className="px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-full text-lg font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
           >
-            Découvrir nos offres
+            Contacter nous
           </Link>
           <Link 
             href="#contact" 
@@ -437,7 +437,7 @@ const EngagementsSection = ({ serviceData, serviceId }) => (
           href="#contact"
           className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-full font-semibold hover:shadow-xl transition-all duration-300 transform hover:scale-105"
         >
-          <span>Découvrez nos services</span>
+          <span>Contactez-nous</span>
           <Icon icon="mdi:arrow-right" className="w-5 h-5 ml-2" />
         </Link>
       </motion.div>
@@ -565,10 +565,10 @@ const ServiceDetails = ({ serviceId }) => {
 
       <main>
         {/* Hero Section */}
-        <HeroSection serviceData={serviceData} serviceId={serviceId} />
+        {/* <HeroSection serviceData={serviceData} serviceId={serviceId} /> */}
 
         {/* Services Content */}
-        <section id="services" className="py-20">
+        <section id="services" className="py-20 mt-20">
           <div className="container mx-auto px-4">
             {/* Service-specific content */}
             <AnimatePresence mode="wait">
@@ -601,7 +601,7 @@ const ServiceDetails = ({ serviceId }) => {
                 >
                   <div className="text-center mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                      Nos Excursions Premium
+                      Nos Excursions en Tunisie
                     </h2>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
                       Découvrez la Tunisie authentique avec nos excursions soigneusement sélectionnées

@@ -150,8 +150,8 @@ export default async function handler(req, res) {
         <body>
           <div class="container">
             <div class="header">
-              <h1>✈️ Demande de Billetterie Reçue</h1>
-              <p>Merci pour votre confiance, ${firstName}!</p>
+              <h1 style="color: black;"> Demande de Billetterie Reçue</h1>
+              <p style="color: black;">Merci pour votre confiance, ${firstName}!</p>
             </div>
             
             <div class="content">
@@ -160,7 +160,7 @@ export default async function handler(req, res) {
               <p>Nous avons bien reçu votre demande de devis pour votre voyage. Notre équipe spécialisée en billetterie va étudier votre demande et vous proposer les meilleures options disponibles.</p>
 
               <div class="summary">
-                <h3>📋 Récapitulatif de votre demande</h3>
+                <h3> Récapitulatif de votre demande</h3>
                 <div class="route">${departureCity} ✈️ ${arrivalCity}</div>
                 
                 <div class="detail">
@@ -201,7 +201,7 @@ export default async function handler(req, res) {
                   <li>Toutes les informations pratiques</li>
                 </ul>
                 <p><strong>Téléphone:</strong> +216 XX XXX XXX</p>
-                <p><strong>Email:</strong> contact@batouta.tn</p>
+                <p><strong>Email:</strong> ticketing.batouta@gmail.com</p>
               </div>
 
               <p>En attendant, n'hésitez pas à nous contacter si vous avez des questions ou des modifications à apporter à votre demande.</p>
@@ -210,7 +210,7 @@ export default async function handler(req, res) {
               
               <p style="margin-top: 30px; font-style: italic; color: #6b7280;">
                 Batouta Voyages - Votre partenaire de confiance pour tous vos voyages<br>
-                🌐 www.batouta.tn | 📧 contact@batouta.tn
+                🌐 www.batouta.tn | 📧 ticketing.batouta@gmail.com
               </p>
             </div>
           </div>
@@ -222,15 +222,15 @@ export default async function handler(req, res) {
     await Promise.all([
       // Email à l'équipe
       resend.emails.send({
-        from: 'Batouta Voyages <noreply@batouta.tn>',
-        to: ['contact@batouta.tn'],
+        from: `Batouta Voyages <ticketing@batouta.tn>`,
+        to: "ticketing.batouta@gmail.com",
         subject: `🎫 Nouvelle demande billetterie - ${firstName} ${lastName}`,
         html: teamEmailContent
       }),
 
       // Email de confirmation au client
       resend.emails.send({
-        from: 'Batouta Voyages <noreply@batouta.tn>',
+        from: `Batouta Voyages <ticketing@batouta.tn>`,
         to: [email],
         subject: '✈️ Confirmation de votre demande de billetterie - Batouta Voyages',
         html: clientEmailContent

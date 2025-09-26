@@ -8,11 +8,6 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-enum UserRole {
-  ADMIN
-  SUPER_ADMIN
-}
-
 model User {
   id        String   @id @default(cuid())
   username  String   @unique
@@ -25,40 +20,41 @@ model User {
 }
 
 model Trip {
-  id           String      @id @default(cuid())
-  title        String      @unique
-  metadata     String?
-  description  String
-  images       Json
-  location_from String
-  location_to  String
-  days         Int
-  price        Float
-  singleAdon   Int
-  from_date    DateTime
-  to_date      DateTime
-  display      Boolean     @default(true)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  timeline     TripTimeline[]
-  featured     Featured[]
-  reservations ProgramReservation[]
-  priceInclude String
+  id                String         @id @default(cuid())
+  title             String         @unique
+  metadata          String?
+  description       String
+  images            Json
+  location_from     String
+  location_to       String
+  days              Int
+  price             Float
+  from_date         DateTime
+  to_date           DateTime
+  display           Boolean        @default(true)
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
   generalConditions String
-  phone String
+  priceInclude      String
+  singleAdon        Int
+  phone             String?
+  whatsappNumber    String?        // WhatsApp number (optional, defaults to phone if not set)
+  featured          Featured[]
+  timeline          TripTimeline[]
 }
 
 model TripTimeline {
-  id          String   @id @default(cuid())
+  id          String          @id @default(cuid())
   tripId      String
   title       String
   description String
-  image       String?
+  image       String?         // Keep for backward compatibility
   date        DateTime
   sortOrder   Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  trip        Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  trip        Trip            @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  images      TimelineImage[] // New: multiple images support
 }
 
 model Featured {
@@ -72,78 +68,56 @@ model Featured {
 }
 
 model LocalProgram {
-  id           String      @id @default(cuid())
-  title        String      @unique
-  metadata     String?
-  description  String
-  images       Json
+  id            String            @id @default(cuid())
+  title         String            @unique
+  metadata      String?
+  description   String
+  images        Json
   location_from String
-  location_to  String
-  days         Int
-  price        Float
-  from_date    DateTime
-  to_date      DateTime
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  timeline     ProgramTimeline[]
+  location_to   String
+  days          Int
+  price         Float
+  from_date     DateTime
+  to_date       DateTime
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  timeline      ProgramTimeline[]
 }
 
 model ProgramTimeline {
-  id          String   @id @default(cuid())
-  programId   String
-  title       String
-  description String
-  image       String?
-  date        DateTime
-  sortOrder   Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  localProgram LocalProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  id           String          @id @default(cuid())
+  programId    String
+  title        String
+  description  String
+  image        String?         // Keep for backward compatibility
+  date         DateTime
+  sortOrder    Int
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  localProgram LocalProgram    @relation(fields: [programId], references: [id], onDelete: Cascade)
+  images       TimelineImage[] // New: multiple images support
 }
 
-enum ReservationStatus {
-  PENDING
-  CONFIRMED
-  CANCELLED
-  COMPLETED
+model TimelineImage {
+  id                String           @id @default(cuid())
+  url               String
+  alt               String?
+  sortOrder         Int              @default(0)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  
+  // Relations - one image can belong to either trip timeline OR program timeline
+  tripTimelineId    String?
+  programTimelineId String?
+  
+  tripTimeline      TripTimeline?    @relation(fields: [tripTimelineId], references: [id], onDelete: Cascade)
+  programTimeline   ProgramTimeline? @relation(fields: [programTimelineId], references: [id], onDelete: Cascade)
+  
+  @@index([tripTimelineId])
+  @@index([programTimelineId])
 }
 
-model ProgramReservation {
-  id              String            @id @default(cuid())
-  tripId          String
-  firstName       String
-  lastName        String
-  email           String
-  phone           String
-  numberOfPersons Int               @default(1)
-  roomType        String            @default("double") // single, double, triple
-  specialRequests String?
-  preferredDate   DateTime?
-  status          ReservationStatus @default(PENDING)
-  totalPrice      Float?
-  notes           String?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  trip            Trip              @relation(fields: [tripId], references: [id], onDelete: Cascade)
-}
-
-model TicketingReservation {
-  id              String            @id @default(cuid())
-  typeOfTrip      String            // one-way, round-trip
-  fromLocation    String
-  toLocation      String
-  departureDate   DateTime
-  returnDate      DateTime?
-  numberOfPersons Int               @default(1)
-  firstName       String
-  lastName        String
-  email           String
-  phone           String
-  classType       String?           @default("economy") // economy, business, first
-  specialRequests String?
-  status          ReservationStatus @default(PENDING)
-  estimatedPrice  Float?
-  notes           String?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+enum UserRole {
+  ADMIN
+  SUPER_ADMIN
 }

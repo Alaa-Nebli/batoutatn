@@ -2,10 +2,11 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
 import { VoyageForm } from '../ProgramReservation/ProgramReservation';
 import { ReservationForm } from '../ReservationForm/ReservationForm';
 
-const TripCard = ({ trip, onSelect, isMobile = false }) => (
+const TripCard = ({ trip, onSelect, onViewDetails, isMobile = false }) => (
   <motion.article
     className="relative bg-white rounded-3xl shadow-lg hover:shadow-2xl overflow-hidden group transition-all duration-500 border border-gray-100/50 h-full"
     whileHover={!isMobile ? { y: -8, scale: 1.02 } : {}}
@@ -56,7 +57,7 @@ const TripCard = ({ trip, onSelect, isMobile = false }) => (
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mt-auto">
         <button
-          onClick={() => onSelect(trip, 'details')}
+          onClick={() => onViewDetails(trip.id)}
           className="flex-1 px-4 py-2 bg-white/95 hover:bg-white rounded-xl shadow-lg backdrop-blur-sm transition-all duration-200 flex items-center justify-center text-sm font-medium text-gray-700 hover:text-gray-900"
         >
           <Icon icon="heroicons:eye" className="w-4 h-4 mr-2" />
@@ -66,7 +67,7 @@ const TripCard = ({ trip, onSelect, isMobile = false }) => (
           onClick={() => onSelect(trip, 'reserve')}
           className="flex-1 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white rounded-xl shadow-lg transition-all duration-200 flex items-center justify-center text-sm font-semibold"
         >
-          <Icon icon="heroicons:heart" className="w-4 h-4 mr-2" />
+          <Icon icon="heroicons:calendar" className="w-4 h-4 mr-2" />
           Réserver
         </button>
       </div>
@@ -75,6 +76,7 @@ const TripCard = ({ trip, onSelect, isMobile = false }) => (
 );
 
 const UnifiedReservation = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('voyages');
   const [availableTrips, setAvailableTrips] = useState([]);
   const [selectedTrip, setSelectedTrip] = useState(null);
@@ -144,6 +146,10 @@ const UnifiedReservation = () => {
     }
   }, []);
 
+  const handleViewDetails = useCallback((tripId) => {
+    router.push(`/programs/${tripId}`);
+  }, [router]);
+
   const calculatePrice = useCallback(() => {
     if (!selectedTrip) return 0;
     const basePrice = selectedTrip.price || 0;
@@ -159,14 +165,21 @@ const UnifiedReservation = () => {
 
     try {
       const reservationData = {
-        ...formData,
+        tripId: selectedTrip?.id,
         tripTitle: selectedTrip?.title,
-        tripPrice: selectedTrip?.price,
-        totalPrice: calculatePrice(),
-        type: 'program'
+        tripLocation: `${selectedTrip?.location_from} → ${selectedTrip?.location_to}`,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        numberOfPersons: formData.numberOfPersons,
+        roomType: formData.roomType,
+        specialRequests: formData.specialRequests,
+        preferredDate: selectedTrip ? `${new Date(selectedTrip.from_date).toLocaleDateString('fr-FR')} - ${new Date(selectedTrip.to_date).toLocaleDateString('fr-FR')}` : '',
+        totalPrice: calculatePrice()
       };
 
-      const response = await fetch('/api/reservations', {
+      const response = await fetch('/api/program-reservation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reservationData),
@@ -180,10 +193,11 @@ const UnifiedReservation = () => {
         });
         setSelectedTrip(null);
       } else {
-        throw new Error('Erreur lors de l\'envoi');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Erreur lors de l\'envoi');
       }
     } catch (error) {
-      setErrorMessage('Une erreur s\'est produite. Veuillez réessayer.');
+      setErrorMessage(error.message || 'Une erreur s\'est produite. Veuillez réessayer.');
     } finally {
       setLoading(false);
     }
@@ -236,11 +250,11 @@ const UnifiedReservation = () => {
           <h2 className="text-3xl md:text-5xl font-light mb-4 text-gray-900">
             Réservez votre{' '}
             <span className="font-medium bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-              prochaine aventure
+              prochain voyage
             </span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto font-light">
-            Que ce soit un <span className="font-medium text-gray-800">voyage organisé clé en main</span> ou une <span className="font-medium text-gray-800">billetterie 100% personnalisée</span>, nous nous occupons de tout pour vous.
+            Que ce soit un <span className="font-medium text-gray-800">voyage à l'étranger clé en main</span> ou une <span className="font-medium text-gray-800">billetterie 100% personnalisée</span>, nous nous occupons de tout pour vous.
           </p>
         </motion.div>
 
@@ -274,7 +288,7 @@ const UnifiedReservation = () => {
                 }`}
               >
                 <Icon icon="heroicons:paper-airplane" className="w-4 h-4 mr-2" />
-                Billets
+                Réserver vol
               </button>
             </div>
           </nav>
@@ -350,6 +364,7 @@ const UnifiedReservation = () => {
                                 <TripCard 
                                   trip={trip} 
                                   onSelect={handleTripSelect} 
+                                  onViewDetails={handleViewDetails}
                                   isMobile={true}
                                 />
                               </div>
@@ -371,6 +386,7 @@ const UnifiedReservation = () => {
                             key={trip.id} 
                             trip={trip} 
                             onSelect={handleTripSelect}
+                            onViewDetails={handleViewDetails}
                             isMobile={false}
                           />
                         ))}
@@ -396,17 +412,6 @@ const UnifiedReservation = () => {
                     )}
                   </>
                 )}
-
-                {/* View All Link */}
-                <div className="text-center mt-12">
-                  <a
-                    href="/programs"
-                    className="inline-flex items-center px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-medium rounded-2xl transition-all duration-300 hover:scale-105"
-                  >
-                    Tous nos programmes
-                    <Icon icon="heroicons:arrow-right" className="w-4 h-4 ml-2" />
-                  </a>
-                </div>
               </div>
 
               {/* Voyage Form */}
@@ -443,7 +448,7 @@ const UnifiedReservation = () => {
                 <div className="flex items-center justify-center mb-4">
                   <Icon icon="mdi:airplane-takeoff" className="w-8 h-8 text-blue-500 mr-3" />
                   <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-500 to-cyan-500 bg-clip-text text-transparent">
-                    Réservation de Billets
+                    Réservation de Vols
                   </h2>
                 </div>
                 <p className="text-lg text-gray-600 max-w-2xl mx-auto">

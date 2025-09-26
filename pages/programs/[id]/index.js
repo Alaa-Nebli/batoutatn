@@ -9,6 +9,7 @@ import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { Layout } from 'components/Layout';
 import SEO from 'components/SEO/SEO';
@@ -16,7 +17,7 @@ import { VoyageForm } from 'components/ProgramReservation/ProgramReservation';
 
 import 'swiper/css';
 import 'swiper/css/navigation';
-import 'swiper/css/pagination';
+import { generateProgramPDF } from '../../../utils/pdfGenerator';
 
 /* -------------------------------------------------- */
 /*  Helpers                                           */
@@ -323,24 +324,65 @@ const ProgramHeaderCard = ({ program }) => {
           </div>
         </div>
 
-        <div className="mt-auto border-t border-gray-200 pt-4 flex items-end justify-between">
-          <Link href={`/programs/detailed/${program.id}`} legacyBehavior>
-          
-            <span className="px-6 py-3 bg-orange-600 text-white rounded-lg shadow-lg hover:bg-orange-700 flex items-center">
+        <div className="mt-auto border-t border-gray-200 pt-4">
+          {/* Desktop Layout - Horizontal */}
+          <div className="hidden md:flex items-center justify-between">
+            <Link 
+              href={`/programs/detailed/${program.id}`}
+              className="px-6 py-3 bg-orange-600 text-white rounded-lg shadow-lg hover:bg-orange-700 flex items-center cursor-pointer transition-colors"
+            >
               Réserver
-            </span>
-          </Link>
-           {/* Call button */}
+            </Link>
+            
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`+216${program.phone || '71030303'}`);
+                toast.success('Numéro copié dans le presse-papiers');
+              }}
+              aria-label="Copier le numéro de téléphone"
+              className="w-full ml-10 inline-flex items-center px-6 py-3 bg-orange-600 text-white text-center rounded-lg font-medium shadow-md hover:bg-orange-700 hover:scale-[1.02] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-600"
+            >
+              <Icon icon="mdi:phone" className="w-4 h-4 mr-2" />
+              +216 {program.phone || '71030303'}
+            </button>
+          </div>
+          
+          {/* Mobile Layout - Vertical Stack */}
+          <div className="md:hidden space-y-3">
+            <Link 
+              href={`/programs/detailed/${program.id}`}
+              className="w-full px-6 py-3 bg-orange-600 text-white rounded-lg shadow-lg hover:bg-orange-700 flex items-center justify-center cursor-pointer transition-colors"
+            >
+              Réserver
+            </Link>
+            
+            <div className="space-y-2">
+               {/* Call button */}
            <a
-            href="tel:+21671030303"
+            href={`tel:${program.phone}`}
             aria-label="Appelez votre conseiller"
-            className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:scale-[1.03] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-600"
+            className="w-full inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:scale-[1.03] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-600 md:hidden"
           >
             <Icon icon="mdi:phone" className="w-5 h-5 mr-2" />
             Appelez votre conseiller
             <span className="hidden md:inline ml-2">+216 {program.phone}</span>
           </a>
+          {/* Mobile-only WhatsApp button */}
+          <a
+            href={`https://wa.me/${program.whatsappNumber || program.phone}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Contactez-nous via WhatsApp"
+            className="w-full inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg font-semibold shadow-md hover:shadow-lg hover:scale-[1.03] transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600 md:hidden"
+          >
+            <Icon icon="mdi:whatsapp" className="w-5 h-5 mr-2" />
+            WhatsApp
+          </a>
+            </div>
           </div>
+        </div>
+
+          
       </div>
     </motion.div>
     
@@ -482,14 +524,14 @@ const ActionButtons = ({ onPrint, onShare, onDownloadPDF, onDownloadText }) => (
       Télécharger <br /> Le Programme
     </button>
 
-    <button
+    {/* <button
       type="button"
       onClick={onPrint}
       className="px-5 py-3 bg-gray-600 text-white rounded-lg shadow-lg hover:bg-gray-700 flex items-center"
     >
       <Icon icon="mdi:printer" className="w-5 h-5 mr-2" />
       Imprimer
-    </button>
+    </button> */}
 
     <button
       type="button"
@@ -550,6 +592,16 @@ export default function ProgramPage() {
   /* -------- handlers ----------------------------------------- */
   const handlePrint = () => window.print();
 
+  const handleDownloadPDF = async () => {
+    try {
+      await generateProgramPDF(program);
+    } catch (error) {
+      console.error('PDF generation error:', error);
+      // Fallback to print method
+      window.print();
+    }
+  };
+
   const handleShare = async () => {
     try {
       if (navigator.share) {
@@ -573,16 +625,34 @@ export default function ProgramPage() {
     
     try {
       const reservationData = {
-        ...formData,
-        programId: program.id,
-        programTitle: program.title,
-        totalPrice: calculatePrice(),
+        tripId: program.id,
+        tripTitle: program.title,
+        tripLocation: `${program.location_from} → ${program.location_to}`,
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phone: formData.phone,
+        numberOfPersons: formData.numberOfPersons,
+        roomType: formData.roomType,
+        specialRequests: formData.specialRequests,
+        preferredDate: `${fmtDate(program.from_date)} - ${fmtDate(program.to_date)}`,
+        totalPrice: calculatePrice()
       };
+
+      const res = await fetch('/api/program-reservation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reservationData)
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Erreur lors de l\'envoi de la demande');
+      }
+
+      const data = await res.json();
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      alert('Demande de réservation envoyée avec succès! Nous vous contacterons bientôt.');
+      toast.success('Demande de réservation envoyée avec succès! Nous vous contacterons bientôt.');
       
       // Reset form
       setFormData({
@@ -598,7 +668,7 @@ export default function ProgramPage() {
       
     } catch (error) {
       console.error('Reservation error:', error);
-      alert('Une erreur est survenue. Veuillez réessayer.');
+      toast.error(error.message || 'Une erreur est survenue. Veuillez réessayer.');
     } finally {
       setReservationLoading(false);
     }
@@ -669,10 +739,11 @@ export default function ProgramPage() {
           <div className="text-center space-y-6 max-w-md px-4">
             <Icon icon="mdi:alert-circle-outline" className="w-16 h-16 mx-auto text-orange-600" />
             <h2 className="text-3xl font-bold">{error ?? 'Programme non trouvé'}</h2>
-            <Link href="/programs" legacyBehavior>
-              <span className="px-6 py-3 bg-orange-600 text-white rounded-lg">
-                Voir tous les programmes
-              </span>
+            <Link 
+              href="/programs"
+              className="px-6 py-3 bg-orange-600 text-white rounded-lg cursor-pointer transition-colors hover:bg-orange-700"
+            >
+              Voir tous les programmes
             </Link>
           </div>
         </div>
@@ -900,16 +971,42 @@ export default function ProgramPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            <h3 className="text-2xl font-bold text-gray-900 mb-6">
               Une question ? Contactez-nous
             </h3>
-            <a
-              href={`tel:+216${program.phone}`}
-              className="inline-flex items-center space-x-3 bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            
+            {/* Desktop-only Copy Phone button */}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`+216${program.phone || '71030303'}`);
+                toast.success('Numéro copié dans le presse-papiers');
+              }}
+              aria-label="Copier le numéro de téléphone"
+              className="hidden md:inline-flex items-center space-x-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
-              <Icon icon="mdi:phone" className="w-6 h-6" />
-              <span className="text-lg">+216 {program.phone}</span>
-            </a>
+              <Icon icon="mdi:content-copy" className="w-6 h-6" />
+              <span className="text-lg">+216 {program.phone || '71030303'}</span>
+            </button>
+            
+            {/* Mobile-only buttons - Optimized vertical layout */}
+            <div className="flex flex-col gap-3 justify-center md:hidden max-w-sm mx-auto">
+              <a
+                href={`tel:+216${program.phone || '71030303'}`}
+                className="inline-flex items-center justify-center space-x-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+              >
+                <Icon icon="mdi:phone" className="w-6 h-6" />
+                <span className="text-lg">Appeler +216 {program.phone || '71030303'}</span>
+              </a>
+              <a
+                href={`https://wa.me/216${program.whatsappNumber || program.phone || '71030303'}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center space-x-3 bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-4 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+              >
+                <Icon icon="mdi:whatsapp" className="w-6 h-6" />
+                <span className="text-lg">WhatsApp</span>
+              </a>
+            </div>
           </motion.div>
         </div>
       </section>
@@ -931,94 +1028,85 @@ export default function ProgramPage() {
             }}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="group bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300"
+            className="flex group bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300"
             title="Réserver ce voyage"
           >
-            <Icon icon="mdi:calendar-check" className="w-6 h-6" />
+            <Icon icon="mdi:calendar-check" className="w-5 h-5 mr-5" /> Réserver
           </motion.button>
           
           <motion.button
-            onClick={handlePrint}
+            onClick={handleDownloadPDF}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="group bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
+            className="flex group bg-blue-600 text-center hover:bg-blue-700 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
             title="Télécharger PDF"
           >
-            <Icon icon="mdi:file-pdf-box" className="w-5 h-5" />
+            <Icon icon="mdi:file-pdf-box" className="w-5 h-5 mr-5" /> Télécharger PDF
           </motion.button>
           
-          <motion.button
+          {/* <motion.button
             onClick={handlePrint}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="group bg-gray-600 hover:bg-gray-700 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
+            className="flex group bg-gray-600 hover:bg-gray-700 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
             title="Imprimer"
           >
-            <Icon icon="mdi:printer" className="w-5 h-5" />
-          </motion.button>
+            <Icon icon="mdi:printer" className="w-5 h-5 mr-5" /> Imprimer
+          </motion.button> */}
           
           <motion.button
             onClick={handleShare}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="group bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
+            className="flex group bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-xl hover:shadow-2xl transition-all duration-300"
             title="Partager"
           >
-            <Icon icon="mdi:share-variant" className="w-5 h-5" />
+            <Icon icon="mdi:share-variant" className="w-5 h-5 mr-5" /> Partager
           </motion.button>
         </div>
 
-        {/* Mobile: Horizontal expandable layout */}
-        <div className="md:hidden">
-          {/* Main action button */}
-          <motion.div className="relative">
-            <motion.button
-              onClick={() => {
-                const element = document.getElementById('reservation-section');
-                if (element) {
-                  element.scrollIntoView({ behavior: 'smooth' });
-                }
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white p-4 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300"
-            >
-              <Icon icon="mdi:calendar-check" className="w-6 h-6" />
-            </motion.button>
-            
-            {/* Secondary actions - appear on tap/hover */}
-            <div className="absolute bottom-0 right-16 flex space-x-2 opacity-0 hover:opacity-100 focus-within:opacity-100 transition-opacity duration-300">
-              <motion.button
-                onClick={handlePrint}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-                title="PDF"
-              >
-                <Icon icon="mdi:file-pdf-box" className="w-4 h-4" />
-              </motion.button>
-              
-              <motion.button
-                onClick={handlePrint}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-gray-600 hover:bg-gray-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-                title="Imprimer"
-              >
-                <Icon icon="mdi:printer" className="w-4 h-4" />
-              </motion.button>
-              
-              <motion.button
-                onClick={handleShare}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-green-600 hover:bg-green-700 text-white p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
-                title="Partager"
-              >
-                <Icon icon="mdi:share-variant" className="w-4 h-4" />
-              </motion.button>
-            </div>
-          </motion.div>
+        {/* Mobile: Always visible vertical stack */}
+        <div className="md:hidden flex flex-col space-y-3">
+          <motion.button
+            onClick={() => {
+              const element = document.getElementById('reservation-section');
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+            whileTap={{ scale: 0.95 }}
+            className="flex bg-gradient-to-r from-orange-500 to-orange-600 text-white p-3 rounded-full shadow-2xl transition-all duration-300"
+            title="Réserver ce voyage"
+          >
+            <Icon icon="mdi:calendar-check" className="w-6 h-6" /> Réserver
+          </motion.button>
+          
+          <motion.button
+            onClick={handleDownloadPDF}
+            whileTap={{ scale: 0.95 }}
+            className="flex bg-blue-600 text-white p-3 rounded-full shadow-xl transition-all duration-300"
+            title="Télécharger PDF"
+          >
+            <Icon icon="mdi:file-pdf-box" className="w-5 h-5" /> Télécharger
+          </motion.button>
+          
+          {/* <motion.button
+            onClick={handlePrint}
+            whileTap={{ scale: 0.95 }}
+            className="bg-gray-600 text-white p-3 rounded-full shadow-xl transition-all duration-300"
+            title="Imprimer"
+          >
+            <Icon icon="mdi:printer" className="w-5 h-5" />
+          </motion.button> */}
+          
+          <motion.button
+            onClick={handleShare}
+            whileTap={{ scale: 0.95 }}
+            className="flex bg-green-600 text-white p-3 rounded-full shadow-xl transition-all duration-300"
+            title="Partager"
+          >
+            <Icon icon="mdi:share-variant" className="w-5 h-5" /> Partager
+          </motion.button>
         </div>
       </div>
 
@@ -1075,6 +1163,7 @@ export default function ProgramPage() {
 
         }
       `}</style>
+      <Toaster position="top-right" />
     </Layout>
   );
 }

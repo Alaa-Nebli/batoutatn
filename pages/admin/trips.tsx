@@ -31,6 +31,7 @@ interface FormData {
   priceInclude: string;
   generalConditions: string;
   phone: string;
+  whatsappNumber: string; // Add WhatsApp number field
 }
 
 // Dynamically load ReactQuill (for Next.js):
@@ -57,7 +58,8 @@ export default function ProgramCreate() {
     display: true,
     priceInclude: '',
     generalConditions: '',
-    phone: ''
+    phone: '',
+    whatsappNumber: ''
   });
   
   const [images, setImages] = useState<File[]>([]);
@@ -248,7 +250,7 @@ export default function ProgramCreate() {
       setFormData(prev => {
         const newTimeline = [...prev.timeline];
         if (newTimeline[timelineIndex]) {
-          if (newTimeline[timelineIndex].image) {
+          if (newTimeline[timelineIndex].image && newTimeline[timelineIndex].image.startsWith('blob:')) {
             URL.revokeObjectURL(newTimeline[timelineIndex].image);
           }
           newTimeline[timelineIndex] = {
@@ -283,6 +285,16 @@ export default function ProgramCreate() {
     }
     if (!formData.fromDate) {
       toast.error('Please select a start date.');
+      return false;
+    }
+    // Check phone number
+    if (!formData.phone || formData.phone.trim().length < 8) {
+      toast.error('Valid phone number is required (minimum 8 digits).');
+      return false;
+    }
+    // Validate phone number format (only digits)
+    if (!/^\d{8,}$/.test(formData.phone.replace(/\s/g, ''))) {
+      toast.error('Phone number should contain only digits.');
       return false;
     }
     // Check priceInclude
@@ -322,9 +334,10 @@ export default function ProgramCreate() {
         timeline: formData.timeline.map((item, index) => ({
           title: item.title,
           description: item.description,
-          image: '',
+          image: timelineImages[index] ? 'PLACEHOLDER' : '', // Will be replaced by actual URL in backend
           sortOrder: index + 1,
-          date: item.date
+          date: item.date,
+          hasImage: !!timelineImages[index] // Flag to indicate if this day has an image
         }))
       };
 
@@ -334,9 +347,11 @@ export default function ProgramCreate() {
         formDataMultipart.append('program_images', file);
       });
       
-      timelineImages.forEach((file) => {
-        if (file) {
-          formDataMultipart.append('timeline_images', file);
+      // Add timeline images in the correct order, maintaining day-to-image mapping
+      formData.timeline.forEach((_, index) => {
+        const timelineImage = timelineImages[index];
+        if (timelineImage) {
+          formDataMultipart.append('timeline_images', timelineImage);
         }
       });
 
@@ -529,15 +544,58 @@ export default function ProgramCreate() {
             </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-            <textarea
-              name="phone"
-              value={formData.phone}
-              onChange={handleSimpleInputChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              rows={3}
-            />
+          {/* Contact Information Section */}
+          <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+            <h3 className="text-lg font-semibold text-blue-900 mb-4 flex items-center">
+              <Icon icon="mdi:phone" className="w-5 h-5 mr-2" />
+              Informations de Contact
+            </h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Numéro de téléphone *
+                  <span className="text-xs text-gray-500 block">Format: 71030303 (sans +216)</span>
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleSimpleInputChange}
+                  placeholder="71030303"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  required
+                />
+                {formData.phone && (
+                  <p className="text-xs text-green-600 mt-1">
+                    Numéro complet: +216{formData.phone}
+                  </p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  WhatsApp (optionnel)
+                  <span className="text-xs text-gray-500 block">Si différent du téléphone</span>
+                </label>
+                <input
+                  type="tel"
+                  name="whatsappNumber"
+                  value={formData.whatsappNumber}
+                  onChange={handleSimpleInputChange}
+                  placeholder="71030303"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+                {formData.whatsappNumber && (
+                  <p className="text-xs text-green-600 mt-1">
+                    WhatsApp: +216{formData.whatsappNumber}
+                  </p>
+                )}
+                {!formData.whatsappNumber && formData.phone && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Par défaut: +216{formData.phone}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
           <div>

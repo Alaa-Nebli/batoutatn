@@ -80,7 +80,7 @@ const SEO = ({
                     "@type": "Offer",
                     "itemOffered": {
                         "@type": "Service",
-                        "name": "Voyages Organisés",
+                        "name": "Voyages à l'étranger",
                         "description": "Circuits organisés premium vers les meilleures destinations"
                     }
                 },
@@ -88,7 +88,7 @@ const SEO = ({
                     "@type": "Offer", 
                     "itemOffered": {
                         "@type": "Service",
-                        "name": "Excursions Locales",
+                        "name": "Excursions en Tunisie",
                         "description": "Découverte des trésors locaux et sites emblématiques"
                     }
                 },

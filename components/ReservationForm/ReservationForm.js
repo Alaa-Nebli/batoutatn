@@ -19,7 +19,6 @@ export const ReservationForm = () => {
   const [successMessage, setSuccessMessage] = useState('');
   const [fromSuggestions, setFromSuggestions] = useState([]);
   const [toSuggestions, setToSuggestions] = useState([]);
-  const [showForm, setShowForm] = useState(false);
 
   const fromRef = useRef(null);
   const toRef = useRef(null);
@@ -70,29 +69,31 @@ export const ReservationForm = () => {
     setSuccessMessage('');
 
     try {
-      const res = await fetch('/api/ticketing', {
+      const res = await fetch('/api/ticketing-reservation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          typeOfTrip,
-          fromLocation,
-          toLocation,
-          departureDate,
-          returnDate,
-          numberOfPersons,
-          name: `${firstName} ${lastName}`,
           firstName,
           lastName,
           email,
           phone,
+          departureCity: fromLocation,
+          arrivalCity: toLocation,
+          departureDate,
+          returnDate: typeOfTrip === 'round-trip' ? returnDate : null,
+          passengers: numberOfPersons,
           classType,
+          specialRequests: ''
         }),
       });
 
       if (!res.ok) {
-        const { message } = await res.json();
-        throw new Error(message || 'Failed to send reservation request.');
+        const errorData = await res.json();
+        throw new Error(errorData.message || 'Erreur lors de l\'envoi');
       }
+
+      const data = await res.json();
+      setSuccessMessage(data.message || 'Demande envoyée avec succès!');
 
       // Reset form
       setTypeOfTrip('one-way');
@@ -106,8 +107,6 @@ export const ReservationForm = () => {
       setEmail('');
       setPhone('');
       setClassType('economy');
-
-      setSuccessMessage('Votre demande de réservation de billet a bien été envoyée! Nous vous contacterons bientôt avec les meilleures options.');
     } catch (error) {
       console.error('Reservation error:', error);
       setErrorMessage(
@@ -120,335 +119,333 @@ export const ReservationForm = () => {
 
   return (
     <section className="relative py-16 px-4 sm:px-6 lg:px-8">
-      {/* Background with overlay */}
-      
       <div className="relative max-w-7xl mx-auto">
-        
-
-        {/* Quick Search Bar */}
-        {!showForm && (
-          <motion.div
-            className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-8 mb-8"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-              <div className="relative" ref={fromRef}>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  <Icon icon="mdi:airplane-takeoff" className="inline w-4 h-4 mr-1" />
-                  De
-                </label>
-                <input
-                  type="text"
-                  className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="Ville ou aéroport"
-                  value={fromLocation}
-                  onChange={(e) => {
-                    setFromLocation(e.target.value);
-                    handleLocationSearch(e.target.value, setFromSuggestions);
-                  }}
-                />
-                {fromSuggestions.length > 0 && (
-                  <div className="absolute bg-white shadow-lg rounded-xl border border-gray-200 mt-1 w-full z-10 max-h-60 overflow-y-auto">
-                    {fromSuggestions.map((airport, index) => (
-                      <div
-                        key={index}
-                        className="px-4 py-3 hover:bg-blue-50 cursor-pointer text-sm border-b border-gray-100 last:border-0"
-                        onClick={() => {
-                          setFromLocation(airport.name);
-                          setFromSuggestions([]);
-                        }}
-                      >
-                        <div className="font-medium">{airport.name}</div>
-                        <div className="text-gray-500 text-xs">{airport.code}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="relative" ref={toRef}>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  <Icon icon="mdi:airplane-landing" className="inline w-4 h-4 mr-1" />
-                  À
-                </label>
-                <input
-                  type="text"
-                  className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="Ville ou aéroport"
-                  value={toLocation}
-                  onChange={(e) => {
-                    setToLocation(e.target.value);
-                    handleLocationSearch(e.target.value, setToSuggestions);
-                  }}
-                />
-                {toSuggestions.length > 0 && (
-                  <div className="absolute bg-white shadow-lg rounded-xl border border-gray-200 mt-1 w-full z-10 max-h-60 overflow-y-auto">
-                    {toSuggestions.map((airport, index) => (
-                      <div
-                        key={index}
-                        className="px-4 py-3 hover:bg-blue-50 cursor-pointer text-sm border-b border-gray-100 last:border-0"
-                        onClick={() => {
-                          setToLocation(airport.name);
-                          setToSuggestions([]);
-                        }}
-                      >
-                        <div className="font-medium">{airport.name}</div>
-                        <div className="text-gray-500 text-xs">{airport.code}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  <Icon icon="mdi:calendar" className="inline w-4 h-4 mr-1" />
-                  Départ
-                </label>
-                <input
-                  type="date"
-                  className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  value={departureDate}
-                  onChange={(e) => setDepartureDate(e.target.value)}
-                  min={new Date().toISOString().split('T')[0]}
-                />
-              </div>
-
-              <div>
-                <button
-                  onClick={() => setShowForm(true)}
-                  disabled={!fromLocation || !toLocation || !departureDate}
-                  className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold py-3 px-6 rounded-xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:transform-none flex items-center justify-center"
-                >
-                  <Icon icon="mdi:magnify" className="w-5 h-5 mr-2" />
-                  Rechercher
-                </button>
+        {/* Enhanced Single Form - Always Visible */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden"
+        >
+          {/* Form Header */}
+          <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-6 text-white">
+            <div className="flex items-center justify-center">
+              <div className="flex items-center">
+                <Icon icon="mdi:airplane" className="w-8 h-8 mr-3" />
+                <div className="text-center">
+                  <h3 className="text-2xl font-bold mt-7">Trouvez les meilleurs tarifs pour votre vol</h3>
+                </div>
               </div>
             </div>
-          </motion.div>
-        )}
+          </div>
 
-        {/* Detailed Form */}
-        <AnimatePresence>
-          {showForm && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.3 }}
-              className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl overflow-hidden"
-            >
-              {/* Form Header */}
-              <div className="bg-gradient-to-r from-blue-500 to-cyan-500 p-6 text-white">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Icon icon="mdi:airplane" className="w-8 h-8 mr-3" />
-                    <div>
-                      <h3 className="text-xl font-bold">Détails de votre vol</h3>
-                      <p className="text-blue-100">{fromLocation} → {toLocation}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setShowForm(false);
-                      setErrorMessage('');
-                      setSuccessMessage('');
+          {/* Form Content */}
+          <form onSubmit={handleSubmit} className="p-8 space-y-8">
+            {/* Flight Details Section */}
+            <div className="space-y-6">
+              <div className="flex items-center mb-4">
+                <Icon icon="mdi:airplane-takeoff" className="w-6 h-6 text-blue-500 mr-3" />
+                <h4 className="text-lg font-bold text-gray-800">Détails du vol</h4>
+              </div>
+              
+              {/* From and To locations */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="relative" ref={fromRef}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Icon icon="mdi:airplane-takeoff" className="inline w-4 h-4 mr-1" />
+                    Ville de départ *
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="Ville ou aéroport de départ"
+                    value={fromLocation}
+                    onChange={(e) => {
+                      setFromLocation(e.target.value);
+                      handleLocationSearch(e.target.value, setFromSuggestions);
                     }}
-                    className="p-2 hover:bg-white/20 rounded-full transition-colors"
-                  >
-                    <Icon icon="mdi:close" className="w-6 h-6" />
-                  </button>
+                    required
+                  />
+                  {fromSuggestions.length > 0 && (
+                    <div className="absolute bg-white shadow-lg rounded-xl border border-gray-200 mt-1 w-full z-10 max-h-60 overflow-y-auto">
+                      {fromSuggestions.map((airport, index) => (
+                        <div
+                          key={index}
+                          className="px-4 py-3 hover:bg-blue-50 cursor-pointer text-sm border-b border-gray-100 last:border-0"
+                          onClick={() => {
+                            setFromLocation(airport.name);
+                            setFromSuggestions([]);
+                          }}
+                        >
+                          <div className="font-medium">{airport.name}</div>
+                          <div className="text-gray-500 text-xs">{airport.code}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="relative" ref={toRef}>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Icon icon="mdi:airplane-landing" className="inline w-4 h-4 mr-1" />
+                    Destination *
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="Ville ou aéroport de destination"
+                    value={toLocation}
+                    onChange={(e) => {
+                      setToLocation(e.target.value);
+                      handleLocationSearch(e.target.value, setToSuggestions);
+                    }}
+                    required
+                  />
+                  {toSuggestions.length > 0 && (
+                    <div className="absolute bg-white shadow-lg rounded-xl border border-gray-200 mt-1 w-full z-10 max-h-60 overflow-y-auto">
+                      {toSuggestions.map((airport, index) => (
+                        <div
+                          key={index}
+                          className="px-4 py-3 hover:bg-blue-50 cursor-pointer text-sm border-b border-gray-100 last:border-0"
+                          onClick={() => {
+                            setToLocation(airport.name);
+                            setToSuggestions([]);
+                          }}
+                        >
+                          <div className="font-medium">{airport.name}</div>
+                          <div className="text-gray-500 text-xs">{airport.code}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Form Content */}
-              <form onSubmit={handleSubmit} className="p-8 space-y-6">
-                {/* Trip Details */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Trip Details */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Icon icon="mdi:swap-horizontal" className="inline w-4 h-4 mr-1" />
+                    Type de voyage *
+                  </label>
+                  <select
+                    className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    value={typeOfTrip}
+                    onChange={(e) => setTypeOfTrip(e.target.value)}
+                    required
+                  >
+                    <option value="one-way">Aller simple</option>
+                    <option value="round-trip">Aller/Retour</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Icon icon="mdi:calendar" className="inline w-4 h-4 mr-1" />
+                    Date de départ *
+                  </label>
+                  <input
+                    type="date"
+                    className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    value={departureDate}
+                    onChange={(e) => setDepartureDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    required
+                  />
+                </div>
+
+                {typeOfTrip === 'round-trip' && (
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Type de voyage
+                      <Icon icon="mdi:calendar" className="inline w-4 h-4 mr-1" />
+                      Date de retour *
                     </label>
-                    <select
+                    <input
+                      type="date"
                       className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      value={typeOfTrip}
-                      onChange={(e) => setTypeOfTrip(e.target.value)}
-                    >
-                      <option value="one-way">Aller simple</option>
-                      <option value="round-trip">Aller/Retour</option>
-                    </select>
+                      value={returnDate}
+                      onChange={(e) => setReturnDate(e.target.value)}
+                      min={departureDate || new Date().toISOString().split('T')[0]}
+                      required
+                    />
                   </div>
+                )}
 
-                  {typeOfTrip === 'round-trip' && (
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Date de retour
-                      </label>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Icon icon="mdi:account-multiple" className="inline w-4 h-4 mr-1" />
+                    Nombre de passagers *
+                  </label>
+                  <select
+                    className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    value={numberOfPersons}
+                    onChange={(e) => setNumberOfPersons(parseInt(e.target.value))}
+                    required
+                  >
+                    {[1,2,3,4,5,6,7,8,9].map(num => (
+                      <option key={num} value={num}>{num} passager{num > 1 ? 's' : ''}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Class Selection */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-4">
+                  <Icon icon="mdi:seat-flat" className="inline w-4 h-4 mr-1" />
+                  Classe de voyage *
+                </label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {[
+                    { value: 'economy', label: 'Économique', icon: 'mdi:seat-recline-normal', desc: 'Confort standard'},
+                    { value: 'premium', label: 'Premium Eco', icon: 'mdi:seat-legroom-extra', desc: 'Plus d\'espace'},
+                    { value: 'business', label: 'Business', icon: 'mdi:seat-flat', desc: 'Luxe et confort'},
+                    { value: 'first', label: 'Première', icon: 'mdi:crown', desc: 'Excellence absolue'}
+                  ].map((option) => (
+                    <div
+                      key={option.value}
+                      className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                        classType === option.value
+                          ? 'border-blue-500 bg-blue-50 shadow-lg'
+                          : 'border-gray-200 hover:border-blue-300 hover:shadow-md'
+                      }`}
+                      onClick={() => setClassType(option.value)}
+                    >
+                      <div className="flex items-center mb-2">
+                        <Icon icon={option.icon} className="w-6 h-6 text-blue-500 mr-2" />
+                        <span className="font-semibold text-sm">{option.label}</span>
+                      </div>
                       <input
-                        type="date"
-                        className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                        value={returnDate}
-                        onChange={(e) => setReturnDate(e.target.value)}
-                        min={departureDate || new Date().toISOString().split('T')[0]}
-                        required
+                        type="radio"
+                        name="classType"
+                        value={option.value}
+                        checked={classType === option.value}
+                        onChange={() => setClassType(option.value)}
+                        className="absolute top-3 right-3"
                       />
                     </div>
-                  )}
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Nombre de passagers
-                    </label>
-                    <select
-                      className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      value={numberOfPersons}
-                      onChange={(e) => setNumberOfPersons(e.target.value)}
-                    >
-                      {[1,2,3,4,5,6,7,8,9].map(num => (
-                        <option key={num} value={num}>{num} passager{num > 1 ? 's' : ''}</option>
-                      ))}
-                    </select>
-                  </div>
+                  ))}
                 </div>
+              </div>
+            </div>
 
-                {/* Class Selection */}
+            {/* Personal Information Section */}
+            <div className="space-y-6 border-t border-gray-200 pt-8">
+              <div className="flex items-center mb-4">
+                <Icon icon="mdi:account" className="w-6 h-6 text-blue-500 mr-3" />
+                <h4 className="text-lg font-bold text-gray-800">Informations personnelles</h4>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-4">
-                    Classe de voyage
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Prénom *
                   </label>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {[
-                      { value: 'economy', label: 'Économique', icon: 'mdi:seat-recline-normal', desc: 'Le meilleur rapport qualité-prix' },
-                      { value: 'business', label: 'Affaires', icon: 'mdi:seat-flat', desc: 'Confort premium et services exclusifs' },
-                      { value: 'first', label: 'Première', icon: 'mdi:crown', desc: 'Luxe et raffinement absolu' }
-                    ].map((option) => (
-                      <div
-                        key={option.value}
-                        className={`relative p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                          classType === option.value
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-gray-200 hover:border-blue-300'
-                        }`}
-                        onClick={() => setClassType(option.value)}
-                      >
-                        <div className="flex items-center mb-2">
-                          <Icon icon={option.icon} className="w-6 h-6 text-blue-500 mr-2" />
-                          <span className="font-semibold">{option.label}</span>
-                        </div>
-                        <p className="text-sm text-gray-600">{option.desc}</p>
-                        <input
-                          type="radio"
-                          name="classType"
-                          value={option.value}
-                          checked={classType === option.value}
-                          onChange={() => setClassType(option.value)}
-                          className="absolute top-4 right-4"
-                        />
-                      </div>
-                    ))}
-                  </div>
+                  <input
+                    type="text"
+                    className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="Votre prénom"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                  />
                 </div>
-
-                {/* Personal Information */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Prénom *
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="Votre prénom"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Nom *
-                    </label>
-                    <input
-                      type="text"
-                      className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="Votre nom"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      required
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Nom de famille *
+                  </label>
+                  <input
+                    type="text"
+                    className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="Votre nom de famille"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                  />
                 </div>
+              </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="votre@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Téléphone *
-                    </label>
-                    <input
-                      type="tel"
-                      className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                      placeholder="+216 99 999 999"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      required
-                    />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Icon icon="mdi:email" className="inline w-4 h-4 mr-1" />
+                    Adresse e-mail *
+                  </label>
+                  <input
+                    type="email"
+                    className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="votre@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
-
-                {/* Submit Button */}
-                <div className="flex justify-center pt-4">
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold py-4 px-8 rounded-2xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:transform-none flex items-center"
-                  >
-                    {loading ? (
-                      <>
-                        <Icon icon="mdi:loading" className="w-5 h-5 mr-2 animate-spin" />
-                        Envoi en cours...
-                      </>
-                    ) : (
-                      <>
-                        <Icon icon="mdi:send" className="w-5 h-5 mr-2" />
-                        Envoyer la demande
-                      </>
-                    )}
-                  </button>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <Icon icon="mdi:phone" className="inline w-4 h-4 mr-1" />
+                    Numéro de téléphone *
+                  </label>
+                  <input
+                    type="tel"
+                    className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="+216 99 999 999"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                  />
                 </div>
+              </div>
+            </div>
 
-                {/* Messages */}
-                {errorMessage && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-2xl text-center">
-                    <Icon icon="mdi:alert-circle" className="w-5 h-5 inline mr-2" />
-                    {errorMessage}
-                  </div>
+            {/* Submit Button */}
+            <div className="flex justify-center pt-6 border-t border-gray-200">
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold py-4 px-12 rounded-2xl hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:transform-none flex items-center text-lg"
+              >
+                {loading ? (
+                  <>
+                    <Icon icon="mdi:loading" className="w-6 h-6 mr-3 animate-spin" />
+                    Envoi en cours...
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="mdi:send" className="w-6 h-6 mr-3" />
+                    Envoyer ma demande
+                  </>
                 )}
-                {successMessage && (
-                  <div className="bg-green-50 border border-green-200 text-green-700 p-4 rounded-2xl text-center">
-                    <Icon icon="mdi:check-circle" className="w-5 h-5 inline mr-2" />
-                    {successMessage}
-                  </div>
-                )}
-              </form>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </button>
+            </div>
+
+            {/* Messages */}
+            {errorMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-xl"
+              >
+                <div className="flex items-center">
+                  <Icon icon="mdi:alert-circle" className="w-5 h-5 mr-2" />
+                  <span className="font-medium">{errorMessage}</span>
+                </div>
+              </motion.div>
+            )}
+            {successMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 rounded-xl"
+              >
+                <div className="flex items-center">
+                  <Icon icon="mdi:check-circle" className="w-5 h-5 mr-2" />
+                  <span className="font-medium">{successMessage}</span>
+                </div>
+              </motion.div>
+            )}
+          </form>
+        </motion.div>
       </div>
     </section>
   );

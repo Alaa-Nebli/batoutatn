@@ -125,6 +125,17 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
         timelineImages.map(file => uploadToSupabase(file, 'timeline-images'))
       );
 
+      // Create a mapping of timeline images based on which days actually have images
+      let timelineImageIndex = 0;
+      const timelineImageMap: Record<number, string> = {};
+      
+      programData.timeline?.forEach((item: any, index: number) => {
+        if (item.hasImage && timelineImageIndex < timelineImageUrls.length) {
+          timelineImageMap[index] = timelineImageUrls[timelineImageIndex];
+          timelineImageIndex++;
+        }
+      });
+
       const fromDate = new Date(programData.fromDate);
       let toDate: Date;
       if (!programData.toDate || programData.toDate.trim() === '') {
@@ -152,13 +163,15 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
           to_date: toDate.toISOString(),
           display: programData.display ?? true, // Default to true if not specified
           timeline: {
-            create: programData.timeline?.map((item: any, index: number) => ({
-              title: item.title,
-              description: item.description,
-              image: timelineImageUrls[index] || null,
-              sortOrder: index + 1,
-              date: new Date(item.date)
-            })) || []
+            create: programData.timeline?.map((item: any, index: number) => {
+              return {
+                title: item.title,
+                description: item.description,
+                image: timelineImageMap[index] || null,
+                sortOrder: index + 1,
+                date: new Date(item.date)
+              };
+            }) || []
           },
           phone: programData.phone || null,
           priceInclude: programData.priceInclude || null,
@@ -198,6 +211,12 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
       const keptImages: string[] = req.body.keptImages
         ? JSON.parse(req.body.keptImages)
         : [];
+      
+      // Parse timeline image replacement info
+      const timelineImageReplacements: Record<number, boolean> = req.body.timelineImageReplacements
+        ? JSON.parse(req.body.timelineImageReplacements)
+        : {};
+        
       const { id } = req.query;
       const files = (req as NextApiRequestWithFiles).files || {};
 
@@ -236,30 +255,66 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
 
       const existing = await prisma.trip.findUnique({
         where: { id: id as string },
-        include: { timeline: true },
+        include: { timeline: { orderBy: { sortOrder: 'asc' } } },
       });
       if (!existing) {
         return res.status(404).json({ message: 'Program not found' });
       }
 
+      // Upload new gallery images
       const newGalleryUrls = await Promise.all(
         galleryFiles.map(f => uploadToSupabase(f, 'program-images')),
       );
 
-      const uploadedTimelineUrls = await Promise.all(
+      // Upload new timeline images (these correspond to specific timeline day indices)
+      const uploadedTimelineUrls: string[] = await Promise.all(
         timelineFiles.map(file => uploadToSupabase(file, 'timeline-images'))
       );
 
       const finalGallery = [...keptImages, ...newGalleryUrls];
 
-      const timelineCreate = programData.timeline.map((item: any, idx: number) => ({
-        title: item.title,
-        description: item.description,
-        image: uploadedTimelineUrls[idx] || item.image || null, // Use existing image if no new image
-        sortOrder: item.sortOrder,
-        date: new Date(item.date),
-      }));
+      // Process timeline with proper image handling
+      const imagesToDelete: string[] = [];
+      let timelineFileIndex = 0;
 
+      const timelineCreate = programData.timeline.map((item: any, dayIndex: number) => {
+        let finalImageUrl = null;
+
+        // Check if this day has a replacement image
+        if (timelineImageReplacements[dayIndex]) {
+          // This day gets a new image
+          if (timelineFileIndex < uploadedTimelineUrls.length) {
+            finalImageUrl = uploadedTimelineUrls[timelineFileIndex];
+            timelineFileIndex++;
+            
+            // Mark old image for deletion if it exists
+            const existingTimelineItem = existing.timeline.find(t => t.sortOrder === dayIndex + 1);
+            if (existingTimelineItem && existingTimelineItem.image) {
+              imagesToDelete.push(existingTimelineItem.image);
+            }
+          }
+        } else {
+          // Keep existing image if it exists and wasn't explicitly removed
+          const existingTimelineItem = existing.timeline.find(t => t.sortOrder === dayIndex + 1);
+          if (existingTimelineItem && existingTimelineItem.image && item.image && item.image !== '') {
+            finalImageUrl = existingTimelineItem.image;
+          }
+          // If item.image is empty/null, it means the user removed the image
+          if (existingTimelineItem && existingTimelineItem.image && (!item.image || item.image === '')) {
+            imagesToDelete.push(existingTimelineItem.image);
+          }
+        }
+
+        return {
+          title: item.title,
+          description: item.description,
+          image: finalImageUrl,
+          sortOrder: dayIndex + 1,
+          date: new Date(item.date),
+        };
+      });
+
+      // Update the program
       const updated = await prisma.trip.update({
         where: { id: id as string },
         data: {
@@ -283,17 +338,15 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
         include: { timeline: true },
       });
 
+      // Clean up deleted images
       const galleryToPurge = (existing.images as string[]).filter(
         url => !keptImages.includes(url),
       );
 
-      const timelineToPurge = existing.timeline
-        .filter(t => t.image && uploadedTimelineUrls[t.sortOrder - 1] !== undefined)
-        .map(t => t.image!);
-
+      // Delete old images from storage
       await Promise.all([
         ...galleryToPurge.map(deleteFromSupabase),
-        ...timelineToPurge.map(deleteFromSupabase),
+        ...imagesToDelete.map(deleteFromSupabase),
       ]);
 
       return res.status(200).json({ message: 'Updated', programId: updated.id });

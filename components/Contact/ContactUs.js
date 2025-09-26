@@ -64,13 +64,13 @@ const ContactSection = () => {
     },
     {
       icon: 'mdi:map-marker',
-      label: "Notre Adresse",
+      label: "Adresse postale",
       value: "97, Rue de Palestine 2ème étage 1002 TUNIS"
     },
     {
       icon: 'mdi:clock-outline',
       label: "Heures d'ouverture",
-      value: "Lun-Ven: 8h00 - 18h00"
+      value: "Lun-Ven: 8:30 – 17:00"
     }
   ];
 
