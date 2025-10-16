@@ -145,7 +145,6 @@ const Banner = () => {
                   transition={{ delay: 0.5 }}
                 >
                 <span className="text-sm md:text-base text-gray-200">Du {banner.fromDate} au {banner.toDate}</span>
-                  <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">Places limitées !</span>
                 </motion.div>
                 
                 <motion.div
