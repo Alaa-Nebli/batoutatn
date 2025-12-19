@@ -1071,6 +1071,41 @@ export default function ProgramPage() {
           </div>
         </div>
       </section>
+
+       {/* Price Include Section */}
+      {program.priceInclude && (
+        <section className="py-16 screen-only bg-white">
+          <div className="max-w-6xl mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Ce prix comprend &amp; ne comprend pas
+              </h2>
+              <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full mx-auto mb-6"></div>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                Détails sur ce qui est inclus et non inclus dans votre voyage
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 md:p-12"
+            >
+              <div 
+                className="prose prose-lg prose-gray max-w-none text-gray-700 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: program.priceInclude }}
+              />
+            </motion.div>
+          </div>
+        </section>
+      )}
+
       {/* General Conditions Section */}
       {program.generalConditions && (
         <section className="py-16 screen-only bg-gradient-to-b from-gray-50 to-white">
@@ -1099,40 +1134,6 @@ export default function ProgramPage() {
               <div 
                 className="prose prose-lg prose-gray max-w-none text-gray-700 leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: program.generalConditions }}
-              />
-            </motion.div>
-          </div>
-        </section>
-      )}
-      
-      {/* Price Include Section */}
-      {program.priceInclude && (
-        <section className="py-16 screen-only bg-white">
-          <div className="max-w-6xl mx-auto px-4">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-16"
-            >
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Ce prix comprend &amp; ne comprend pas
-              </h2>
-              <div className="w-24 h-1 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full mx-auto mb-6"></div>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Détails sur ce qui est inclus et non inclus dans votre voyage
-              </p>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 md:p-12"
-            >
-              <div 
-                className="prose prose-lg prose-gray max-w-none text-gray-700 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: program.priceInclude }}
               />
             </motion.div>
           </div>
