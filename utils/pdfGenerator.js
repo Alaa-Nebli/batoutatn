@@ -215,7 +215,7 @@ export const generateProgramPDF = async (program) => {
     infoY += 6;
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(...colors.dark);
-    const destText = `${program.location_from} -> ${program.location_to}`;
+    const destText = `${program.location_from.toUpperCase()} -> ${program.location_to.toUpperCase()}`;
     const destLines = pdf.splitTextToSize(destText, (contentWidth / 2) - 10);
     destLines.forEach(line => {
       pdf.text(line, col1X, infoY);
@@ -230,9 +230,17 @@ export const generateProgramPDF = async (program) => {
     pdf.setFont('helvetica', 'normal');
     pdf.setTextColor(...colors.dark);
     const dateText = `Du ${formatDate(program.from_date)}`;
-    pdf.text(dateText, col1X, infoY);
-    infoY += 5;
-    pdf.text(`au ${formatDate(program.to_date)}`, col1X, infoY);
+    const dateLines = pdf.splitTextToSize(dateText, (contentWidth / 2) - 10);
+    dateLines.forEach(line => {
+      pdf.text(line, col1X, infoY);
+      infoY += 5;
+    });
+    const dateText2 = `au ${formatDate(program.to_date)}`;
+    const dateLines2 = pdf.splitTextToSize(dateText2, (contentWidth / 2) - 10);
+    dateLines2.forEach(line => {
+      pdf.text(line, col1X, infoY);
+      infoY += 5;
+    });
 
     // Column 2
     infoY = yPosition;
@@ -253,7 +261,10 @@ export const generateProgramPDF = async (program) => {
     pdf.setTextColor(...colors.dark);
     pdf.setFontSize(13);
     pdf.setFont('helvetica', 'bold');
-    const priceFormatted = (program.price?.toLocaleString('fr-FR') || '').replace(/\u00A0/g, ' ');
+    const priceFormatted = (program.price?.toLocaleString('fr-FR') || '')
+      .replace(/\u00A0/g, ' ')
+      .replace(/\s+/g, ' ')
+      .replace(/[^\x20-\x7E\u00C0-\u00FF\d]/g, ' ');
     pdf.text(`${priceFormatted} TND`, col2X, infoY);
     infoY += 5;
     pdf.setFontSize(9);
@@ -264,7 +275,10 @@ export const generateProgramPDF = async (program) => {
       infoY += 6;
       pdf.setFontSize(10);
       pdf.setTextColor(...colors.gray);
-      const singleFormatted = program.singleAdon.toLocaleString('fr-FR').replace(/\u00A0/g, ' ');
+      const singleFormatted = program.singleAdon.toLocaleString('fr-FR')
+        .replace(/\u00A0/g, ' ')
+        .replace(/\s+/g, ' ')
+        .replace(/[^\x20-\x7E\u00C0-\u00FF\d]/g, ' ');
       pdf.text(`Supplement single: ${singleFormatted} TND`, col2X, infoY);
     }
 
@@ -320,8 +334,9 @@ export const generateProgramPDF = async (program) => {
       pdf.setTextColor(...colors.primary);
       pdf.setFontSize(12);
       pdf.setFont('helvetica', 'bold');
-      const cleanTitle = item.title.replace(/[^\x00-\x7F\u00C0-\u00FF]/g, '').replace(/[—–]/g, '-');
-      const dayTitle = `Jour ${index + 1} : ${cleanTitle}`;
+      const cleanTitle = item.title.replace(/[^\x00-\x7F\u00C0-\u00FF]/g, '').replace(/[—–]/g, '-').replace(/\u00A0/g, ' ');
+      // Check if title already starts with "Jour" to avoid duplication
+      const dayTitle = cleanTitle.toLowerCase().startsWith('jour') ? cleanTitle : `Jour ${index + 1} : ${cleanTitle}`;
       const titleLines = pdf.splitTextToSize(dayTitle, contentWidth - 15);
       titleLines.forEach((line, idx) => {
         pdf.text(line, margin + 12, yPosition + 4 + (idx * 6));
@@ -376,24 +391,29 @@ export const generateProgramPDF = async (program) => {
 
     // ========== GENERAL CONDITIONS SECTION ==========
     if (program.generalConditions) {
-      checkAndAddPage(35);
+      checkAndAddPage(25);
       
-      pdf.setFillColor(...colors.primary);
-      pdf.roundedRect(margin, yPosition, contentWidth, 12, 2, 2, 'F');
-      
-      pdf.setTextColor(...colors.white);
-      pdf.setFontSize(14);
+      // Smaller, less prominent header
+      pdf.setTextColor(...colors.gray);
+      pdf.setFontSize(11);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('CONDITIONS GÉNÉRALES', margin + 5, yPosition + 8);
+      pdf.text('Conditions générales', margin, yPosition);
       
-      yPosition += 18;
+      yPosition += 8;
+      
+      // Draw subtle line
+      pdf.setDrawColor(...colors.lightGray);
+      pdf.setLineWidth(0.3);
+      pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+      
+      yPosition += 6;
 
-      pdf.setTextColor(...colors.dark);
-      pdf.setFontSize(10);
+      pdf.setTextColor(...colors.gray);
+      pdf.setFontSize(8);
       pdf.setFont('helvetica', 'normal');
       
       const cleanConditions = cleanHtmlContent(program.generalConditions);
-      addTextBlock(cleanConditions, 10, 6);
+      addTextBlock(cleanConditions, 8, 4);
     }
 
     // ========== FOOTER ON ALL PAGES ==========
