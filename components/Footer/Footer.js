@@ -1,159 +1,147 @@
-import React from 'react';
-import { useTranslation } from 'next-i18next';
-import Image from "next/legacy/image";
+import React, { useState } from 'react';
+import Image from "next/image";
 import Link from "next/link";
 import { Icon } from "@iconify/react";
 
-const SectionContainer = ({ id, children, className = "" }) => {
-    return (
-        <section id={id} className={`${className && className}`}>
-            {children}
-        </section>
-    );
-};
 export const Footer = () => {
-    const { t } = useTranslation('common');
     const currentYear = new Date().getFullYear();
+    const [email, setEmail] = useState('');
     
-    const FOOTER_LINKS = [
+    const footerLinks = [
         {
-            title: "Explorer",
+            title: "Découvrir",
             items: [
-                { label: "À propos de nous", href: "/about#who-we-are" },
-                { label: "Nos services", href: "/our_services" },
+                { label: "Accueil", href: "/" },
+                { label: "Voyages Organisés", href: "/programs" },
+                { label: "Programmes en Tunisie", href: "/programmes-en-tunisie" },
+                { label: "Réservation de Vols", href: "/vols" },
+                { label: "Tous nos services", href: "/our_services" }
+            ]
+        },
+        {
+            title: "L'Agence",
+            items: [
+                { label: "À propos de nous", href: "/about" },
                 { label: "Notre histoire", href: "/about#history" },
-                { label: "Nos valeurs", href: "/about#our-values" },
+                { label: "Nos engagements", href: "/about#our-values" },
+                { label: "Contactez-nous", href: "/#contact" },
             ]
         },
         {
-            title: "Connectez-vous avec nous",
+            title: "Informations",
             items: [
-                { 
-                    label: "Facebook", 
-                    href: "https://www.facebook.com/profile.php?id=100057621002945&locale=gl_ES&_rdr", 
-                    isExternal: true,
-                    icon: "mdi:facebook"
-                },
-                { 
-                    label: "Instagram", 
-                    href: "https://www.instagram.com/batoutavoyages_events/?hl=fr", 
-                    isExternal: true,
-                    icon: "mdi:instagram"
-                },
-            ]
-        },
-        {
-            title: "Plan du site",
-            items: [
-                { label: "Acceuil", href: "/" },
-                { label: "Nos Services", href: "/our_services" },
-                { label: "Contact", href: "#contact" },
-                { label: "Conditions Générales", href: "/general_condition" }
+                { label: "Conditions Générales", href: "/general_condition" },
+                { label: "Politique de confidentialité", href: "/privacy" },
+                { label: "Plan du site", href: "/sitemap" }
             ]
         }
     ];
 
-    const FooterLink = ({ item }) => {
-        if (item.isExternal) {
-            return (
-                <a
-                    href={item.href}
-                    className="mb-2 inline-flex items-center gap-2 font-medium text-gray-600 transition-colors duration-300 hover:text-orange-500"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    {item.icon && (
-                        <span className="text-lg">
-                            <Icon icon={item.icon} />
-                        </span>
-                    )}
-                    {item.label}
-                </a>
-            );
-        }
-    
-        return (
-            <Link 
-                href={item.href}
-                className="mb-2 inline-flex items-center gap-2 font-medium text-gray-600 transition-colors duration-300 hover:text-orange-500"
-            >
-                {item.label}
-            </Link>
-        );
-    };
-
     return (
-        <footer id="footer" className="bg-gradient-to-b from-gray-50 via-white to-orange-50">
-            <SectionContainer className="relative z-10">
-                <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16">
-                    <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
-                        <div className="lg:col-span-4">
-                            <div className="space-y-8">
-                                <Link href="/" className="block">
-                                    <Image
-                                        src="/Batouta_Logo.png"
-                                        alt="Batouta Travel Logo"
-                                        width={300}
-                                        height={150}
-                                        className="h-auto w-auto"
-                                        priority
-                                    />
-                                </Link>
-                                
-                                <div className="flex gap-4">
-                                    <a href="#" className="p-2 rounded-full bg-gray-100 hover:bg-orange-200 transition">
-                                        <Icon icon="mdi:facebook" className="text-orange-600" />
-                                    </a>
-                                    <a href="#" className="p-2 rounded-full bg-gray-100 hover:bg-orange-200 transition">
-                                        <Icon icon="mdi:instagram" className="text-orange-600" />
-                                    </a>
-                                </div>
-                            </div>
+        <footer className="bg-[#0B2D4D] text-white pt-16 pb-6 overflow-hidden border-t border-white/5">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                
+                <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-8 mb-12">
+                    
+                    {/* Brand */}
+                    <div className="lg:col-span-4 flex flex-col items-start">
+                        <Link href="/" className="block mb-4" aria-label="Retour à l'accueil">
+                            <Image
+                                src="/Batouta_Logo.png"
+                                alt="Batouta Voyages"
+                                width={140}
+                                height={56}
+                                className="w-auto h-11 object-contain brightness-0 invert"
+                                priority
+                            />
+                        </Link>
+                        <p className="text-white/60 text-xs leading-relaxed mb-6 max-w-xs font-medium">
+                            Batouta Voyages & Events, votre partenaire de confiance pour des voyages uniques en Tunisie et à travers le monde.
+                        </p>
+                        
+                        <div className="flex gap-2.5">
+                            {[
+                                { icon: "mdi:facebook", href: "https://www.facebook.com/profile.php?id=100057621002945&locale=gl_ES&_rdr" },
+                                { icon: "mdi:instagram", href: "https://www.instagram.com/batoutavoyages_events/?hl=fr" },
+                                { icon: "mdi:whatsapp", href: "https://wa.me/21671802881" }
+                            ].map((social, index) => (
+                                <a 
+                                    key={index}
+                                    href={social.href} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="w-8.5 h-8.5 rounded-full bg-white/5 flex items-center justify-center text-white/60 hover:text-white hover:bg-[#FF5E14] transition-all duration-200"
+                                >
+                                    <Icon icon={social.icon} className="w-4 h-4" />
+                                </a>
+                            ))}
                         </div>
+                    </div>
 
-                        <div className="lg:col-span-8">
-                            <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
-                                {FOOTER_LINKS.map((section) => (
-                                    <div key={section.title} className="space-y-4">
-                                        <h3 className="text-lg font-semibold text-gray-900">
-                                            {section.title}
-                                        </h3>
-                                        <ul className="space-y-2">
-                                            {section.items.map((item) => (
-                                                <li key={item.label}>
-                                                    <FooterLink item={item} />
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                ))}
+                    {/* Links */}
+                    <div className="lg:col-span-5">
+                        <div className="grid grid-cols-3 gap-6">
+                            {footerLinks.map((section) => (
+                                <div key={section.title}>
+                                    <h3 className="text-[11px] font-black text-white uppercase tracking-wider mb-4 border-b border-white/5 pb-2">
+                                        {section.title}
+                                    </h3>
+                                    <ul className="space-y-3">
+                                        {section.items.map((item) => (
+                                            <li key={item.label}>
+                                                <Link 
+                                                    href={item.href}
+                                                    className="text-[11px] font-bold text-white/50 hover:text-[#FF5E14] transition-colors duration-150"
+                                                >
+                                                    {item.label}
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Staged Newsletter Stack to match exact designs */}
+                    <div className="lg:col-span-3">
+                        <h3 className="text-[11px] font-black text-white uppercase tracking-wider mb-4 border-b border-white/5 pb-2">
+                            Restez inspiré
+                        </h3>
+                        <p className="text-xs text-white/50 leading-relaxed mb-4 font-medium">
+                            Recevez nos meilleures offres et idées de voyages directement dans votre boîte mail.
+                        </p>
+                        <div className="space-y-2.5">
+                            <div className="relative">
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="Votre adresse email"
+                                    className="w-full bg-white rounded-xl px-4 py-3 pr-10 text-xs text-slate-800 placeholder:text-slate-400 outline-none focus:ring-2 focus:ring-[#FF5E14] font-semibold"
+                                />
+                                <Icon icon="mdi:email-outline" className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4.5 h-4.5 text-slate-400" />
                             </div>
+                            <button className="w-full bg-[#FF5E14] hover:bg-[#e04f0f] text-white py-3 rounded-xl font-extrabold text-xs transition-colors flex items-center justify-center gap-1.5 shadow-sm shadow-[#FF5E14]/10">
+                                S&apos;abonner
+                                <Icon icon="mdi:arrow-right" className="w-4 h-4" />
+                            </button>
                         </div>
                     </div>
                 </div>
-            </SectionContainer>
 
-            <div className="border-t border-gray-300 bg-gradient-to-r from-orange-100 to-white">
-                <SectionContainer className="relative z-10">
-                    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        <div className="flex flex-col sm:flex-row items-center justify-between py-6 gap-4">
-                            <p className="text-sm text-gray-700">
-                                © {currentYear} Batouta voyages. All rights reserved.
-                            </p>
-                            <p className="text-sm text-gray-700">
-                                Designed and developed by{" "}
-                                <a
-                                    className="ml-1 text-orange-600 transition-colors duration-300 hover:underline"
-                                    href="https://neuratech-solutions.com/"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    Neuratech Solutions
-                                </a>
-                            </p>
-                        </div>
+                {/* Bottom copyright details */}
+                <div className="pt-6 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <p className="text-[11px] font-bold text-white/30 text-center md:text-left">
+                        © {currentYear} Batouta Voyages & Events. Tous droits réservés.
+                    </p>
+                    <div className="flex items-center gap-3 text-[11px] font-bold text-white/30">
+                        <span className="w-px h-3 bg-white/10" />
+                        <span>Développé Par</span>
+                        <span className="w-px h-3 bg-white/10" />
+                        <a href="https://www.neuratech.com" target="_blank" rel="noreferrer" className="text-white/50 hover:text-[#FF5E14] transition-colors">Neuratech Solutions</a>
                     </div>
-                </SectionContainer>
+                </div>
             </div>
         </footer>
     );

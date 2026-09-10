@@ -35,7 +35,19 @@ const nextConfig = {
             {
                 source: "/(.*)",
                 headers: [
-                    ...createSecureHeaders(),
+                    ...createSecureHeaders({
+                        contentSecurityPolicy: {
+                            directives: {
+                                frameAncestors: ["'none'"],
+                                frameSrc: [
+                                    "https://www.google.com",
+                                    "https://maps.google.com",
+                                    "https://www.youtube.com",
+                                    "https://player.vimeo.com",
+                                ],
+                            },
+                        },
+                    }),
                     // HSTS Preload: https://hstspreload.org/
                     {
                         key: "Strict-Transport-Security",

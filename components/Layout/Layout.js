@@ -12,7 +12,7 @@ const adminNavigation = [
     { name: "Se connecter", href: '/admin/', icon: 'material-symbols:login' },
     { name: 'Dashboard', href: '/admin/dashboard', icon: 'material-symbols:dashboard' },
     { name: 'Voyages a l\'étranger', href: '/admin/trips', icon: 'material-symbols:view-list' },
-    { name: 'Programmes en tunisie', href: '/admin/programs', icon: 'material-symbols:featured-play-list' },
+    { name: 'Programme en Tunisie', href: '/admin/programs', icon: 'material-symbols:featured-play-list' },
     { name: 'A la une', href: '/admin/offers', icon: 'material-symbols:percent' },
 ];
 

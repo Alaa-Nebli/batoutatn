@@ -365,9 +365,9 @@ export const generateProgramPDF = async (program) => {
       yPosition += 10;
     });
 
-    // ========== PRICE INCLUDES SECTION ==========
-    if (program.priceInclude) {
-      checkAndAddPage(35);
+    // ========== PRICE INCLUDES & DETAILS SECTION ==========
+    if (program.priceInclude || program.priceExclude || program.paymentConditions || program.cancellationTerms) {
+      checkAndAddPage(40);
       
       pdf.setFillColor(...colors.primary);
       pdf.roundedRect(margin, yPosition, contentWidth, 12, 2, 2, 'F');
@@ -375,18 +375,35 @@ export const generateProgramPDF = async (program) => {
       pdf.setTextColor(...colors.white);
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('CE QUE COMPREND LE PRIX', margin + 5, yPosition + 8);
+      pdf.text('DÉTAILS DU PRIX ET CONDITIONS', margin + 5, yPosition + 8);
       
       yPosition += 18;
 
-      pdf.setTextColor(...colors.dark);
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      
-      const cleanPriceInclude = cleanHtmlContent(program.priceInclude);
-      addTextBlock(cleanPriceInclude, 10, 6);
+      const addDetailSection = (title, content, color = colors.primary) => {
+        if (!content || content.trim() === '') return;
+        
+        checkAndAddPage(15);
+        pdf.setTextColor(...color);
+        pdf.setFontSize(11);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(title.toUpperCase(), margin + 5, yPosition);
+        yPosition += 6;
+        
+        pdf.setTextColor(...colors.dark);
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        
+        const cleanContent = cleanHtmlContent(content);
+        addTextBlock(cleanContent, 9, 5);
+        yPosition += 4;
+      };
 
-      yPosition += 10;
+      addDetailSection('Ce qui est inclus', program.priceInclude, [22, 163, 74]); // Green
+      addDetailSection('Ce qui n\'est pas inclus', program.priceExclude, [220, 38, 38]); // Red
+      addDetailSection('Conditions de paiement', program.paymentConditions, colors.primary);
+      addDetailSection('Conditions d\'annulation', program.cancellationTerms, [217, 119, 6]); // Amber
+
+      yPosition += 5;
     }
 
     // ========== GENERAL CONDITIONS SECTION ==========
@@ -434,7 +451,7 @@ export const generateProgramPDF = async (program) => {
       
       // Contact info
       pdf.text('Tel: +216 71 802 881', margin, footerY + 7);
-      pdf.text('Email: outgoing.batouta@gmail.com', margin, footerY + 13);
+      pdf.text('Email: outgoing@batouta.com', margin, footerY + 13);
       
       // Page number
       pdf.setFont('helvetica', 'bold');

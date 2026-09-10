@@ -1,30 +1,96 @@
 /*
-
 =========================================================
-* CHRSTNL CSS Kit v1.0.0
+* Batouta Voyages Design System v5.0
+* Branded Batouta Palette — Warm Mediterranean Premium
 =========================================================
-
-* Demo Page: 'https://nutritrack.chrstnl.com/'
-* Copyright 2023 @chrstnl 
-* Coded by @chrstnl
-
+* Brand: Batouta Voyages
+* Orange: #F37021  |  Blue: #28A9E0  |  Navy: #0B2D4D
+* Warm, Tunisian, trustworthy, vivid, premium
 =========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 */
 
-// Core CSS Reset/MISCS
+:root {
+    // Batouta Orange — conversion energy
+    --color-orange-50: #FFF8F5;
+    --color-orange-100: #FFE0CC;
+    --color-orange-200: #FFC7A3;
+    --color-orange-300: #FFA97A;
+    --color-orange-400: #F98C52;
+    --color-orange-500: #F37021;
+    --color-orange-600: #D85A12;
+    --color-orange-700: #B5460E;
+    --color-orange-800: #92350B;
+    --color-orange-900: #702808;
+
+    // Batouta Blue — travel trust
+    --color-blue-50: #F0F9FF;
+    --color-blue-100: #EAF7FD;
+    --color-blue-200: #B8E3F5;
+    --color-blue-300: #7FCAED;
+    --color-blue-400: #4FB5E5;
+    --color-blue-500: #28A9E0;
+    --color-blue-600: #168FC4;
+    --color-blue-700: #0F72A0;
+    --color-blue-800: #0A587C;
+    --color-blue-900: #06405A;
+
+    // Deep Travel Navy — premium headings, header, footer
+    --color-navy-50: #E8EDF2;
+    --color-navy-100: #C5D0E0;
+    --color-navy-200: #9DB0CA;
+    --color-navy-300: #7490B4;
+    --color-navy-400: #5579A4;
+    --color-navy-500: #366294;
+    --color-navy-600: #2C5686;
+    --color-navy-700: #1D416C;
+    --color-navy-800: #132D52;
+    --color-navy-900: #0B2D4D;
+
+    // Teal — secondary accents only
+    --color-teal-50: #F0FDFA;
+    --color-teal-100: #CCFBF1;
+    --color-teal-500: #14B8A6;
+    --color-teal-600: #12A594;
+    --color-teal-700: #0F8579;
+
+    // Warm Backgrounds
+    --color-warm-white: #FFFDF8;
+    --color-warm-sky: #EAF7FD;
+    --color-warm-sand: #FFF3E8;
+
+    // Text
+    --color-text-main: #172033;
+    --color-text-muted: #64748B;
+    --color-text-light: #94A3B8;
+
+    // Border
+    --color-line: #E6EAF0;
+
+    // Shadows
+    --shadow-sm: 0 1px 2px 0 rgba(11, 45, 77, 0.04);
+    --shadow-md: 0 4px 6px -1px rgba(11, 45, 77, 0.05), 0 2px 4px -2px rgba(11, 45, 77, 0.03);
+    --shadow-lg: 0 10px 15px -3px rgba(11, 45, 77, 0.06), 0 4px 6px -4px rgba(11, 45, 77, 0.02);
+    --shadow-card: 0 4px 20px rgba(11, 45, 77, 0.04);
+    --shadow-card-hover: 0 12px 32px rgba(11, 45, 77, 0.08);
+    --shadow-orange: 0 8px 24px rgba(243, 112, 33, 0.18);
+
+    // Border radius
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.25rem;
+    --radius-2xl: 1.5rem;
+
+    // Header
+    --header-height: 104px;
+    --header-height-mobile: 96px;
+}
+
 @import "core/misc";
-
-// Core Declarations
 @import "core/variables";
-
-// Core Layouts and Style Definitions
 @import "core/general";
 @import "core/typography";
 @import "core/utilities";
-
-// Core Components
 @import "core/components/button";
 @import "core/components/badge";
 @import "core/components/nav";
@@ -33,5 +99,41 @@
 @import "core/components/page-banner";
 @import "core/components/footer";
 
-// Core Plugins
-// @import "plugins/plugin-tailwind";
+html { scroll-behavior: smooth; }
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+*:focus-visible {
+    outline: 2px solid var(--color-orange-500);
+    outline-offset: 2px;
+}
+
+::selection {
+    background-color: var(--color-orange-100);
+    color: var(--color-orange-900);
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--color-warm-white); }
+::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: var(--radius-full); }
+::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+.text-balance { text-wrap: balance; }
+
+.header-spacer { padding-top: var(--header-height); }
+@media (max-width: 1023px) {
+    .header-spacer { padding-top: var(--header-height-mobile); }
+}

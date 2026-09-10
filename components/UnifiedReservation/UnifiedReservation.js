@@ -19,7 +19,7 @@ const TripCard = ({ trip, onSelect, onViewDetails, isMobile = false }) => (
         className="object-cover transition-transform duration-700 group-hover:scale-110"
         sizes="(max-width: 768px) 80vw, (max-width: 1024px) 50vw, 33vw"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-white/20 via-transparent to-transparent" />
 
       {/* Price Badge */}
       <div className="absolute top-4 left-4">
@@ -232,7 +232,7 @@ const UnifiedReservation = () => {
   }
 
   return (
-    <section className="relative py-16 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <section id="reservation-section" className="relative py-16 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-white to-blue-50/30"></div>

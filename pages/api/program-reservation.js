@@ -1,6 +1,8 @@
 import { Resend } from 'resend';
+import { PrismaClient } from '@prisma/client';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -29,6 +31,32 @@ export default async function handler(req, res) {
       return res.status(400).json({ 
         message: 'Veuillez remplir tous les champs obligatoires.' 
       });
+    }
+
+    try {
+      const localProgram = await prisma.localProgram.findUnique({
+        where: { id: tripId },
+        select: { id: true },
+      });
+
+      if (localProgram) {
+        await prisma.programReservation.create({
+          data: {
+            programId: localProgram.id,
+            firstName,
+            lastName,
+            email,
+            phone,
+            numberOfPersons: Number(numberOfPersons || 1),
+            roomType: roomType || null,
+            specialRequests: specialRequests || null,
+            preferredDate: preferredDate || null,
+            totalPrice: Number.isFinite(Number(totalPrice)) ? Number(totalPrice) : null,
+          },
+        });
+      }
+    } catch (reservationError) {
+      console.error('Error saving local program reservation:', reservationError);
     }
 
     // 2. Build the professional HTML email for the team
@@ -103,8 +131,8 @@ export default async function handler(req, res) {
 
     // 3. Send to your back-office
     await resend.emails.send({
-      from:    'Batouta Voyages <outgoing@batouta.tn>',
-      to:      ['outgoing.batouta@gmail.com'],   
+      from:    'Batouta Voyages <outgoing@batouta.com>',
+      to:      ['outgoing@batouta.com'],   
       subject: `Nouvelle réservation Voyage – ${firstName} ${lastName}`,
       html: teamEmailHtml,
     });
@@ -170,7 +198,7 @@ export default async function handler(req, res) {
                 <li>Finaliser votre réservation</li>
                 <li>Répondre à toutes vos questions</li>
               </ul>
-              <p><strong>Email:</strong> outgoing.batouta@gmail.com</p>
+              <p><strong>Email:</strong> outgoing@batouta.com</p>
               <p><strong>Téléphone:</strong> +216 XX XXX XXX</p>
             </div>
 
@@ -183,7 +211,7 @@ export default async function handler(req, res) {
 
           <div class="footer">
             <p>Batouta Voyages - Votre partenaire de confiance pour tous vos voyages</p>
-            <p>www.batouta.tn | outgoing.batouta@gmail.com</p>
+            <p>www.batouta.tn | outgoing@batouta.com</p>
           </div>
         </div>
       </body>
@@ -192,7 +220,7 @@ export default async function handler(req, res) {
 
     // 5. Acknowledge to the user
     await resend.emails.send({
-      from:    'Batouta Voyages <outgoing@batouta.tn>',
+      from:    'Batouta Voyages <outgoing@batouta.com>',
       to:      [email],
       subject: 'Votre demande de réservation de voyage a bien été reçue',
       html: clientEmailHtml

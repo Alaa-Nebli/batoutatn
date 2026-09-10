@@ -1,230 +1,255 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Icon } from '@iconify/react';
 
-export const VoyageForm = ({ trips, selectedTrip, formData, setFormData, setSelectedTrip, onSubmit, loading, calculatePrice }) => {
+export const VoyageForm = ({ 
+  trips = [], 
+  selectedTrip, 
+  formData, 
+  setFormData, 
+  setSelectedTrip, 
+  onSubmit, 
+  loading, 
+  calculatePrice 
+}) => {
+  
+  // Gestion de la saisie
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    // On s'assure que le nombre de personnes est bien un entier pour le calcul du prix
+    const val = name === 'numberOfPersons' ? parseInt(value, 10) : value;
+    setFormData(prev => ({ ...prev, [name]: val }));
   };
 
+  // Gestion du changement de voyage (Uniquement si plusieurs voyages sont disponibles)
   const handleTripSelect = (e) => {
     const tripId = e.target.value;
     const trip = trips.find(t => t.id === tripId);
     setSelectedTrip(trip);
+    setFormData(prev => ({ ...prev, tripId }));
   };
 
   const selectedTripData = selectedTrip || trips.find(trip => trip.id === formData.tripId);
+  const nightsCount = Number(selectedTripData?.nights ?? Math.max(Number(selectedTripData?.days || 1) - 1, 0));
+  const needsRoomType = Boolean(
+    selectedTripData &&
+    (nightsCount > 0 || ['WEEKEND', 'MULTI_DAY_CIRCUIT'].includes(selectedTripData.type))
+  );
+  const estimatedTotal = selectedTripData && typeof calculatePrice === 'function' ? calculatePrice() : 0;
+  const currency = selectedTripData?.currency || 'TND';
+  const ctaLabel = needsRoomType ? 'Demander disponibilite' : 'Reserver ma place';
+  const formatShortDate = (value) => {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
+  };
+  
+  // Si on passe un seul voyage en paramètre, on masque la sélection pour simplifier
+  const isSingleTrip = trips.length === 1;
+  const fieldGridClass = "grid grid-cols-1 sm:grid-cols-2 gap-3";
+  const labelClass = "block text-sm font-bold text-gray-900 mb-1.5 pl-0.5";
+  const inputClass = "w-full bg-gray-50 border border-gray-200 text-gray-900 text-base rounded-xl px-4 py-3 focus:ring-4 focus:ring-orange-600/10 focus:border-orange-600 focus:bg-white outline-none transition-all shadow-sm";
+  const selectClass = `${inputClass} cursor-pointer`;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden"
+      className="w-full font-sans"
       itemScope
       itemType="https://schema.org/TravelAction"
     >
-      {/* Minimal Header */}
-      <div className="px-8 py-6 border-b border-gray-100 bg-gradient-to-r from-orange-500 to-orange-400">
-        <div className="flex items-center">
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3">
-            <Icon icon="heroicons:globe-europe-africa" className="w-5 h-5 text-orange-600" />
-          </div>
-          <div>
-            <h2 className="text-lg mt-5 font-semibold text-white">Réservez votre prochaine aventure</h2>
-          </div>
-        </div>
-      </div>
-
-      <form onSubmit={onSubmit} className="p-8 space-y-6">
-        {/* Trip Selection */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            Programme sélectionné
-          </label>
-          <select
-            value={selectedTrip?.id || ''}
-            onChange={handleTripSelect}
-            className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-gray-50/50"
-            required
-          >
-            <option value="">Choisir un programme</option>
-            {trips.map(trip => (
-              <option key={trip.id} value={trip.id}>
-                {trip.title} - {trip.price?.toLocaleString('fr-FR')} TND
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Selected Trip Info - Minimalist */}
+      <form onSubmit={onSubmit} className="space-y-3.5">
         {selectedTripData && (
-          <div className="bg-orange-50 p-6 rounded-2xl border border-orange-100/50">
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <h4 className="font-semibold text-gray-900 mb-2">{selectedTripData.title}</h4>
-                <div className="flex items-center space-x-4 text-sm text-gray-600">
-                  <span className="flex items-center">
-                    <Icon icon="heroicons:calendar-days" className="w-4 h-4 mr-1" />
-                    {selectedTripData.days} jours
-                  </span>
-                  <span className="flex items-center">
-                    <Icon icon="heroicons:map-pin" className="w-4 h-4 mr-1" />
-                    {selectedTripData.location_to}
-                  </span>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-orange-600">
-                  {selectedTripData.price?.toLocaleString('fr-FR')}
-                  <span className="text-sm text-gray-500 ml-1">TND</span>
-                </p>
-              </div>
+          <div className="rounded-2xl border border-orange-100 bg-orange-50/70 p-4">
+            <p className="text-xs font-bold uppercase tracking-wide text-orange-700">
+              Programme selectionne
+            </p>
+            <p className="mt-1 text-base font-extrabold leading-snug text-gray-950">
+              {selectedTripData.title}
+            </p>
+            <div className="mt-3 grid grid-cols-2 gap-2 text-sm text-gray-700">
+              <span className="inline-flex items-center gap-1.5">
+                <Icon icon="mdi:account-group-outline" className="h-4 w-4 text-orange-600" />
+                {formData.numberOfPersons || 1} personne{Number(formData.numberOfPersons || 1) > 1 ? 's' : ''}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <Icon icon="mdi:calendar-range" className="h-4 w-4 text-orange-600" />
+                {selectedTripData.isDateFlexible
+                  ? 'Date flexible'
+                  : `${formatShortDate(selectedTripData.from_date)}${selectedTripData.to_date ? ` - ${formatShortDate(selectedTripData.to_date)}` : ''}`}
+              </span>
             </div>
           </div>
         )}
-
-        {/* Clean Form Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        {/* ── SÉLECTION DU VOYAGE (Caché si un seul voyage) ── */}
+        {!isSingleTrip && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Prénom</label>
+            <label className={labelClass}>
+              Programme sélectionné
+            </label>
+            <select
+              value={selectedTrip?.id || ''}
+              onChange={handleTripSelect}
+              className={selectClass}
+              required
+            >
+              <option value="">Choisir un programme</option>
+              {trips.map(trip => (
+                <option key={trip.id} value={trip.id}>
+                  {trip.title} - {trip.price?.toLocaleString('fr-FR')} TND
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {/* ── INFORMATIONS PERSONNELLES ── */}
+        <div className={needsRoomType ? fieldGridClass : "grid grid-cols-1 gap-3"}>
+          <div>
+            <label className={labelClass}>Prénom</label>
             <input
               type="text"
               name="firstName"
               value={formData.firstName}
               onChange={handleInputChange}
-              className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-gray-50/50"
-              placeholder="Votre prénom"
+              className={inputClass}
+              placeholder="Ex: Ali"
               required
-              itemProp="agent"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Nom</label>
+            <label className={labelClass}>Nom</label>
             <input
               type="text"
               name="lastName"
               value={formData.lastName}
               onChange={handleInputChange}
-              className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-gray-50/50"
-              placeholder="Votre nom"
+              className={inputClass}
+              placeholder="Ex: Ben Salah"
               required
             />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className={fieldGridClass}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-gray-50/50"
-              placeholder="votre@email.com"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Téléphone</label>
+            <label className={labelClass}>Téléphone</label>
             <input
               type="tel"
               name="phone"
               value={formData.phone}
               onChange={handleInputChange}
-              className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-gray-50/50"
-              placeholder="+216 99 999 999"
+              className={inputClass}
+              placeholder="Ex: 99 999 999"
+              required
+            />
+          </div>
+          <div>
+            <label className={labelClass}>Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              className={inputClass}
+              placeholder="votre@email.com"
               required
             />
           </div>
         </div>
 
-        {/* Trip Details */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* ── DÉTAILS DU VOYAGE ── */}
+        <div className={fieldGridClass}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Nombre de personnes</label>
+            <label className={labelClass}>Personnes</label>
             <select
               name="numberOfPersons"
               value={formData.numberOfPersons}
               onChange={handleInputChange}
-              className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-gray-50/50"
+              className={selectClass}
             >
-              {[1,2,3,4,5,6,7,8].map(num => (
+              {[1, 2, 3, 4, 5, 6, 7, 8].map(num => (
                 <option key={num} value={num}>{num} personne{num > 1 ? 's' : ''}</option>
               ))}
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">Type de chambre</label>
-            <select
-              name="roomType"
-              value={formData.roomType}
-              onChange={handleInputChange}
-              className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-gray-50/50"
-            >
-              <option value="double">Chambre double</option>
-              <option value="single">Chambre single</option>
-              <option value="triple">Chambre triple</option>
-            </select>
-          </div>
+          {needsRoomType && (
+            <div>
+              <label className={labelClass}>Type de chambre</label>
+              <select
+                name="roomType"
+                value={formData.roomType}
+                onChange={handleInputChange}
+                className={selectClass}
+              >
+                <option value="double">Chambre Double</option>
+                <option value="single">Chambre Individuelle (Single)</option>
+                <option value="triple">Chambre Triple</option>
+              </select>
+            </div>
+          )}
         </div>
 
-        {/* Special Requests */}
+        {/* ── DEMANDES SPÉCIALES ── */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">Demandes spéciales (optionnel)</label>
+          <label className={labelClass}>Demandes spéciales (Optionnel)</label>
           <textarea
             name="specialRequests"
             value={formData.specialRequests}
             onChange={handleInputChange}
-            rows="3"
-            className="w-full rounded-2xl border border-gray-200 px-4 py-3.5 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all duration-200 bg-gray-50/50 resize-none"
-            placeholder="Régimes alimentaires, préférences particulières..."
+            rows="2"
+            className={`${inputClass} resize-none`}
+            placeholder="Régime alimentaire, préférence de chambre..."
           />
         </div>
 
-        {/* Clean Price Summary */}
+        {/* ── RÉSUMÉ DU PRIX ESTIMÉ ── */}
         {selectedTripData && (
-          <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-700 mb-1">Prix total estimé</p>
-                <p className="text-xs text-gray-500">
-                  {formData.numberOfPersons} personne{formData.numberOfPersons > 1 ? 's' : ''} • {
-                    formData.roomType === 'double' ? 'Chambre double' : 
-                    formData.roomType === 'single' ? 'Chambre single' : 'Chambre triple'
-                  }
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-2xl font-bold text-gray-900" itemProp="priceSpecification">
-                  {calculatePrice().toLocaleString('fr-FR')}
-                  <span className="text-sm text-gray-500 ml-1">TND</span>
-                </p>
-              </div>
+          <div className="bg-gray-900 rounded-2xl p-4 mt-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xl shadow-gray-900/10">
+            <div>
+              <p className="text-gray-400 font-semibold mb-1 uppercase tracking-wider text-xs">Total indicatif</p>
+              <p className="text-white font-medium text-sm">
+                {formData.numberOfPersons} personne{formData.numberOfPersons > 1 ? 's' : ''} <span className="text-gray-500 mx-1">•</span> {
+                  needsRoomType
+                    ? formData.roomType === 'double' ? 'Chambre Double' : formData.roomType === 'single' ? 'Chambre Single' : 'Chambre Triple'
+                    : 'Place programme'
+                }
+              </p>
+            </div>
+            <div className="text-left sm:text-right">
+              <p className="text-2xl font-extrabold text-orange-500 leading-none" itemProp="priceSpecification">
+                {estimatedTotal.toLocaleString('fr-FR')}
+                <span className="text-base font-medium text-gray-400 ml-1.5">{currency}</span>
+              </p>
             </div>
           </div>
         )}
 
-        {/* Minimalist Submit Button */}
-        <div className="pt-2">
+        {/* ── BOUTON DE VALIDATION ── */}
+        <div className="pt-1">
           <button
             type="submit"
             disabled={loading || !selectedTripData}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-4 px-6 rounded-2xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            className="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-bold text-lg py-4 px-5 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2.5 shadow-lg shadow-orange-600/20"
           >
             {loading ? (
               <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                <span>Envoi en cours...</span>
+                <div className="w-5 h-5 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <span>Validation en cours...</span>
               </>
             ) : (
               <>
-                <Icon icon="heroicons:paper-airplane" className="w-4 h-4" />
-                <span>Envoyer la demande</span>
+                <Icon icon="mdi:paperplane" className="w-5 h-5" />
+                <span>{ctaLabel}</span>
               </>
             )}
           </button>
+        
         </div>
+
       </form>
     </motion.div>
   );

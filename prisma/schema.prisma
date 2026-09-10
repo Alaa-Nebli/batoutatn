@@ -36,6 +36,11 @@ model Trip {
   updatedAt         DateTime       @updatedAt
   generalConditions String
   priceInclude      String
+  priceExclude      String?        // New: non inclus
+  paymentConditions String?        // New: conditions de paiement
+  cancellationTerms String?        // New: conditions d'annulation
+  mapEmbedUrl       String?        // Google My Maps embed URL
+  hotels            Json?
   singleAdon        Int
   phone             String?
   whatsappNumber    String?        // WhatsApp number (optional, defaults to phone if not set)
@@ -68,34 +73,108 @@ model Featured {
 }
 
 model LocalProgram {
-  id            String            @id @default(cuid())
-  title         String            @unique
-  metadata      String?
-  description   String
-  images        Json
-  location_from String
-  location_to   String
-  days          Int
-  price         Float
-  from_date     DateTime
-  to_date       DateTime
-  createdAt     DateTime          @default(now())
-  updatedAt     DateTime          @updatedAt
-  timeline      ProgramTimeline[]
+  id                String       @id @default(cuid())
+  title             String
+  slug              String       @unique
+  type              String       @default("MULTI_DAY_CIRCUIT")
+  status            String       @default("PUBLISHED")
+  description       String
+  shortDescription  String?
+  highlights        Json?
+  images            Json
+  videoUrl          String?
+  location_from     String
+  location_to       String
+  meetingPoint      String?
+  destinations      Json?
+  days              Int
+  nights            Int
+  price             Float
+  priceLabel        String?
+  currency          String       @default("TND")
+  durationLabel     String?
+  from_date         DateTime
+  to_date           DateTime
+  isDateFlexible    Boolean      @default(false)
+  display           Boolean      @default(true)
+  featured          Boolean      @default(false)
+  sortOrder         Int          @default(0)
+  phone             String?
+  whatsappNumber    String?
+  includes          Json?
+  excludes          Json?
+  generalConditions Json?
+  paymentConditions Json?
+  cancellationTerms Json?
+  mapEmbedUrl       String?
+  hotels            Json?
+  singleAddonPrice  Float?
+  childPrice        Float?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  daysDetails       ProgramDay[]
+  reservations      ProgramReservation[]
+
+  @@index([display, status])
+  @@index([type])
+  @@index([featured])
+  @@index([sortOrder])
 }
 
-model ProgramTimeline {
-  id           String          @id @default(cuid())
-  programId    String
-  title        String
-  description  String
-  image        String?         // Keep for backward compatibility
-  date         DateTime
-  sortOrder    Int
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
-  localProgram LocalProgram    @relation(fields: [programId], references: [id], onDelete: Cascade)
-  images       TimelineImage[] // New: multiple images support
+model ProgramDay {
+  id         String            @id @default(cuid())
+  programId  String
+  program    LocalProgram      @relation(fields: [programId], references: [id], onDelete: Cascade)
+  dayNumber  Int
+  title      String
+  route      String
+  summary    String?
+  highlight  String?
+  hotel      String?
+  meals      Json?
+  tags       Json?
+  order      Int
+  activities ProgramActivity[]
+  createdAt  DateTime          @default(now())
+
+  @@index([programId, order])
+}
+
+model ProgramActivity {
+  id          String      @id @default(cuid())
+  dayId       String
+  day         ProgramDay  @relation(fields: [dayId], references: [id], onDelete: Cascade)
+  time        String?
+  title       String
+  description String?
+  type        String?
+  location    String?
+  order       Int
+  createdAt   DateTime    @default(now())
+
+  @@index([dayId, order])
+}
+
+model ProgramReservation {
+  id              String       @id @default(cuid())
+  programId       String
+  program         LocalProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  firstName       String
+  lastName        String
+  email           String
+  phone           String
+  numberOfPersons Int
+  roomType        String?
+  specialRequests String?
+  preferredDate   String?
+  totalPrice      Float?
+  status          String       @default("PENDING")
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  @@index([programId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model TimelineImage {
@@ -108,13 +187,10 @@ model TimelineImage {
   
   // Relations - one image can belong to either trip timeline OR program timeline
   tripTimelineId    String?
-  programTimelineId String?
   
   tripTimeline      TripTimeline?    @relation(fields: [tripTimelineId], references: [id], onDelete: Cascade)
-  programTimeline   ProgramTimeline? @relation(fields: [programTimelineId], references: [id], onDelete: Cascade)
   
   @@index([tripTimelineId])
-  @@index([programTimelineId])
 }
 
 enum UserRole {

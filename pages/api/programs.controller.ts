@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 import multer from 'multer';
 import { createClient } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
@@ -68,6 +68,20 @@ const deleteFromSupabase = async (url: string) => {
   } catch (error) {
     console.error('Error deleting file:', error);
   }
+};
+
+const normalizeHotels = (hotels: any): Prisma.InputJsonValue | typeof Prisma.JsonNull => {
+  if (!Array.isArray(hotels)) return Prisma.JsonNull;
+
+  const normalized = hotels
+    .map((hotel: any) => ({
+      name: String(hotel?.name || '').trim(),
+      website: String(hotel?.website || '').trim(),
+      image: String(hotel?.image || '').trim(),
+    }))
+    .filter((hotel: any) => hotel.name);
+
+  return normalized.length > 0 ? normalized : Prisma.JsonNull;
 };
 
 export const createProgram = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -162,6 +176,14 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
           from_date: fromDate.toISOString(),
           to_date: toDate.toISOString(),
           display: programData.display ?? true, // Default to true if not specified
+          phone: programData.phone || null,
+          priceInclude: programData.priceInclude || null,
+          priceExclude: programData.priceExclude || null,
+          paymentConditions: programData.paymentConditions || null,
+          cancellationTerms: programData.cancellationTerms || null,
+          mapEmbedUrl: programData.mapEmbedUrl || null,
+          hotels: normalizeHotels(programData.hotels),
+          generalConditions: programData.generalConditions || null,
           timeline: {
             create: programData.timeline?.map((item: any, index: number) => {
               return {
@@ -173,9 +195,6 @@ export const createProgram = async (req: NextApiRequest, res: NextApiResponse) =
               };
             }) || []
           },
-          phone: programData.phone || null,
-          priceInclude: programData.priceInclude || null,
-          generalConditions: programData.generalConditions || null,
         },
         include: {
           timeline: true
@@ -332,6 +351,11 @@ export const updateProgram = async (req: NextApiRequest, res: NextApiResponse) =
           display: programData.display ?? existing.display,
           phone: programData.phone || null,
           priceInclude: programData.priceInclude || null,
+          priceExclude: programData.priceExclude || null,
+          paymentConditions: programData.paymentConditions || null,
+          cancellationTerms: programData.cancellationTerms || null,
+          mapEmbedUrl: programData.mapEmbedUrl || null,
+          hotels: normalizeHotels(programData.hotels),
           generalConditions: programData.generalConditions || null,
           timeline: { deleteMany: {}, create: timelineCreate },
         },

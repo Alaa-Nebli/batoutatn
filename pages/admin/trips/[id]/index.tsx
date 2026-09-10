@@ -21,6 +21,12 @@ interface TimelineItem {
   date: string;
   image: string;
 }
+
+interface HotelItem {
+  name: string;
+  website: string;
+  image: string;
+}
 interface FormData {
   title: string;
   metadata: string;
@@ -35,6 +41,11 @@ interface FormData {
   timeline: TimelineItem[];
   display: boolean;
   priceInclude: string;
+  priceExclude: string;
+  paymentConditions: string;
+  cancellationTerms: string;
+  mapEmbedUrl: string;
+  hotels: HotelItem[];
   generalConditions: string;
   existingImages: string[];
   phone: string;
@@ -69,6 +80,11 @@ export default function EditProgram() {
     timeline: [],
     display: true,
     priceInclude: "",
+    priceExclude: "",
+    paymentConditions: "",
+    cancellationTerms: "",
+    mapEmbedUrl: "",
+    hotels: [],
     generalConditions: "",
     existingImages: [],
     phone: "",
@@ -116,6 +132,11 @@ export default function EditProgram() {
           })),
           display:           !!data.display,
           priceInclude:      data.priceInclude ?? "",
+          priceExclude:      data.priceExclude ?? "",
+          paymentConditions: data.paymentConditions ?? "",
+          cancellationTerms: data.cancellationTerms ?? "",
+          mapEmbedUrl:       data.mapEmbedUrl ?? "",
+          hotels:            Array.isArray(data.hotels) ? data.hotels : [],
           generalConditions: data.generalConditions ?? "",
           existingImages:    data.images ?? [],
           phone:             data.phone  ?? "",
@@ -161,7 +182,35 @@ export default function EditProgram() {
   /* WYSIWYG */
   const setDescription       = (v: string) => setFormData(p => ({ ...p, description: v }));
   const setPriceInclude      = (v: string) => setFormData(p => ({ ...p, priceInclude: v }));
+  const setPriceExclude      = (v: string) => setFormData(p => ({ ...p, priceExclude: v }));
+  const setPaymentConditions = (v: string) => setFormData(p => ({ ...p, paymentConditions: v }));
+  const setCancellationTerms = (v: string) => setFormData(p => ({ ...p, cancellationTerms: v }));
   const setGeneralConditions = (v: string) => setFormData(p => ({ ...p, generalConditions: v }));
+
+  const setHotelField = (index: number, field: keyof HotelItem, value: string) => {
+    setFormData((prev) => {
+      const hotels = [...prev.hotels];
+      hotels[index] = {
+        ...(hotels[index] || { name: '', website: '', image: '' }),
+        [field]: value,
+      };
+      return { ...prev, hotels };
+    });
+  };
+
+  const addHotel = () => {
+    setFormData((prev) => ({
+      ...prev,
+      hotels: [...prev.hotels, { name: '', website: '', image: '' }],
+    }));
+  };
+
+  const removeHotel = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      hotels: prev.hotels.filter((_, i) => i !== index),
+    }));
+  };
 
   /* timeline title / desc */
   const setTlTitle = (idx: number, v: string) => setFormData(p => {
@@ -257,6 +306,13 @@ const handleSubmit = async (e: React.FormEvent) => {
       singleAdon: parseInt(formData.singleAdon) || 0,
       from_date: formData.fromDate,
       to_date: formData.toDate,
+      priceInclude: formData.priceInclude,
+      priceExclude: formData.priceExclude,
+      paymentConditions: formData.paymentConditions,
+      cancellationTerms: formData.cancellationTerms,
+      mapEmbedUrl: formData.mapEmbedUrl,
+      hotels: formData.hotels.filter((hotel) => hotel.name.trim()),
+      generalConditions: formData.generalConditions,
       timeline: formData.timeline.map((item, idx) => ({
         ...item,
         sortOrder: idx + 1,
@@ -453,6 +509,67 @@ const handleSubmit = async (e: React.FormEvent) => {
           </section>
 
           {/* -------------------------------------------------- */}
+          {/*  Hotels                                            */}
+          {/* -------------------------------------------------- */}
+          <section className="p-4 bg-gray-50 rounded-lg border">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-xl font-semibold flex items-center">
+                <Icon icon="mdi:bed" className="w-5 h-5 mr-2 text-indigo-600" />
+                Hotels du voyage
+              </h2>
+              <button
+                type="button"
+                onClick={addHotel}
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+              >
+                <Icon icon="mdi:plus" className="w-4 h-4" /> Ajouter
+              </button>
+            </div>
+
+            {formData.hotels.length === 0 ? (
+              <p className="text-sm text-gray-500">Ajoutez les hotels possibles avec un lien et/ou une image.</p>
+            ) : (
+              <div className="space-y-3">
+                {formData.hotels.map((hotel, index) => (
+                  <div key={index} className="grid md:grid-cols-3 gap-3 p-3 rounded-lg border border-gray-200 bg-white">
+                    <input
+                      type="text"
+                      value={hotel.name}
+                      onChange={(e) => setHotelField(index, 'name', e.target.value)}
+                      placeholder="Nom de l'hotel"
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                    />
+                    <input
+                      type="url"
+                      value={hotel.website}
+                      onChange={(e) => setHotelField(index, 'website', e.target.value)}
+                      placeholder="Lien hotel (optionnel)"
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                    />
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="url"
+                        value={hotel.image}
+                        onChange={(e) => setHotelField(index, 'image', e.target.value)}
+                        placeholder="Image URL (optionnel)"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeHotel(index)}
+                        className="p-2 rounded-md border border-red-200 text-red-600 hover:bg-red-50"
+                        aria-label="Supprimer hotel"
+                      >
+                        <Icon icon="mdi:trash-can-outline" className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* -------------------------------------------------- */}
           {/*  Metadata                                          */}
           {/* -------------------------------------------------- */}
           <section>
@@ -601,16 +718,71 @@ const handleSubmit = async (e: React.FormEvent) => {
           </section>
 
           {/* -------------------------------------------------- */}
-          {/*  Price include & general conditions                */}
+          {/*  Price options & conditions                       */}
           {/* -------------------------------------------------- */}
-          <section>
-            <label className="block mb-2 font-medium">What&lsquo;s included</label>
-            <ReactQuill value={formData.priceInclude} onChange={setPriceInclude} />
+          <section className="space-y-6">
+            <div>
+              <label className="block mb-2 font-medium">Ce qui est inclus (Inclus)</label>
+              <ReactQuill value={formData.priceInclude} onChange={setPriceInclude} />
+            </div>
+
+            <div>
+              <label className="block mb-2 font-medium">Ce qui n&lsquo;est pas inclus (Non Inclus)</label>
+              <ReactQuill value={formData.priceExclude} onChange={setPriceExclude} />
+            </div>
+
+            <div>
+              <label className="block mb-2 font-medium">Conditions de paiement</label>
+              <ReactQuill value={formData.paymentConditions} onChange={setPaymentConditions} />
+            </div>
+
+            <div>
+              <label className="block mb-2 font-medium">Conditions d&lsquo;annulation et de remboursement</label>
+              <ReactQuill value={formData.cancellationTerms} onChange={setCancellationTerms} />
+            </div>
+
+            <div>
+              <label className="block mb-2 font-medium">Conditions générales</label>
+              <ReactQuill value={formData.generalConditions} onChange={setGeneralConditions} />
+            </div>
           </section>
 
-          <section>
-            <label className="block mb-2 font-medium">General conditions</label>
-            <ReactQuill value={formData.generalConditions} onChange={setGeneralConditions} />
+          {/* -------------------------------------------------- */}
+          {/*  Map Data                                          */}
+          {/* -------------------------------------------------- */}
+          <section className="p-4 bg-gray-50 rounded-lg border">
+            <h2 className="text-xl font-semibold mb-2 flex items-center">
+              <Icon icon="mdi:map" className="w-5 h-5 mr-2 text-blue-600" />
+              Carte de l&lsquo;itinéraire (Google My Maps)
+            </h2>
+            <p className="text-sm text-gray-500 mb-3">
+              Créez une carte sur{" "}
+              <a href="https://www.google.com/maps/d/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                Google My Maps
+              </a>
+              , puis collez le lien d&lsquo;intégration ici.
+            </p>
+            <input
+              type="url"
+              name="mapEmbedUrl"
+              value={formData.mapEmbedUrl}
+              onChange={onSimpleChange}
+              placeholder="https://www.google.com/maps/d/embed?mid=..."
+              className="w-full rounded-lg border px-4 py-2 focus:ring-2 focus:ring-blue-500"
+            />
+            {formData.mapEmbedUrl && (
+              <div className="mt-3 rounded-lg overflow-hidden border">
+                <iframe
+                  src={formData.mapEmbedUrl}
+                  width="100%"
+                  height="300"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  title="Aperçu carte"
+                />
+              </div>
+            )}
           </section>
 
           {/* -------------------------------------------------- */}
@@ -645,7 +817,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-2 bg-blue black rounded-lg hover:bg-blue-700 "
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? (
                 <span className="flex items-center">

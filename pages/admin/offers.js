@@ -195,16 +195,19 @@ export default function OfferDetails() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Call To Action Text</label>
+            <label className="block text-sm font-medium mb-2">Redirect URL</label>
             <input
               type="text"
               name="cta"
               value={formData.cta}
               onChange={handleInputChange}
-              placeholder="e.g., Book Now, Learn More, Explore"
+              placeholder="e.g., /programs/trip-id or https://example.com"
               className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
+            <p className="mt-1 text-xs text-gray-500">
+              This is where the banner image redirects when clicked. If left as old text, the banner falls back to the selected trip page.
+            </p>
           </div>
 
           <div className="flex justify-end gap-4 pt-4 border-t">

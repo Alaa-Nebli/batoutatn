@@ -12,6 +12,7 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('programs');
   const [stats, setStats] = useState({
     programs: [],
+    locals: [],
     featured: []
   });
 
@@ -34,8 +35,18 @@ export default function Dashboard() {
     }
   };
 
+  const fetchLocalPrograms = async () => {
+    try {
+      const response = await axios.get('/api/locals');
+      setStats(prev => ({ ...prev, locals: response.data }));
+    } catch (error) {
+      console.error('Error fetching local programs:', error);
+    }
+  };
+
   useEffect(() => {
     fetchPrograms();
+    fetchLocalPrograms();
     fetchFeatured();
   }, []);
 
@@ -74,6 +85,21 @@ export default function Dashboard() {
         }
       } catch (error) {
         console.error('Error deleting featured item:', error);
+      }
+    }
+  };
+
+  const handleDeleteLocalProgram = async (id) => {
+    if (confirm('Are you sure you want to delete this Programme en Tunisie?')) {
+      try {
+        const response = await fetch(`/api/locals?id=${id}`, {
+          method: 'DELETE'
+        });
+        if (response.ok) {
+          fetchLocalPrograms();
+        }
+      } catch (error) {
+        console.error('Error deleting local program:', error);
       }
     }
   };
@@ -165,6 +191,40 @@ export default function Dashboard() {
           ))}
         </div>
       );
+    } else if (activeTab === 'locals') {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {items.map((item) => (
+            <div key={item.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-lg font-semibold">{item.title}</h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => router.push(`/admin/programs?edit=${item.id}`)}
+                    className="p-2 hover:bg-gray-100 rounded-full"
+                  >
+                    <Icon icon="mdi:pencil" className="w-5 h-5 text-blue-600" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteLocalProgram(item.id)}
+                    className="p-2 hover:bg-gray-100 rounded-full"
+                  >
+                    <Icon icon="mdi:trash" className="w-5 h-5 text-red-500" />
+                  </button>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600">{item.location_from} → {item.location_to}</p>
+              <p className="mt-1 text-sm text-gray-600">{item.days} days</p>
+              <p className="mt-2 font-semibold">{item.price} TND</p>
+              <Link href={`/programmes-en-tunisie/${item.slug || item.id}`}>
+                <span className="text-blue-500 hover:underline block mt-2 text-sm">
+                  View Programme en Tunisie
+                </span>
+              </Link>
+            </div>
+          ))}
+        </div>
+      );
     }
   };
 
@@ -175,11 +235,18 @@ export default function Dashboard() {
           <h1 className="text-2xl font-bold">Batouta Voyages Dashboard</h1>
           <div className="flex gap-4">
             <button
-              onClick={() => router.push(`/admin/programs/new`)}
+              onClick={() => router.push(`/admin/trips`)}
               className="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
             >
               <Icon icon="mdi:plus-circle" className="w-5 h-5" />
               Add New Program
+            </button>
+            <button
+              onClick={() => router.push(`/admin/programs`)}
+              className="flex items-center gap-2 bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600"
+            >
+              <Icon icon="mdi:map-marker-path" className="w-5 h-5" />
+              Programme en Tunisie
             </button>
             <button
               onClick={() => router.push(`/admin/featured/new`)}
@@ -195,6 +262,10 @@ export default function Dashboard() {
           <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="font-semibold text-gray-600">Programs</h3>
             <p className="text-3xl font-bold mt-2">{stats.programs?.length || 0}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="font-semibold text-gray-600">Programme en Tunisie</h3>
+            <p className="text-3xl font-bold mt-2">{stats.locals?.length || 0}</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6">
             <h3 className="font-semibold text-gray-600">Featured Items</h3>
@@ -225,6 +296,16 @@ export default function Dashboard() {
             }`}
           >
             Featured
+          </button>
+          <button
+            onClick={() => setActiveTab('locals')}
+            className={`px-4 py-2 rounded-lg ${
+              activeTab === 'locals'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200'
+            }`}
+          >
+            Programme en Tunisie
           </button>
         </div>
 

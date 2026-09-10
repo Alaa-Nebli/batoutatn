@@ -367,7 +367,7 @@
       "phone_title": "Appelez-nous",
       "phone": "(+216) 71 802 881",
       "email_title": "Envoyez-nous un email",
-      "email": "reservation.batouta@gmail.com"
+      "email": "outgoing@batouta.com"
     },
     "Email_form": {
       "form_title": "Envoyez-nous un message",
@@ -396,6 +396,7 @@
     "designed_by": "Conçu par"
   },
   "common": {
-    "Popular Excursions": "Excursions Populaire"
+    "Popular Excursions": "Excursions Populaires",
+    "Discover More": "Découvrez Plus"
   }
 }
